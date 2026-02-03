@@ -1,0 +1,11 @@
+# Files to ignore based on OS
+{{ if ne .chezmoi.os "darwin" }}
+# Ignore macOS-specific files on non-macOS systems
+.chezmoiscripts/darwin/**
+{{ end }}
+
+# General ignores
+README.md
+LICENSE
+.git
+.github

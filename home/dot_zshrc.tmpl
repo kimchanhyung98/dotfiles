@@ -1,0 +1,53 @@
+# ~/.zshrc
+# Managed by chezmoi
+
+# Homebrew
+{{ if eq .chezmoi.os "darwin" }}
+{{ if .isAppleSilicon }}
+eval "$(/opt/homebrew/bin/brew shellenv)"
+{{ else }}
+eval "$(/usr/local/bin/brew shellenv)"
+{{ end }}
+{{ end }}
+
+# History
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+
+# Key bindings
+bindkey -e
+bindkey '^[[A' history-search-backward
+bindkey '^[[B' history-search-forward
+
+# Aliases
+alias ll='ls -la'
+alias la='ls -A'
+alias l='ls -CF'
+
+# Git aliases
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit'
+alias gp='git push'
+alias gl='git pull'
+alias gd='git diff'
+alias gco='git checkout'
+alias gb='git branch'
+
+# Path
+export PATH="$HOME/.local/bin:$PATH"
+
+# Editor
+export EDITOR="vim"
+export VISUAL="vim"
+
+# Prompt (basic)
+autoload -Uz vcs_info
+precmd() { vcs_info }
+zstyle ':vcs_info:git:*' formats '%b '
+setopt PROMPT_SUBST
+PROMPT='%F{green}%n@%m%f:%F{blue}%~%f %F{yellow}${vcs_info_msg_0_}%f$ '
