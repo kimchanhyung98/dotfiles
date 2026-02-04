@@ -1,0 +1,40 @@
+{{/* chezmoi configuration template */}}
+{{/* macOS (Intel & Apple Silicon) only */}}
+
+{{- $name := "YOUR_NAME" -}}
+{{- $email := "YOUR_EMAIL" -}}
+
+{{/* Detect macOS architecture */}}
+{{- $isAppleSilicon := false -}}
+{{- if eq .chezmoi.os "darwin" -}}
+{{-   if eq .chezmoi.arch "arm64" -}}
+{{-     $isAppleSilicon = true -}}
+{{-   end -}}
+{{- end -}}
+
+{{/* Homebrew path varies by architecture */}}
+{{- $homebrewPrefix := "/usr/local" -}}
+{{- if $isAppleSilicon -}}
+{{-   $homebrewPrefix = "/opt/homebrew" -}}
+{{- end -}}
+
+{{/* Work around unreliable hostname on macOS */}}
+{{- $hostname := .chezmoi.hostname -}}
+{{- if eq .chezmoi.os "darwin" -}}
+{{-   $hostname = output "scutil" "--get" "LocalHostName" | trim -}}
+{{- end -}}
+
+{{/* Interactive prompts for personalization */}}
+{{- if stdinIsATTY -}}
+{{-   $name = promptStringOnce . "name" "Full name" -}}
+{{-   $email = promptStringOnce . "email" "Email address" -}}
+{{- end -}}
+
+sourceDir = {{ .chezmoi.sourceDir | quote }}
+
+[data]
+    name = {{ $name | quote }}
+    email = {{ $email | quote }}
+    hostname = {{ $hostname | quote }}
+    isAppleSilicon = {{ $isAppleSilicon }}
+    homebrewPrefix = {{ $homebrewPrefix | quote }}

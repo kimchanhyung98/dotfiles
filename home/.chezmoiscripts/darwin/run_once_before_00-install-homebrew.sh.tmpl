@@ -1,0 +1,27 @@
+#!/bin/bash
+# {{ template "scripts-library" }}
+#
+# Install Homebrew (macOS only)
+# Runs once on first setup
+
+{{ if ne .chezmoi.os "darwin" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "Checking Homebrew installation..."
+
+if ! command -v brew &>/dev/null; then
+    echo "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    # Configure shell environment for Homebrew
+    {{ if .isAppleSilicon }}
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+    {{ else }}
+    eval "$(/usr/local/bin/brew shellenv)"
+    {{ end }}
+else
+    echo "Homebrew is already installed."
+fi
