@@ -31,10 +31,6 @@ init: ## Setup Project environment
 		echo "[init] Checking macOS permissions"; \
 		bash .claude/hooks/check-permissions.sh || true; \
 	fi
-	@if command -v claude >/dev/null 2>&1; then \
-		echo "[init] Setting up claude-hud"; \
-		claude -p "/claude-hud:setup" --model=sonnet --dangerously-skip-permissions || true; \
-	fi
 	@if ! command -v docker >/dev/null 2>&1; then \
 		echo "[init] 'docker' not found"; \
 		exit 1; \
