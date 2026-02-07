@@ -102,7 +102,7 @@
   "spinnerTipsEnabled": false,
   "alwaysThinkingEnabled": true,
   "companyAnnouncements": [
-    "\nWelcome to base!\nRun 'make init' on first launch."
+    "\nWelcome to dotfiles!\nRun 'make init' on first launch."
   ],
   "autoUpdatesChannel": "latest"
 }

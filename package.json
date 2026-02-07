@@ -1,7 +1,7 @@
 {
-  "name": "base",
+  "name": "dotfiles",
   "version": "1.0.0",
-  "description": "Base project template with automated Git hooks and commit validation",
+  "description": "macOS dotfiles managed with chezmoi",
   "author": "kimchanhyung98",
   "scripts": {
     "prepare": "husky"
