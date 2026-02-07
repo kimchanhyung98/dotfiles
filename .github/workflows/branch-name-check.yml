@@ -10,7 +10,21 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Check branch name
+      - name: Check bot user
+        id: bot-check
+        env:
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          echo "PR author: $PR_AUTHOR"
+          if [[ "$PR_AUTHOR" == *"[bot]"* ]]; then
+            echo "✓ Bot user detected - skipping validation"
+            echo "is_bot=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_bot=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate branch name
+        if: steps.bot-check.outputs.is_bot == 'false'
         env:
           BRANCH: ${{ github.head_ref }}
         run: |
