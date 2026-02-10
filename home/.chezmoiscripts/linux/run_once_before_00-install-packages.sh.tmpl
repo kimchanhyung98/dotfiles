@@ -41,7 +41,9 @@ elif command -v dnf &>/dev/null; then
 elif command -v yum &>/dev/null; then
     sudo yum install -y -q "${install_needed[@]}"
 else
-    echo "Warning: Could not detect package manager. Please install manually: ${install_needed[*]}"
+    echo "Warning: No supported package manager found (apt-get, dnf, yum)."
+    echo "Please install the following packages manually: ${install_needed[*]}"
+    exit 1
 fi
 
 echo "Essential packages installation complete."
