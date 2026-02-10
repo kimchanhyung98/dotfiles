@@ -1,0 +1,47 @@
+#!/bin/bash
+#
+# Install essential packages (Linux only)
+# Runs once on first setup
+
+{{ if ne .chezmoi.os "linux" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "Checking essential packages..."
+
+packages=(
+    curl
+    git
+    vim
+    zsh
+)
+
+install_needed=()
+
+for pkg in "${packages[@]}"; do
+    if ! command -v "$pkg" &>/dev/null; then
+        install_needed+=("$pkg")
+    fi
+done
+
+if [ ${#install_needed[@]} -eq 0 ]; then
+    echo "All essential packages are already installed."
+    exit 0
+fi
+
+echo "Installing packages: ${install_needed[*]}"
+
+if command -v apt-get &>/dev/null; then
+    sudo apt-get update -qq
+    sudo apt-get install -y -qq "${install_needed[@]}"
+elif command -v dnf &>/dev/null; then
+    sudo dnf install -y -q "${install_needed[@]}"
+elif command -v yum &>/dev/null; then
+    sudo yum install -y -q "${install_needed[@]}"
+else
+    echo "Warning: Could not detect package manager. Please install manually: ${install_needed[*]}"
+fi
+
+echo "Essential packages installation complete."
