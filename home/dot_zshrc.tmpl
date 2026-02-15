@@ -1,12 +1,12 @@
 # ~/.zshrc
 # Managed by chezmoi
 
-# Homebrew
+# zerobrew
 {{ if eq .chezmoi.os "darwin" }}
 {{ if .isAppleSilicon }}
-eval "$(/opt/homebrew/bin/brew shellenv)"
+eval "$(/opt/zerobrew/bin/zb shellenv)"
 {{ else }}
-eval "$(/usr/local/bin/brew shellenv)"
+eval "$(/usr/local/zerobrew/bin/zb shellenv)"
 {{ end }}
 {{ end }}
 

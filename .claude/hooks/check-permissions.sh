@@ -19,7 +19,7 @@ if ! command -v terminal-notifier &>/dev/null; then
     echo ""
 
     if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-        brew install terminal-notifier
+        zb install terminal-notifier
     fi
 fi
 
