@@ -18,8 +18,19 @@ if ! command -v terminal-notifier &>/dev/null; then
     read -n 1 -r -t 10 || true
     echo ""
 
+    install_cmd=()
+    if command -v zb &>/dev/null; then
+        install_cmd=(zb install)
+    elif command -v brew &>/dev/null; then
+        install_cmd=(brew install)
+    fi
+
     if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-        zb install terminal-notifier
+        if [[ ${#install_cmd[@]} -gt 0 ]]; then
+            "${install_cmd[@]}" terminal-notifier
+        else
+            echo "zb/brew를 찾지 못했습니다. terminal-notifier를 수동으로 설치해주세요."
+        fi
     fi
 fi
 

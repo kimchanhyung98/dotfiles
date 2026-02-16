@@ -1,13 +1,19 @@
 # ~/.zshrc
 # Managed by chezmoi
 
-# zerobrew
+# Homebrew (base)
 {{ if eq .chezmoi.os "darwin" }}
 {{ if .isAppleSilicon }}
-eval "$(/opt/zerobrew/bin/zb shellenv)"
+eval "$(/opt/homebrew/bin/brew shellenv)"
 {{ else }}
-eval "$(/usr/local/zerobrew/bin/zb shellenv)"
+eval "$(/usr/local/bin/brew shellenv)"
 {{ end }}
+
+# zerobrew: faster package manager, fallback to Homebrew
+if command -v zb &>/dev/null; then
+    alias brew='zb'
+    pkg_install() { zb install "$@" || command brew install "$@"; }
+fi
 {{ end }}
 
 # History

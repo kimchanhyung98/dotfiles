@@ -1,0 +1,41 @@
+#!/bin/bash
+#
+# Install zerobrew (macOS only)
+# Runs once on first setup, after Homebrew
+
+{{ if ne .chezmoi.os "darwin" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "Checking zerobrew installation..."
+
+ensure_zb_available() {
+    if command -v zb &>/dev/null; then
+        return 0
+    fi
+
+    for candidate in "$HOME/.local/bin/zb" "/opt/zerobrew/bin/zb" "/usr/local/zerobrew/bin/zb"; do
+        if [ -x "$candidate" ]; then
+            export PATH="$(dirname "$candidate"):$PATH"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+if ! command -v zb &>/dev/null; then
+    echo "Installing zerobrew..."
+    # See: https://github.com/lucasgelfond/zerobrew
+    curl -fsSL https://zerobrew.rs/install | bash
+fi
+
+if ensure_zb_available; then
+    echo "zerobrew is ready: $(command -v zb)"
+else
+    echo "Error: zerobrew was installed but 'zb' command is not available."
+    echo "Please add zerobrew bin directory to PATH and re-run."
+    exit 1
+fi

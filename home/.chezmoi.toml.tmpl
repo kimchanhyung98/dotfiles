@@ -12,10 +12,10 @@
 {{-   end -}}
 {{- end -}}
 
-{{/* zerobrew path varies by architecture */}}
-{{- $zerobrewPrefix := "/usr/local/zerobrew" -}}
+{{/* Homebrew path varies by architecture */}}
+{{- $homebrewPrefix := "/usr/local" -}}
 {{- if $isAppleSilicon -}}
-{{-   $zerobrewPrefix = "/opt/zerobrew" -}}
+{{-   $homebrewPrefix = "/opt/homebrew" -}}
 {{- end -}}
 
 {{/* Work around unreliable hostname on macOS */}}
@@ -37,4 +37,4 @@ sourceDir = {{ .chezmoi.sourceDir | quote }}
     email = {{ $email | quote }}
     hostname = {{ $hostname | quote }}
     isAppleSilicon = {{ $isAppleSilicon }}
-    zerobrewPrefix = {{ $zerobrewPrefix | quote }}
+    homebrewPrefix = {{ $homebrewPrefix | quote }}
