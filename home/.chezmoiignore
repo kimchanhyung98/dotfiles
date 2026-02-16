@@ -4,6 +4,11 @@
 .chezmoiscripts/darwin/**
 {{ end }}
 
+{{ if ne .chezmoi.os "linux" }}
+# Ignore Linux-specific files on non-Linux systems
+.chezmoiscripts/linux/**
+{{ end }}
+
 # General ignores
 README.md
 LICENSE
