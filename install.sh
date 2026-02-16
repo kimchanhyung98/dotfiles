@@ -24,11 +24,14 @@ echo_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Check if running on macOS
-if [[ "$(uname -s)" != "Darwin" ]]; then
-    echo_error "This script is designed for macOS only."
+# Check if running on a supported OS
+OS="$(uname -s)"
+if [[ "$OS" != "Darwin" && "$OS" != "Linux" ]]; then
+    echo_error "This script supports macOS and Linux only."
     exit 1
 fi
+
+echo_info "Detected OS: $OS"
 
 echo_info "Starting dotfiles installation..."
 

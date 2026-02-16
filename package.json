@@ -1,7 +1,7 @@
 {
   "name": "dotfiles",
   "version": "1.0.0",
-  "description": "macOS dotfiles managed with chezmoi",
+  "description": "dotfiles managed with chezmoi (macOS & Linux)",
   "author": "kimchanhyung98",
   "scripts": {
     "prepare": "husky"
