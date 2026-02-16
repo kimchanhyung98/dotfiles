@@ -26,16 +26,20 @@ ensure_zb_available() {
     return 1
 }
 
-if ! command -v zb &>/dev/null; then
-    echo "Installing zerobrew..."
-    # See: https://github.com/lucasgelfond/zerobrew
-    curl -fsSL https://zerobrew.rs/install | bash
+if ensure_zb_available; then
+    echo "zerobrew is already installed: $(command -v zb)"
+    exit 0
 fi
+
+echo "Installing zerobrew..."
+# See: https://github.com/lucasgelfond/zerobrew
+installer=$(mktemp)
+curl -fsSL https://zerobrew.rs/install -o "$installer"
+bash "$installer"
+rm -f "$installer"
 
 if ensure_zb_available; then
     echo "zerobrew is ready: $(command -v zb)"
 else
-    echo "Error: zerobrew was installed but 'zb' command is not available."
-    echo "Please add zerobrew bin directory to PATH and re-run."
-    exit 1
+    echo "Warning: zerobrew installation failed. Homebrew will be used as fallback."
 fi

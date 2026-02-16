@@ -8,11 +8,15 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 {{ else }}
 eval "$(/usr/local/bin/brew shellenv)"
 {{ end }}
+{{ end }}
 
+# Path
+export PATH="$HOME/.local/bin:$PATH"
+
+{{ if eq .chezmoi.os "darwin" }}
 # zerobrew: faster package manager, fallback to Homebrew
 if command -v zb &>/dev/null; then
-    alias brew='zb'
-    pkg_install() { zb install "$@" || command brew install "$@"; }
+    pkg_install() { zb install "$@" || \brew install "$@"; }
 fi
 {{ end }}
 
@@ -43,9 +47,6 @@ alias gl='git pull'
 alias gd='git diff'
 alias gco='git checkout'
 alias gb='git branch'
-
-# Path
-export PATH="$HOME/.local/bin:$PATH"
 
 # Editor
 export EDITOR="vim"
