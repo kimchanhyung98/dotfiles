@@ -1,0 +1,34 @@
+#!/bin/bash
+#
+# Git baseline: user config, SSH basics
+# Re-applies when this script changes
+
+{{ if ne .chezmoi.os "linux" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "=== Git Baseline ==="
+
+# Git user config (handled by dot_gitconfig.tmpl, verify only)
+if git config --global user.name &>/dev/null; then
+    echo "Git user: $(git config --global user.name) <$(git config --global user.email)>"
+else
+    echo "Warning: Git user not configured. Check ~/.gitconfig"
+fi
+
+# SSH key basics
+SSH_DIR="$HOME/.ssh"
+if [ ! -d "$SSH_DIR" ]; then
+    echo "Creating SSH directory..."
+    mkdir -p "$SSH_DIR"
+    chmod 700 "$SSH_DIR"
+fi
+
+if [ ! -f "$SSH_DIR/id_ed25519" ]; then
+    echo "Note: No SSH key found. Generate one with:"
+    echo "  ssh-keygen -t ed25519 -C \"{{ .email }}\""
+fi
+
+echo "=== Git Baseline complete ==="
