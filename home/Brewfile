@@ -1,0 +1,53 @@
+# Brewfile
+# Managed by chezmoi — synced via `brew bundle`
+
+# System CLI
+brew "bash"
+brew "zsh"
+brew "curl"
+brew "wget"
+brew "git"
+brew "gh"
+brew "jq"
+brew "tree"
+brew "gnupg"
+
+# Dev CLI
+brew "tmux"
+brew "ripgrep"
+brew "fzf"
+brew "watchman"
+brew "fswatch"
+brew "direnv"
+
+# Languages
+brew "node"
+brew "python"
+brew "go"
+brew "rust"
+brew "php"
+brew "ruby"
+
+# Package/Virtual Env
+brew "pipx"
+brew "uv"
+
+# Data/Utility
+brew "sqlite"
+
+# Font
+cask "font-jetbrains-mono"
+
+# Terminal
+cask "ghostty"
+
+# GUI Apps
+cask "docker"
+cask "iterm2"
+cask "google-chrome"
+cask "rectangle"
+cask "slack"
+cask "figma"
+
+# AI Core
+brew "ollama"
