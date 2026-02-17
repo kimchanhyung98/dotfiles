@@ -46,8 +46,11 @@ fi
 mkdir -p "$HOME/.codex"
 if [ ! -f "$HOME/.codex/.profile-initialized" ]; then
     echo "Initializing Codex default profile..."
-    oh-my-codex init 2>/dev/null || echo "Warning: oh-my-codex init failed"
-    touch "$HOME/.codex/.profile-initialized"
+    if oh-my-codex init 2>/dev/null; then
+        touch "$HOME/.codex/.profile-initialized"
+    else
+        echo "Warning: oh-my-codex init failed"
+    fi
 fi
 
 echo "=== AI Codex complete ==="

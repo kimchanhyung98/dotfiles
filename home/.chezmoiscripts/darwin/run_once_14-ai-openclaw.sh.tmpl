@@ -49,7 +49,7 @@ if [ ! -f "$PLIST_PATH" ]; then
 </dict>
 </plist>
 PLIST
-    launchctl load "$PLIST_PATH" 2>/dev/null || echo "Warning: launchd load failed"
+    launchctl bootstrap "gui/$(id -u)" "$PLIST_PATH" 2>/dev/null || echo "Warning: launchd bootstrap failed"
 else
     echo "OpenClaw daemon: already registered"
 fi

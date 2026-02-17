@@ -16,73 +16,73 @@
     "SessionStart": [
       {
         "type": "command",
-        "command": "bash ~/.claude/hooks/peon-ping/peon.sh session-start"
+        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh session-start || true"
       },
       {
         "type": "command",
-        "command": "bash ~/.claude-mem/hooks/session-start.sh"
+        "command": "[ -f ~/.claude-mem/hooks/session-start.sh ] && bash ~/.claude-mem/hooks/session-start.sh || true"
       }
     ],
     "UserPromptSubmit": [
       {
         "type": "command",
-        "command": "bash ~/.claude/hooks/peon-ping/peon.sh user-prompt-submit"
+        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh user-prompt-submit || true"
       },
       {
         "type": "command",
-        "command": "bash ~/.claude-mem/hooks/user-prompt-submit.sh"
+        "command": "[ -f ~/.claude-mem/hooks/user-prompt-submit.sh ] && bash ~/.claude-mem/hooks/user-prompt-submit.sh || true"
       }
     ],
     "Stop": [
       {
         "type": "command",
-        "command": "bash ~/.claude/hooks/peon-ping/peon.sh stop"
+        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh stop || true"
       },
       {
         "type": "command",
-        "command": "bash ~/.claude-mem/hooks/stop.sh"
+        "command": "[ -f ~/.claude-mem/hooks/stop.sh ] && bash ~/.claude-mem/hooks/stop.sh || true"
       }
     ],
     "PermissionRequest": [
       {
         "type": "command",
-        "command": "bash ~/.claude/hooks/peon-ping/peon.sh permission-request"
+        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh permission-request || true"
       }
     ],
     "Notification": [
       {
         "type": "command",
-        "command": "bash ~/.claude/hooks/peon-ping/peon.sh notification"
+        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh notification || true"
       }
     ],
     "SessionEnd": [
       {
         "type": "command",
-        "command": "bash ~/.claude/hooks/peon-ping/peon.sh session-end"
+        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh session-end || true"
       }
     ],
     "PostToolUseFailure": [
       {
         "type": "command",
-        "command": "bash ~/.claude/hooks/peon-ping/peon.sh post-tool-use-failure"
+        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh post-tool-use-failure || true"
       }
     ],
     "PreCompact": [
       {
         "type": "command",
-        "command": "bash ~/.claude/hooks/peon-ping/peon.sh pre-compact"
+        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh pre-compact || true"
       }
     ],
     "Setup": [
       {
         "type": "command",
-        "command": "bash ~/.claude-mem/hooks/setup.sh"
+        "command": "[ -f ~/.claude-mem/hooks/setup.sh ] && bash ~/.claude-mem/hooks/setup.sh || true"
       }
     ],
     "PostToolUse": [
       {
         "type": "command",
-        "command": "bash ~/.claude-mem/hooks/post-tool-use.sh"
+        "command": "[ -f ~/.claude-mem/hooks/post-tool-use.sh ] && bash ~/.claude-mem/hooks/post-tool-use.sh || true"
       }
     ]
   }
