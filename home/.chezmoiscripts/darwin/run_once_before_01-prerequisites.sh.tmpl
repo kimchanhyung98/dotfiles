@@ -26,6 +26,7 @@ fi
 # Homebrew
 if ! command -v brew &>/dev/null; then
     echo "Installing Homebrew..."
+    # Homebrew is intentionally installed via the official bootstrap command.
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     {{ if .isAppleSilicon }}
     eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -54,7 +55,9 @@ if ! ensure_zb_available; then
     echo "Installing zerobrew..."
     installer=$(mktemp)
     if curl -fsSL https://zerobrew.rs/install -o "$installer" 2>/dev/null; then
-        bash "$installer" || true
+        bash "$installer" || echo "Warning: zerobrew installation failed"
+    else
+        echo "Warning: zerobrew download failed"
     fi
     rm -f "$installer"
     if ensure_zb_available; then

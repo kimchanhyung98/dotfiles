@@ -19,10 +19,10 @@ check() {
     local cmd="$2"
     if eval "$cmd" &>/dev/null; then
         echo -e "  ${GREEN}✓${NC} $label"
-        ((pass++))
+        pass=$((pass + 1))
     else
         echo -e "  ${RED}✗${NC} $label"
-        ((fail++))
+        fail=$((fail + 1))
     fi
 }
 
@@ -33,10 +33,10 @@ check_version() {
         local ver
         ver=$(eval "$cmd" 2>/dev/null | head -1 || echo "unknown")
         echo -e "  ${GREEN}✓${NC} $label ($ver)"
-        ((pass++))
+        pass=$((pass + 1))
     else
         echo -e "  ${RED}✗${NC} $label"
-        ((fail++))
+        fail=$((fail + 1))
     fi
 }
 
@@ -45,10 +45,10 @@ check_path() {
     local path="$2"
     if [ -e "$path" ]; then
         echo -e "  ${GREEN}✓${NC} $label"
-        ((pass++))
+        pass=$((pass + 1))
     else
         echo -e "  ${RED}✗${NC} $label — $path"
-        ((fail++))
+        fail=$((fail + 1))
     fi
 }
 
@@ -68,7 +68,7 @@ if [ "$OS" = "Darwin" ]; then
 else
     echo -e "  ${GREEN}✓${NC} Linux $(uname -r) ($ARCH)"
 fi
-((pass++))
+pass=$((pass + 1))
 
 # Shell
 section "Shell"

@@ -1,6 +1,6 @@
 [user]
-    name = {{ .name }}
-    email = {{ .email }}
+    name = {{ .name | quote }}
+    email = {{ .email | quote }}
 
 [init]
     defaultBranch = main
