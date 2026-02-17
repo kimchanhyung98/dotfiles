@@ -1,0 +1,52 @@
+" ~/.vimrc
+" Managed by chezmoi
+
+set nocompatible
+filetype plugin indent on
+syntax on
+
+" Encoding
+set encoding=utf-8
+set fileencoding=utf-8
+
+" UI
+set number
+set relativenumber
+set cursorline
+set showmatch
+set showcmd
+set wildmenu
+set laststatus=2
+set scrolloff=8
+
+" Indentation
+set autoindent
+set smartindent
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+set expandtab
+
+" Search
+set hlsearch
+set incsearch
+set ignorecase
+set smartcase
+
+" Behavior
+set backspace=indent,eol,start
+set hidden
+set autoread
+set noswapfile
+set nobackup
+set nowritebackup
+
+" Performance
+set lazyredraw
+set ttyfast
+
+" Key mappings
+let mapleader=" "
+nnoremap <leader>w :w<CR>
+nnoremap <leader>q :q<CR>
+nnoremap <Esc><Esc> :nohlsearch<CR>
