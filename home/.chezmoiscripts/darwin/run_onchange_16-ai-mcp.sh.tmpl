@@ -1,0 +1,27 @@
+#!/bin/bash
+#
+# AI MCP: register MCP servers (context7, sequential-thinking)
+# Re-runs when MCP config changes
+#
+# MCP config hash: {{ include "dot_claude.json.tmpl" | sha256sum }}
+
+{{ if ne .chezmoi.os "darwin" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "=== AI MCP ==="
+
+# MCP servers are declared in ~/.claude.json (dot_claude.json.tmpl)
+# This script ensures the npm packages are available
+
+# context7 MCP server
+echo "Ensuring context7 MCP server..."
+npm list -g @upstash/context7-mcp &>/dev/null || npm install -g @upstash/context7-mcp@2.1.1 2>/dev/null || echo "Warning: context7 MCP install failed"
+
+# sequential-thinking MCP server
+echo "Ensuring sequential-thinking MCP server..."
+npm list -g @modelcontextprotocol/server-sequential-thinking &>/dev/null || npm install -g @modelcontextprotocol/server-sequential-thinking@2025.12.18 2>/dev/null || echo "Warning: sequential-thinking MCP install failed"
+
+echo "=== AI MCP complete ==="

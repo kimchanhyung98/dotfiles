@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+# AI Core: gemini CLI, SuperGemini, ollama
+# Runs once on first setup
+
+{{ if ne .chezmoi.os "darwin" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "=== AI Core ==="
+
+# gemini CLI
+if ! command -v gemini &>/dev/null; then
+    echo "Installing gemini CLI..."
+    npm install -g @google/gemini-cli@0.28.2
+else
+    echo "gemini CLI: already installed ($(gemini --version 2>/dev/null || echo 'installed'))"
+fi
+
+# SuperGemini
+if ! command -v supergemini &>/dev/null; then
+    echo "Installing SuperGemini..."
+    pipx install supergemini
+else
+    echo "SuperGemini: already installed"
+fi
+
+# ollama (installed via Brewfile, verify only)
+if command -v ollama &>/dev/null; then
+    echo "ollama: already installed ($(ollama --version 2>/dev/null || echo 'installed'))"
+else
+    echo "Warning: ollama not found. It should be installed via Brewfile."
+fi
+
+echo "=== AI Core complete ==="
