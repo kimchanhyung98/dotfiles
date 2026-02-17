@@ -1,0 +1,2 @@
+# Files to remove on next `chezmoi apply`
+# List paths relative to home directory that are no longer managed
