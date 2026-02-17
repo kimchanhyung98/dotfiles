@@ -47,8 +47,8 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
   독립적으로 변경할 수 있다.
 - **멱등성**: 모든 스크립트는 여러 번 실행해도 동일한 결과를 보장한다. 이미 설치된 도구는 건너뛰고, 이미 적용된 설정은 재적용하지 않는다. `chezmoi apply`를 반복 실행해도 시스템 상태가 일관되게
   유지된다.
-- **순서 보장**: chezmoi 네이밍 컨벤션(`run_once_before_` → `run_onchange_` → `run_once_` → `run_once_after_`)으로 실행 순서를 제어한다. 번호
-  접두사(01, 02, ...)로 같은 타입 내 순서를 추가로 고정한다.
+- **순서 보장**: chezmoi 네이밍 컨벤션(`run_` + `once_`/`onchange_` + `before_`/`after_` + 이름)으로 실행 순서를 제어한다. 번호
+  접두사(01, 02, ...)로 같은 타입 내 순서를 추가로 고정한다. `macos-settings`는 파일 배포 이후 적용이 필요하므로 `run_onchange_after_`를 사용한다.
 - **OS 분기**: 실행 스크립트는 OS별 하위 디렉토리(`darwin/`, `linux/`)로 물리적 분리하고, 설정 파일은 `.tmpl` 템플릿 조건문으로 분기한다. 하나의 소스에서 두 OS 환경을 모두
   관리할 수 있다.
 - **설치와 설정 분리**: 도구의 바이너리 설치는 스크립트가 담당하고, 사용자 설정은 chezmoi가 배포하는 설정 파일(`.tmpl`)이 담당한다. 설치 방식이 바뀌어도 설정은 그대로 유지되고, 설정을 변경해도
@@ -133,6 +133,9 @@ dotfiles/
     ├── dot_openclaw/
     │   ├── openclaw.json.tmpl
     │   └── workspace/
+    │       ├── AGENTS.md.tmpl
+    │       ├── SOUL.md.tmpl
+    │       └── TOOLS.md.tmpl
     │
     └── dot_local/bin/
         └── executable_dotfiles-doctor
@@ -430,12 +433,12 @@ Ghostty는 macOS에서 Homebrew cask(`brew install --cask ghostty`), Linux에서
 공통 스킬을 각 도구의 글로벌 스킬 경로에 배포한다. 스킬 형식은 SKILL.md 기반으로 도구에 무관하게 동일하다. **4개 도구의 경로 일관성 확보가 필수**이며, 스킬을 추가할 때는 반드시 4개 경로를 함께
 갱신해야 한다.
 
-| 도구             | 글로벌 스킬 경로                    | 프로젝트 스킬 경로          | chezmoi 관리 방식                         |
-|----------------|------------------------------|---------------------|---------------------------------------|
-| Claude Code    | `~/.claude/skills/`          | `.claude/skills/`   | `.chezmoiexternal.toml`로 외부 리소스 동기화   |
-| Codex          | `~/.agents/skills/`          | `.agents/skills/`   | `.chezmoiexternal.toml`로 외부 리소스 동기화   |
-| GitHub Copilot | `~/.copilot/skills/`         | `.github/skills/`   | `dot_copilot/skills/`에서 직접 관리         |
-| OpenCode       | `~/.config/opencode/skills/` | `.opencode/skills/` | `dot_config/opencode/skills/`에서 직접 관리 |
+| 도구             | 글로벌 스킬 경로                                                              | 프로젝트 스킬 경로                                                | chezmoi 관리 방식                         |
+|----------------|------------------------------------------------------------------------|-----------------------------------------------------------|---------------------------------------|
+| Claude Code    | `~/.claude/skills/`                                                    | `.claude/skills/`                                         | `.chezmoiexternal.toml`로 외부 리소스 동기화   |
+| Codex          | `~/.agents/skills/`                                                    | `.agents/skills/`                                         | `.chezmoiexternal.toml`로 외부 리소스 동기화   |
+| GitHub Copilot | `~/.copilot/skills/`, `~/.claude/skills/`                              | `.github/skills/`, `.claude/skills/`                      | `dot_copilot/skills/`에서 직접 관리         |
+| OpenCode       | `~/.config/opencode/skills/`, `~/.claude/skills/`, `~/.agents/skills/` | `.opencode/skills/`, `.claude/skills/`, `.agents/skills/` | `dot_config/opencode/skills/`에서 직접 관리 |
 
 **스킬 소스**:
 
@@ -487,6 +490,13 @@ Ghostty는 macOS에서 Homebrew cask(`brew install --cask ghostty`), Linux에서
 |----------------------------------|-----------------------------------------|------------------|-------------------------------------------------------------------------------------------------------|
 | settings.json.tmpl               | `~/.claude/settings.json`               | 핵심 설정            | 권한 정책(승인 기반 실행), 기본 모델 설정, 훅 등록, 활성화된 플러그인 목록(`enabledPlugins` 필드). Claude Code의 모든 동작을 제어하는 단일 설정 파일 |
 | hooks/peon-ping/config.json.tmpl | `~/.claude/hooks/peon-ping/config.json` | peon-ping 사운드 설정 | 사용할 사운드 팩, CESP 카테고리별 사운드 매핑, 볼륨 설정. Claude Code 훅 디렉토리 내에 위치하여 Claude가 직접 관리                         |
+
+**추가 사용자 경로** (chezmoi 관리 대상이 아닌 Claude Code 네이티브 경로):
+
+| 경로                    | 역할              | 상세                                                         |
+|-----------------------|-----------------|------------------------------------------------------------|
+| `~/.claude/commands/` | 글로벌 커스텀 슬래시 커맨드 | 마크다운 파일로 정의하는 사용자 커스텀 슬래시 커맨드. `/help`에서 목록 확인 가능          |
+| `~/.claude/agents/`   | 글로벌 커스텀 서브에이전트  | YAML frontmatter가 포함된 마크다운 파일로 정의하는 서브에이전트. 오케스트레이터가 자동 생성 |
 
 **MCP 설정 위치**: 사용자 범위는 `~/.claude.json` (`dot_claude.json.tmpl`), 프로젝트 범위는 `.mcp.json`을 사용한다. `~/.claude/` 디렉토리 내부가 아닌 *
 *홈 디렉토리
@@ -564,9 +574,9 @@ superpowers도 Codex에 설치된다 (수동 clone + symlink). karpathy 지침�
 
 **설치 (스크립트)**
 
-| 스크립트           | 내용                                                                            | 설치 대상                |
-|----------------|-------------------------------------------------------------------------------|----------------------|
-| 13-ai-opencode | OpenCode (Homebrew), oh-my-opencode (npm), superpowers (clone+symlink+plugin) | OpenCode 바이너리와 확장 기능 |
+| 스크립트           | 내용                                                                       | 설치 대상                |
+|----------------|--------------------------------------------------------------------------|----------------------|
+| 13-ai-opencode | OpenCode (npm), oh-my-opencode (npm), superpowers (clone+symlink+plugin) | OpenCode 바이너리와 확장 기능 |
 
 **설정 (dot_config/opencode/ → ~/.config/opencode/)**
 
@@ -588,6 +598,9 @@ superpowers도 Codex에 설치된다 (수동 clone + symlink). karpathy 지침�
 | LSP/AST-Grep | 결정론적 리팩토링 도구               | 언어 서버 프로토콜(LSP)과 AST 기반 코드 검색(AST-Grep)을 활용하여 정확한 코드 리팩토링을 수행. AI 추론이 아닌 구문 분석 기반으로 동작             |
 
 superpowers도 OpenCode에 설치된다 (수동 clone + symlink + 플러그인 등록).
+
+OpenCode는 프로젝트/글로벌 모두에서 `.opencode/skills/` 외에 `.claude/skills/`와 `.agents/skills/`도 자동 탐색한다. 별도 설정 없이 Claude, Codex와
+동일한 스킬을 자동으로 인식한다.
 
 ### OpenClaw
 
@@ -631,8 +644,8 @@ OpenClaw는 업데이트가 빠른 편이므로 적용 전에 반드시 `https:/
 
 Copilot 스킬 경로:
 
-- **글로벌**: `~/.copilot/skills/<skill-name>/SKILL.md` — 모든 프로젝트에서 참조
-- **프로젝트**: `.github/skills/<skill-name>/SKILL.md` — 해당 프로젝트에서만 참조
+- **글로벌**: `~/.copilot/skills/<skill-name>/SKILL.md` 또는 `~/.claude/skills/<skill-name>/SKILL.md` — 모든 프로젝트에서 참조
+- **프로젝트**: `.github/skills/<skill-name>/SKILL.md` 또는 `.claude/skills/<skill-name>/SKILL.md` — 해당 프로젝트에서만 참조
 
 ### 기타 AI CLI
 
