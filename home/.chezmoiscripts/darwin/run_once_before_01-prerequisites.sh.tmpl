@@ -53,8 +53,9 @@ ensure_zb_available() {
 if ! ensure_zb_available; then
     echo "Installing zerobrew..."
     installer=$(mktemp)
-    curl -fsSL https://zerobrew.rs/install -o "$installer"
-    bash "$installer" || true
+    if curl -fsSL https://zerobrew.rs/install -o "$installer" 2>/dev/null; then
+        bash "$installer" || true
+    fi
     rm -f "$installer"
     if ensure_zb_available; then
         echo "zerobrew: installed ($(command -v zb))"

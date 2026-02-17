@@ -31,7 +31,8 @@ AWESOME_SKILLS_DIR="$HOME/.local/share/awesome-agent-skills"
 
 if [ ! -d "$AWESOME_SKILLS_DIR" ]; then
     echo "Cloning awesome-agent-skills..."
-    git clone --depth 1 "$AWESOME_SKILLS_REPO" "$AWESOME_SKILLS_DIR"
+    git clone "$AWESOME_SKILLS_REPO" "$AWESOME_SKILLS_DIR"
+    (cd "$AWESOME_SKILLS_DIR" && git checkout feb81d6)
 fi
 
 # Selected skills to deploy

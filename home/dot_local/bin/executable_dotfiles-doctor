@@ -3,7 +3,7 @@
 # dotfiles-doctor — Health check for dotfiles installation
 # Usage: dotfiles-doctor
 
-set -euo pipefail
+set -uo pipefail
 
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -13,7 +13,6 @@ NC='\033[0m'
 
 pass=0
 fail=0
-warn=0
 
 check() {
     local label="$1"

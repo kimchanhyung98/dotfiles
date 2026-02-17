@@ -34,6 +34,7 @@ CODEX_SKILLS_DIR="$HOME/.agents/skills/superpowers"
 if [ ! -d "$SUPERPOWERS_DIR" ]; then
     echo "Cloning superpowers..."
     git clone https://github.com/obra/superpowers.git "$SUPERPOWERS_DIR"
+    (cd "$SUPERPOWERS_DIR" && git checkout e16d611d871e194160a28a5991e84a22a84250c1)
 fi
 
 if [ ! -L "$CODEX_SKILLS_DIR" ]; then

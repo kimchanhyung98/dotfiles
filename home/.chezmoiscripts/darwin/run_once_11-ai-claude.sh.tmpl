@@ -46,7 +46,7 @@ done
 if [ ! -d "$HOME/.claude/hooks/peon-ping" ]; then
     echo "Installing peon-ping..."
     installer=$(mktemp)
-    if curl -fsSL https://raw.githubusercontent.com/PeonPing/peon-ping/main/install.sh -o "$installer" 2>/dev/null; then
+    if curl -fsSL https://raw.githubusercontent.com/PeonPing/peon-ping/e8d9502/install.sh -o "$installer" 2>/dev/null; then
         bash "$installer" || echo "Warning: peon-ping installation failed"
         rm -f "$installer"
     else
