@@ -20,7 +20,7 @@ fi
 # Claude Code
 if ! command -v claude &>/dev/null; then
     echo "Installing Claude Code..."
-    npm install -g @anthropic-ai/claude-code@2.1.44 || echo "Warning: Claude Code install failed"
+    npm install -g @anthropic-ai/claude-code || echo "Warning: Claude Code install failed"
 else
     echo "Claude Code: already installed"
 fi
@@ -28,7 +28,7 @@ fi
 # Codex CLI
 if ! command -v codex &>/dev/null; then
     echo "Installing Codex CLI..."
-    npm install -g @openai/codex@0.101.0 || echo "Warning: Codex install failed"
+    npm install -g @openai/codex || echo "Warning: Codex install failed"
 else
     echo "Codex CLI: already installed"
 fi
@@ -36,7 +36,7 @@ fi
 # oh-my-codex
 if ! command -v oh-my-codex &>/dev/null; then
     echo "Installing oh-my-codex..."
-    npm install -g oh-my-codex@0.4.0 || echo "Warning: oh-my-codex install failed"
+    npm install -g oh-my-codex || echo "Warning: oh-my-codex install failed"
 else
     echo "oh-my-codex: already installed"
 fi
@@ -44,7 +44,7 @@ fi
 # OpenCode
 if ! command -v opencode &>/dev/null; then
     echo "Installing OpenCode..."
-    npm install -g opencode-ai@1.2.6 || echo "Warning: OpenCode install failed"
+    npm install -g opencode-ai || echo "Warning: OpenCode install failed"
 else
     echo "OpenCode: already installed"
 fi
@@ -52,7 +52,7 @@ fi
 # oh-my-opencode
 if ! command -v oh-my-opencode &>/dev/null; then
     echo "Installing oh-my-opencode..."
-    npm install -g oh-my-opencode@3.7.1 || echo "Warning: oh-my-opencode install failed"
+    npm install -g oh-my-opencode || echo "Warning: oh-my-opencode install failed"
 else
     echo "oh-my-opencode: already installed"
 fi
@@ -60,7 +60,7 @@ fi
 # OpenClaw
 if ! command -v openclaw &>/dev/null; then
     echo "Installing OpenClaw..."
-    npm install -g @openclaw/openclaw@latest || echo "Warning: OpenClaw install failed"
+    npm install -g @openclaw/openclaw || echo "Warning: OpenClaw install failed"
 else
     echo "OpenClaw: already installed"
 fi
@@ -93,7 +93,7 @@ fi
 # Gemini CLI
 if ! command -v gemini &>/dev/null; then
     echo "Installing Gemini CLI..."
-    npm install -g @google/gemini-cli@0.28.2 || echo "Warning: Gemini CLI install failed"
+    npm install -g @google/gemini-cli || echo "Warning: Gemini CLI install failed"
 else
     echo "Gemini CLI: already installed"
 fi

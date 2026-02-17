@@ -14,7 +14,7 @@ echo "=== AI OpenCode ==="
 # OpenCode
 if ! command -v opencode &>/dev/null; then
     echo "Installing OpenCode..."
-    npm install -g opencode-ai@1.2.6
+    npm install -g opencode-ai
 else
     echo "OpenCode: already installed ($(opencode --version 2>/dev/null || echo 'installed'))"
 fi
@@ -22,7 +22,7 @@ fi
 # oh-my-opencode
 if ! command -v oh-my-opencode &>/dev/null; then
     echo "Installing oh-my-opencode..."
-    npm install -g oh-my-opencode@3.7.1
+    npm install -g oh-my-opencode
 else
     echo "oh-my-opencode: already installed"
 fi
@@ -34,7 +34,6 @@ OPENCODE_PLUGINS_DIR="$HOME/.config/opencode/plugins/superpowers"
 if [ ! -d "$SUPERPOWERS_DIR" ]; then
     echo "Cloning superpowers..."
     git clone https://github.com/obra/superpowers.git "$SUPERPOWERS_DIR"
-    (cd "$SUPERPOWERS_DIR" && git checkout e16d611d871e194160a28a5991e84a22a84250c1)
 fi
 
 if [ ! -L "$OPENCODE_PLUGINS_DIR" ]; then

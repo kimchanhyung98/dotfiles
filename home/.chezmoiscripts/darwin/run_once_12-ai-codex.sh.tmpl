@@ -14,7 +14,7 @@ echo "=== AI Codex ==="
 # Codex CLI
 if ! command -v codex &>/dev/null; then
     echo "Installing Codex CLI..."
-    npm install -g @openai/codex@0.101.0
+    npm install -g @openai/codex
 else
     echo "Codex CLI: already installed ($(codex --version 2>/dev/null || echo 'installed'))"
 fi
@@ -22,7 +22,7 @@ fi
 # oh-my-codex
 if ! command -v oh-my-codex &>/dev/null; then
     echo "Installing oh-my-codex..."
-    npm install -g oh-my-codex@0.4.0
+    npm install -g oh-my-codex
 else
     echo "oh-my-codex: already installed"
 fi
@@ -34,7 +34,6 @@ CODEX_SKILLS_DIR="$HOME/.agents/skills/superpowers"
 if [ ! -d "$SUPERPOWERS_DIR" ]; then
     echo "Cloning superpowers..."
     git clone https://github.com/obra/superpowers.git "$SUPERPOWERS_DIR"
-    (cd "$SUPERPOWERS_DIR" && git checkout e16d611d871e194160a28a5991e84a22a84250c1)
 fi
 
 if [ ! -L "$CODEX_SKILLS_DIR" ]; then

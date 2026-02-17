@@ -14,7 +14,7 @@ echo "=== AI Core ==="
 # gemini CLI
 if ! command -v gemini &>/dev/null; then
     echo "Installing gemini CLI..."
-    npm install -g @google/gemini-cli@0.28.2
+    npm install -g @google/gemini-cli
 else
     echo "gemini CLI: already installed ($(gemini --version 2>/dev/null || echo 'installed'))"
 fi

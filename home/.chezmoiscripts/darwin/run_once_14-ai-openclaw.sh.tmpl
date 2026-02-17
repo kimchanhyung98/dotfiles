@@ -14,7 +14,7 @@ echo "=== AI OpenClaw ==="
 # OpenClaw
 if ! command -v openclaw &>/dev/null; then
     echo "Installing OpenClaw..."
-    npm install -g @openclaw/openclaw@latest
+    npm install -g @openclaw/openclaw
 else
     echo "OpenClaw: already installed ($(openclaw --version 2>/dev/null || echo 'installed'))"
 fi
@@ -58,7 +58,7 @@ fi
 if [ ! -f "$HOME/.claude-mem/.installed" ]; then
     echo "Setting up claude-mem for OpenClaw..."
     installer=$(mktemp)
-    if curl -fsSL https://raw.githubusercontent.com/thedotmack/claude-mem/e975555/install/openclaw.sh -o "$installer" 2>/dev/null; then
+    if curl -fsSL https://raw.githubusercontent.com/thedotmack/claude-mem/main/install/openclaw.sh -o "$installer" 2>/dev/null; then
         bash "$installer" || echo "Warning: claude-mem OpenClaw integration failed"
         rm -f "$installer"
     else
