@@ -1,0 +1,66 @@
+#!/bin/bash
+#
+# AI Claude: Claude Code, SuperClaude, plugins (6)
+# Runs once on first setup
+
+{{ if ne .chezmoi.os "darwin" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "=== AI Claude ==="
+
+# Claude Code
+if ! command -v claude &>/dev/null; then
+    echo "Installing Claude Code..."
+    npm install -g @anthropic-ai/claude-code
+else
+    echo "Claude Code: already installed ($(claude --version 2>/dev/null || echo 'installed'))"
+fi
+
+# SuperClaude
+if ! command -v superclaude &>/dev/null; then
+    echo "Installing SuperClaude..."
+    pipx install superclaude
+else
+    echo "SuperClaude: already installed"
+fi
+
+# Plugins via marketplace
+echo "Installing Claude Code plugins..."
+PLUGINS=(
+    "superpowers"
+    "everything-claude-code"
+    "claude-hud"
+    "andrej-karpathy-skills"
+    "claude-mem"
+)
+
+for plugin in "${PLUGINS[@]}"; do
+    echo "  Installing plugin: $plugin"
+    claude plugin install "$plugin" 2>/dev/null || echo "  Warning: failed to install $plugin"
+done
+
+# peon-ping (download-then-execute for supply chain safety)
+if [ ! -d "$HOME/.claude/hooks/peon-ping" ]; then
+    echo "Installing peon-ping..."
+    installer=$(mktemp)
+    if curl -fsSL https://raw.githubusercontent.com/PeonPing/peon-ping/main/install.sh -o "$installer" 2>/dev/null; then
+        bash "$installer" || echo "Warning: peon-ping installation failed"
+        rm -f "$installer"
+    else
+        rm -f "$installer"
+        echo "Warning: peon-ping download failed"
+    fi
+else
+    echo "peon-ping: already installed"
+fi
+
+# everything-claude-code rules (separate install script)
+if command -v claude &>/dev/null; then
+    echo "Installing everything-claude-code rules..."
+    npx --yes @anthropic-ai/claude-code-ecc-rules 2>/dev/null || echo "Warning: ecc rules installation failed"
+fi
+
+echo "=== AI Claude complete ==="

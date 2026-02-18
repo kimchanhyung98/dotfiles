@@ -1,0 +1,101 @@
+#!/bin/bash
+#
+# AI Tools: claude, codex, oh-my-codex, opencode, oh-my-opencode, openclaw, gemini
+# Runs once on first setup
+
+{{ if ne .chezmoi.os "linux" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "=== AI Tools ==="
+
+# Ensure npm is available
+if ! command -v npm &>/dev/null; then
+    echo "Error: npm not found. Install Node.js first."
+    exit 1
+fi
+
+# Claude Code
+if ! command -v claude &>/dev/null; then
+    echo "Installing Claude Code..."
+    npm install -g @anthropic-ai/claude-code || echo "Warning: Claude Code install failed"
+else
+    echo "Claude Code: already installed"
+fi
+
+# Codex CLI
+if ! command -v codex &>/dev/null; then
+    echo "Installing Codex CLI..."
+    npm install -g @openai/codex || echo "Warning: Codex install failed"
+else
+    echo "Codex CLI: already installed"
+fi
+
+# oh-my-codex
+if ! command -v oh-my-codex &>/dev/null; then
+    echo "Installing oh-my-codex..."
+    npm install -g oh-my-codex || echo "Warning: oh-my-codex install failed"
+else
+    echo "oh-my-codex: already installed"
+fi
+
+# OpenCode
+if ! command -v opencode &>/dev/null; then
+    echo "Installing OpenCode..."
+    npm install -g opencode-ai || echo "Warning: OpenCode install failed"
+else
+    echo "OpenCode: already installed"
+fi
+
+# oh-my-opencode
+if ! command -v oh-my-opencode &>/dev/null; then
+    echo "Installing oh-my-opencode..."
+    npm install -g oh-my-opencode || echo "Warning: oh-my-opencode install failed"
+else
+    echo "oh-my-opencode: already installed"
+fi
+
+# OpenClaw
+if ! command -v openclaw &>/dev/null; then
+    echo "Installing OpenClaw..."
+    npm install -g @openclaw/openclaw || echo "Warning: OpenClaw install failed"
+else
+    echo "OpenClaw: already installed"
+fi
+
+# OpenClaw systemd daemon
+SYSTEMD_DIR="$HOME/.config/systemd/user"
+SERVICE_FILE="$SYSTEMD_DIR/openclaw.service"
+if [ ! -f "$SERVICE_FILE" ] && command -v openclaw &>/dev/null; then
+    echo "Registering OpenClaw systemd daemon..."
+    mkdir -p "$SYSTEMD_DIR"
+    OPENCLAW_BIN=$(command -v openclaw)
+    cat > "$SERVICE_FILE" << EOF
+[Unit]
+Description=OpenClaw AI Assistant Daemon
+After=network.target
+
+[Service]
+ExecStart=${OPENCLAW_BIN} daemon
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
+EOF
+    systemctl --user daemon-reload 2>/dev/null || true
+    systemctl --user enable openclaw 2>/dev/null || true
+    systemctl --user start openclaw 2>/dev/null || true
+fi
+
+# Gemini CLI
+if ! command -v gemini &>/dev/null; then
+    echo "Installing Gemini CLI..."
+    npm install -g @google/gemini-cli || echo "Warning: Gemini CLI install failed"
+else
+    echo "Gemini CLI: already installed"
+fi
+
+echo "=== AI Tools complete ==="

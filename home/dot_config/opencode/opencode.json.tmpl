@@ -1,0 +1,18 @@
+{{- /* ~/.config/opencode/opencode.json — OpenCode core settings */ -}}
+{
+  "provider": {
+    "default": "anthropic"
+  },
+  "permissions": {
+    "autoApprove": false
+  },
+  "agent": {
+    "model": "claude-sonnet-4-5-20250929"
+  },
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    }
+  }
+}

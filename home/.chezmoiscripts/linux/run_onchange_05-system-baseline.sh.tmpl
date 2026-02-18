@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+# System baseline: default editor, paths, basic security
+# Re-applies when this script changes
+
+{{ if ne .chezmoi.os "linux" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "=== System Baseline ==="
+
+PROFILE_FILE="$HOME/.profile"
+touch "$PROFILE_FILE"
+
+append_if_missing() {
+    local line="$1"
+    if ! grep -Fqx "$line" "$PROFILE_FILE" 2>/dev/null; then
+        echo "$line" >> "$PROFILE_FILE"
+    fi
+}
+
+# Default editor
+if command -v vim &>/dev/null; then
+    if ! grep -Fq 'export EDITOR="vim"' "$PROFILE_FILE" 2>/dev/null; then
+        echo "Setting vim as default editor..."
+        append_if_missing 'export EDITOR="vim"'
+        append_if_missing 'export VISUAL="vim"'
+    fi
+fi
+
+# Ensure ~/.local/bin in PATH
+mkdir -p "$HOME/.local/bin"
+if ! grep -Fq 'export PATH="$HOME/.local/bin:$PATH"' "$PROFILE_FILE" 2>/dev/null; then
+    append_if_missing 'export PATH="$HOME/.local/bin:$PATH"'
+fi
+
+echo "=== System Baseline complete ==="

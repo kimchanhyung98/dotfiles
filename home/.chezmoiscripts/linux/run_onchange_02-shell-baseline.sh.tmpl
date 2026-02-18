@@ -1,0 +1,47 @@
+#!/bin/bash
+#
+# Shell baseline: default shell zsh, history, keybindings, locale, timezone
+# Re-applies when this script changes
+
+{{ if ne .chezmoi.os "linux" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "=== Shell Baseline ==="
+
+# Set zsh as default shell
+ZSH_PATH=$(command -v zsh 2>/dev/null)
+if [ -n "$ZSH_PATH" ] && [ "$SHELL" != "$ZSH_PATH" ]; then
+    echo "Setting zsh as default shell..."
+    if grep -q "$ZSH_PATH" /etc/shells; then
+        chsh -s "$ZSH_PATH" 2>/dev/null || echo "Warning: chsh failed. Run manually: chsh -s $ZSH_PATH"
+    else
+        echo "Warning: $ZSH_PATH not in /etc/shells. Add it first:"
+        echo "  echo '$ZSH_PATH' | sudo tee -a /etc/shells"
+    fi
+else
+    echo "zsh: already default shell."
+fi
+
+# Locale
+if [ -f /etc/locale.gen ]; then
+    if ! locale -a 2>/dev/null | grep -q "en_US.utf8"; then
+        echo "Setting locale to en_US.UTF-8..."
+        sudo sed -i 's/# en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen 2>/dev/null
+        sudo locale-gen 2>/dev/null || true
+    fi
+fi
+
+# Timezone
+if [ -f /etc/timezone ]; then
+    CURRENT_TZ=$(cat /etc/timezone 2>/dev/null || echo "")
+    if [ "$CURRENT_TZ" != "Asia/Seoul" ]; then
+        echo "Setting timezone to Asia/Seoul..."
+        sudo timedatectl set-timezone Asia/Seoul 2>/dev/null || \
+            sudo ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime 2>/dev/null || true
+    fi
+fi
+
+echo "=== Shell Baseline complete ==="

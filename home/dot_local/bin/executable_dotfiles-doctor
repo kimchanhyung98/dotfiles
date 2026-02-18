@@ -1,0 +1,165 @@
+#!/bin/bash
+#
+# dotfiles-doctor — Health check for dotfiles installation
+# Usage: dotfiles-doctor
+
+set -uo pipefail
+
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+pass=0
+fail=0
+
+check() {
+    local label="$1"
+    local cmd="$2"
+    if eval "$cmd" &>/dev/null; then
+        echo -e "  ${GREEN}✓${NC} $label"
+        pass=$((pass + 1))
+    else
+        echo -e "  ${RED}✗${NC} $label"
+        fail=$((fail + 1))
+    fi
+}
+
+check_version() {
+    local label="$1"
+    local cmd="$2"
+    if command -v "$(echo "$cmd" | awk '{print $1}')" &>/dev/null; then
+        local ver
+        ver=$(eval "$cmd" 2>/dev/null | head -1 || echo "unknown")
+        echo -e "  ${GREEN}✓${NC} $label ($ver)"
+        pass=$((pass + 1))
+    else
+        echo -e "  ${RED}✗${NC} $label"
+        fail=$((fail + 1))
+    fi
+}
+
+check_path() {
+    local label="$1"
+    local path="$2"
+    if [ -e "$path" ]; then
+        echo -e "  ${GREEN}✓${NC} $label"
+        pass=$((pass + 1))
+    else
+        echo -e "  ${RED}✗${NC} $label — $path"
+        fail=$((fail + 1))
+    fi
+}
+
+section() {
+    echo -e "\n${BLUE}[$1]${NC}"
+}
+
+echo "=== dotfiles-doctor ==="
+echo "$(date '+%Y-%m-%d %H:%M:%S')"
+
+# System
+section "System"
+OS=$(uname -s)
+ARCH=$(uname -m)
+if [ "$OS" = "Darwin" ]; then
+    echo -e "  ${GREEN}✓${NC} macOS $(sw_vers -productVersion) ($ARCH)"
+else
+    echo -e "  ${GREEN}✓${NC} Linux $(uname -r) ($ARCH)"
+fi
+pass=$((pass + 1))
+
+# Shell
+section "Shell"
+check_version "zsh" "zsh --version"
+check_version "git" "git --version"
+check_version "vim" "vim --version"
+check "tmux" "command -v tmux"
+
+# Terminal
+section "Terminal"
+check "ghostty" "command -v ghostty"
+
+# Languages
+section "Languages"
+check_version "node" "node --version"
+check_version "python3" "python3 --version"
+check_version "go" "go version"
+check_version "rustc" "rustc --version"
+check_version "php" "php --version"
+check_version "ruby" "ruby --version"
+
+# Package Managers
+section "Package Managers"
+check "brew" "command -v brew"
+check "zb" "command -v zb"
+check "pipx" "command -v pipx"
+check "bun" "command -v bun"
+
+# AI CLI
+section "AI CLI"
+check "claude" "command -v claude"
+check "codex" "command -v codex"
+check "opencode" "command -v opencode"
+check "openclaw" "command -v openclaw"
+check "ollama" "command -v ollama"
+check "gemini" "command -v gemini"
+
+# AI Plugins
+section "AI Plugins"
+check "superpowers" "[ -d '$HOME/.local/share/superpowers' ] || claude plugin list 2>/dev/null | grep -q superpowers"
+check "everything-claude-code" "claude plugin list 2>/dev/null | grep -q everything-claude-code"
+check "claude-hud" "claude plugin list 2>/dev/null | grep -q claude-hud"
+check "peon-ping" "[ -d '$HOME/.claude/hooks/peon-ping' ]"
+check "claude-mem" "[ -d '$HOME/.claude-mem' ]"
+check "oh-my-codex" "command -v oh-my-codex"
+check "oh-my-opencode" "command -v oh-my-opencode"
+
+# Skill Directories
+section "Skill Directories"
+check_path "Claude skills" "$HOME/.claude/skills"
+check_path "Codex skills" "$HOME/.agents/skills"
+check_path "Copilot skills" "$HOME/.copilot/skills"
+check_path "OpenCode skills" "$HOME/.config/opencode/skills"
+
+# AGENTS.md
+section "AGENTS.md"
+check_path "~/AGENTS.md" "$HOME/AGENTS.md"
+
+# claude-mem
+section "claude-mem"
+check_path "~/.claude-mem/" "$HOME/.claude-mem"
+check_path "settings.json" "$HOME/.claude-mem/settings.json"
+
+# Dotfiles
+section "Dotfiles"
+check_path "~/.zshrc" "$HOME/.zshrc"
+check_path "~/.gitconfig" "$HOME/.gitconfig"
+check_path "~/.vimrc" "$HOME/.vimrc"
+check_path "~/.oh-my-zsh" "$HOME/.oh-my-zsh"
+
+# Config
+section "Config"
+check_path "ghostty" "$HOME/.config/ghostty/config"
+check_path "opencode" "$HOME/.config/opencode/opencode.json"
+check_path "claude" "$HOME/.claude/settings.json"
+check_path "codex" "$HOME/.codex/config.toml"
+check_path "copilot" "$HOME/.copilot/skills"
+check_path "openclaw" "$HOME/.openclaw/openclaw.json"
+
+# MCP
+section "MCP"
+check_path "~/.claude.json" "$HOME/.claude.json"
+
+# Summary
+echo ""
+echo "=== Summary ==="
+echo -e "  ${GREEN}Pass: $pass${NC}  ${RED}Fail: $fail${NC}"
+
+if [ "$fail" -eq 0 ]; then
+    echo -e "\n${GREEN}All checks passed!${NC}"
+else
+    echo -e "\n${YELLOW}$fail item(s) need attention.${NC}"
+    exit 1
+fi

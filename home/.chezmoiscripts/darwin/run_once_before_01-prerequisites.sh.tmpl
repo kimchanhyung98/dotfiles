@@ -1,0 +1,82 @@
+#!/bin/bash
+#
+# Prerequisites: Xcode CLI Tools, Homebrew, zerobrew, Rosetta 2 (Apple Silicon)
+# Runs once on first setup, before dotfiles deployment
+
+{{ if ne .chezmoi.os "darwin" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "=== Prerequisites ==="
+
+# Xcode Command Line Tools
+if ! xcode-select -p &>/dev/null; then
+    echo "Installing Xcode Command Line Tools..."
+    xcode-select --install
+    echo "Waiting for Xcode CLI Tools installation..."
+    until xcode-select -p &>/dev/null; do
+        sleep 5
+    done
+else
+    echo "Xcode CLI Tools: already installed."
+fi
+
+# Homebrew
+if ! command -v brew &>/dev/null; then
+    echo "Installing Homebrew..."
+    # Homebrew is intentionally installed via the official bootstrap command.
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    {{ if .isAppleSilicon }}
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+    {{ else }}
+    eval "$(/usr/local/bin/brew shellenv)"
+    {{ end }}
+else
+    echo "Homebrew: already installed."
+fi
+
+# zerobrew
+ensure_zb_available() {
+    if command -v zb &>/dev/null; then
+        return 0
+    fi
+    for candidate in "$HOME/.local/bin/zb" "/opt/zerobrew/bin/zb" "/usr/local/zerobrew/bin/zb"; do
+        if [ -x "$candidate" ]; then
+            export PATH="$(dirname "$candidate"):$PATH"
+            return 0
+        fi
+    done
+    return 1
+}
+
+if ! ensure_zb_available; then
+    echo "Installing zerobrew..."
+    installer=$(mktemp)
+    if curl -fsSL https://zerobrew.rs/install -o "$installer" 2>/dev/null; then
+        bash "$installer" || echo "Warning: zerobrew installation failed"
+    else
+        echo "Warning: zerobrew download failed"
+    fi
+    rm -f "$installer"
+    if ensure_zb_available; then
+        echo "zerobrew: installed ($(command -v zb))"
+    else
+        echo "Warning: zerobrew installation failed. Homebrew will be used as fallback."
+    fi
+else
+    echo "zerobrew: already installed ($(command -v zb))"
+fi
+
+{{ if .isAppleSilicon }}
+# Rosetta 2 (Apple Silicon only)
+if ! pkgutil --pkgs 2>/dev/null | grep -q "com.apple.pkg.RosettaUpdateAuto"; then
+    echo "Installing Rosetta 2..."
+    /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+else
+    echo "Rosetta 2: already installed."
+fi
+{{ end }}
+
+echo "=== Prerequisites complete ==="

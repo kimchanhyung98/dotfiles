@@ -1,0 +1,89 @@
+{{- /* ~/.claude/settings.json — Claude Code core settings */ -}}
+{
+  "permissions": {
+    "allow": [],
+    "deny": []
+  },
+  "enabledPlugins": [
+    "superpowers",
+    "everything-claude-code",
+    "claude-hud",
+    "peon-ping",
+    "andrej-karpathy-skills",
+    "claude-mem"
+  ],
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh session-start || true"
+      },
+      {
+        "type": "command",
+        "command": "[ -f ~/.claude-mem/hooks/session-start.sh ] && bash ~/.claude-mem/hooks/session-start.sh || true"
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "type": "command",
+        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh user-prompt-submit || true"
+      },
+      {
+        "type": "command",
+        "command": "[ -f ~/.claude-mem/hooks/user-prompt-submit.sh ] && bash ~/.claude-mem/hooks/user-prompt-submit.sh || true"
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh stop || true"
+      },
+      {
+        "type": "command",
+        "command": "[ -f ~/.claude-mem/hooks/stop.sh ] && bash ~/.claude-mem/hooks/stop.sh || true"
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "type": "command",
+        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh permission-request || true"
+      }
+    ],
+    "Notification": [
+      {
+        "type": "command",
+        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh notification || true"
+      }
+    ],
+    "SessionEnd": [
+      {
+        "type": "command",
+        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh session-end || true"
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "type": "command",
+        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh post-tool-use-failure || true"
+      }
+    ],
+    "PreCompact": [
+      {
+        "type": "command",
+        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh pre-compact || true"
+      }
+    ],
+    "Setup": [
+      {
+        "type": "command",
+        "command": "[ -f ~/.claude-mem/hooks/setup.sh ] && bash ~/.claude-mem/hooks/setup.sh || true"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": "[ -f ~/.claude-mem/hooks/post-tool-use.sh ] && bash ~/.claude-mem/hooks/post-tool-use.sh || true"
+      }
+    ]
+  }
+}
