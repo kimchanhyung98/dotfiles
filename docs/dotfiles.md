@@ -170,24 +170,24 @@ dotfiles/
 
 ### macOS (darwin/)
 
-| 순서 | 스크립트           | 역할                                           | 실행 조건             | 상세                                                                                                                                                      |
-|:--:|----------------|----------------------------------------------|-------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 순서 | 스크립트           | 역할                                           | 실행 조건             | 상세                                                                                                                                                                                                               |
+|:--:|----------------|----------------------------------------------|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | 01 | prerequisites  | Xcode CLI, Homebrew, zerobrew                | 최초 1회, dotfiles 전 | Xcode Command Line Tools가 없으면 설치하고, Homebrew를 설치한 뒤 zerobrew(Rust 기반 Homebrew 대안 클라이언트)를 설치하여 `zb` 명령을 기본 패키지 관리자로 설정. Homebrew는 공식 bootstrap(`curl ... \| bash`) 방식을 예외로 사용한다. Apple Silicon이면 Rosetta 2도 함께 설치 |
-| 02 | macos-settings | Dock, Finder, Keyboard, Trackpad, Screenshot | 설정 변경 시           | defaults 명령으로 macOS 시스템 설정을 일괄 적용. `run_onchange_`이므로 스크립트 내용이 변경될 때만 재실행되어 불필요한 재적용을 방지                                                                |
-| 03 | brew-packages  | Brewfile 기반 패키지 설치                           | Brewfile 변경 시     | Brewfile의 체크섬을 감시하여 패키지 목록이 변경되면 `brew bundle`로 전체 패키지를 동기화. 새 패키지 추가, 기존 패키지 제거를 한 번에 처리                                                               |
-| 04 | runtime        | Bun                                          | 최초 1회             | JavaScript/TypeScript 런타임으로 Bun을 설치. Node.js는 Brewfile에서 관리하고, Bun은 공식 설치 스크립트로 별도 설치                                                                   |
+| 02 | macos-settings | Dock, Finder, Keyboard, Trackpad, Screenshot | 설정 변경 시           | defaults 명령으로 macOS 시스템 설정을 일괄 적용. `run_onchange_`이므로 스크립트 내용이 변경될 때만 재실행되어 불필요한 재적용을 방지                                                                                                                         |
+| 03 | brew-packages  | Brewfile 기반 패키지 설치                           | Brewfile 변경 시     | Brewfile의 체크섬을 감시하여 패키지 목록이 변경되면 `brew bundle`로 전체 패키지를 동기화. 새 패키지 추가, 기존 패키지 제거를 한 번에 처리                                                                                                                        |
+| 04 | runtime        | Bun                                          | 최초 1회             | JavaScript/TypeScript 런타임으로 Bun을 설치. Node.js는 Brewfile에서 관리하고, Bun은 공식 설치 스크립트로 별도 설치                                                                                                                            |
 
 **AI 스크립트 (darwin/ai/)**
 
-| 순서 | 스크립트        | 역할                                | 실행 조건       | 상세                                                                                                               |
-|:--:|-------------|-----------------------------------|-------------|------------------------------------------------------------------------------------------------------------------|
-| 10 | ai-core     | gemini, SuperGemini, ollama       | 최초 1회       | AI 도구 공통 기반. gemini CLI(npm), SuperGemini(pipx), ollama(Homebrew)를 설치하여 다양한 AI 모델 접근 환경 구성                       |
-| 11 | ai-claude   | Claude Code, SuperClaude, 플러그인 6종 | 최초 1회       | Claude Code(npm), SuperClaude 프레임워크(pipx)를 설치한 뒤, 플러그인 마켓플레이스와 설치 스크립트로 6종 플러그인을 등록. 설정 파일 배포와 분리하여 바이너리 설치만 담당  |
-| 12 | ai-codex    | Codex CLI, oh-my-codex, 프로필 초기화   | 최초 1회       | Codex CLI(npm), oh-my-codex(npm)를 설치하고 기본 프로필을 초기화. superpowers는 수동 clone + symlink로 Codex에 연결                   |
-| 13 | ai-opencode | OpenCode, oh-my-opencode          | 최초 1회       | OpenCode(npm), oh-my-opencode(npm)를 설치. superpowers는 수동 clone + symlink + 플러그인으로 OpenCode에 연결                    |
+| 순서 | 스크립트        | 역할                                | 실행 조건       | 상세                                                                                                                             |
+|:--:|-------------|-----------------------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------|
+| 10 | ai-core     | gemini, SuperGemini, ollama       | 최초 1회       | AI 도구 공통 기반. gemini CLI(npm), SuperGemini(pipx), ollama(Homebrew)를 설치하여 다양한 AI 모델 접근 환경 구성                                     |
+| 11 | ai-claude   | Claude Code, SuperClaude, 플러그인 6종 | 최초 1회       | Claude Code(npm), SuperClaude 프레임워크(pipx)를 설치한 뒤, 플러그인 마켓플레이스와 설치 스크립트로 6종 플러그인을 등록. 설정 파일 배포와 분리하여 바이너리 설치만 담당                |
+| 12 | ai-codex    | Codex CLI, oh-my-codex, 프로필 초기화   | 최초 1회       | Codex CLI(npm), oh-my-codex(npm)를 설치하고 기본 프로필을 초기화. superpowers는 수동 clone + symlink로 Codex에 연결                                 |
+| 13 | ai-opencode | OpenCode, oh-my-opencode          | 최초 1회       | OpenCode(npm), oh-my-opencode(npm)를 설치. superpowers는 수동 clone + symlink + 플러그인으로 OpenCode에 연결                                  |
 | 14 | ai-openclaw | OpenClaw, 데몬 등록, claude-mem 연동    | 최초 1회       | OpenClaw(npm)를 설치하고 macOS launchd에 데몬으로 등록하여 상시 실행. claude-mem 연동은 별도 설치 스크립트(`thedotmack/claude-mem/install/openclaw.sh`)로 처리 |
-| 15 | ai-skills   | 공유 스킬 배포                          | 최초 1회       | awesome-agent-skills에서 선별한 스킬을 Claude, Codex, Copilot, OpenCode의 글로벌 스킬 경로에 각각 배포. 4개 도구에서 동일한 스킬 접근을 보장         |
-| 16 | ai-mcp      | MCP 서버 등록                         | MCP 설정 변경 시 | context7, sequential-thinking MCP 서버를 등록. `run_onchange_`로 MCP 설정이 변경되면 자동 재등록하여 항상 최신 MCP 구성 유지                 |
+| 15 | ai-skills   | 공유 스킬 배포                          | 최초 1회       | awesome-agent-skills에서 선별한 스킬을 Claude, Codex, Copilot, OpenCode의 글로벌 스킬 경로에 각각 배포. 4개 도구에서 동일한 스킬 접근을 보장                       |
+| 16 | ai-mcp      | MCP 서버 등록                         | MCP 설정 변경 시 | context7, sequential-thinking MCP 서버를 등록. `run_onchange_`로 MCP 설정이 변경되면 자동 재등록하여 항상 최신 MCP 구성 유지                               |
 
 | 순서 | 스크립트           | 역할          | 실행 조건             |
 |:--:|----------------|-------------|-------------------|
@@ -498,21 +498,22 @@ Ghostty는 macOS에서 Homebrew cask(`brew install --cask ghostty`), Linux에서
 | `~/.claude/commands/` | 글로벌 커스텀 슬래시 커맨드 | 마크다운 파일로 정의하는 사용자 커스텀 슬래시 커맨드. `/help`에서 목록 확인 가능          |
 | `~/.claude/agents/`   | 글로벌 커스텀 서브에이전트  | YAML frontmatter가 포함된 마크다운 파일로 정의하는 서브에이전트. 오케스트레이터가 자동 생성 |
 
-**MCP 설정 위치**: 사용자 범위는 `~/.claude.json` (`dot_claude.json.tmpl`), 프로젝트 범위는 `.mcp.json`을 사용한다. `~/.claude/` 디렉토리 내부가 아닌 **홈 디렉토리 루트**에 위치하는 점에 주의. `~/.claude.json`은 사용자 기본 MCP 서버를, `.mcp.json`은 프로젝트별 MCP 서버를 선언한다.
+**MCP 설정 위치**: 사용자 범위는 `~/.claude.json` (`dot_claude.json.tmpl`), 프로젝트 범위는 `.mcp.json`을 사용한다. `~/.claude/` 디렉토리 내부가 아닌 *
+*홈 디렉토리 루트**에 위치하는 점에 주의. `~/.claude.json`은 사용자 기본 MCP 서버를, `.mcp.json`은 프로젝트별 MCP 서버를 선언한다.
 
 **플러그인**
 
 Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록된다. 플러그인 전용 `plugins.json`/`hud.json` 파일은 사용하지 않으며, MCP는
 `~/.claude.json`(사용자)과 `.mcp.json`(프로젝트)으로 관리한다.
 
-| 플러그인                   | 역할            | 설치 방식         | 상세                                                                                                                                                                    |
-|------------------------|---------------|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| superpowers            | 구조화된 워크플로우    | 플러그인 마켓플레이스   | 브레인스토밍, TDD, 코드 리뷰, 서브에이전트 기반 개발 등 12종+ 스킬을 제공. 코드 작성 전 계획 수립, 검증 후 완료 선언 등 체계적 개발 프로세스를 강제                                                                           |
-| everything-claude-code | 종합 프레임워크      | 마켓플레이스 + npx   | 약칭 "ecc". 에이전트 13종, 커맨드 31종, 스킬 37종을 포함하는 대규모 확장. 코드 리뷰, 타입 분석, PR 테스트, 사일런트 에러 탐지 등 전문 에이전트를 제공. 코어 플러그인은 마켓플레이스로 설치하고, rules는 `npx --yes @anthropic-ai/claude-code-ecc-rules`로 설치 |
-| claude-hud             | 상태 표시줄        | 플러그인 마켓플레이스   | 컨텍스트 사용량, 현재 모델, Git 상태, 활성 도구, 에이전트, 진행률을 터미널 하단에 실시간 표시. 기본 statusline으로 설정. 설정은 자동 생성됨 (`~/.claude/plugins/claude-hud/config.json`)                                |
-| peon-ping              | 멀티 에이전트 음성 알림 | 설치 스크립트       | CESP(Coding Event Sound Pack Specification) 표준 기반. `sc_scv` 사운드 팩을 기본 제공. 작업 완료, 권한 요청, 오류 발생 등 이벤트를 음성으로 알려주어 멀티태스킹 효율 향상. Claude Code 네이티브 훅 + 8종 어댑터로 다양한 AI 도구 지원 |
-| andrej-karpathy-skills | 코딩 행동 지침      | 플러그인 마켓플레이스   | Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution 4대 원칙을 Claude Code 세션에 자동 주입하여 코드 품질 기준선 유지                                            |
-| claude-mem             | 세션 간 메모리 지속   | 플러그인 마켓플레이스   | 데이터를 `~/.claude-mem/`에 저장하고, AI 기반 압축으로 컨텍스트 효율을 유지. MCP 검색 5종을 지원하여 과거 세션의 결정사항, 패턴, 컨텍스트를 현재 세션에서 참조 가능                                                             |
+| 플러그인                   | 역할            | 설치 방식        | 상세                                                                                                                                                                                  |
+|------------------------|---------------|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| superpowers            | 구조화된 워크플로우    | 플러그인 마켓플레이스  | 브레인스토밍, TDD, 코드 리뷰, 서브에이전트 기반 개발 등 12종+ 스킬을 제공. 코드 작성 전 계획 수립, 검증 후 완료 선언 등 체계적 개발 프로세스를 강제                                                                                         |
+| everything-claude-code | 종합 프레임워크      | 마켓플레이스 + npx | 약칭 "ecc". 에이전트 13종, 커맨드 31종, 스킬 37종을 포함하는 대규모 확장. 코드 리뷰, 타입 분석, PR 테스트, 사일런트 에러 탐지 등 전문 에이전트를 제공. 코어 플러그인은 마켓플레이스로 설치하고, rules는 `npx --yes @anthropic-ai/claude-code-ecc-rules`로 설치 |
+| claude-hud             | 상태 표시줄        | 플러그인 마켓플레이스  | 컨텍스트 사용량, 현재 모델, Git 상태, 활성 도구, 에이전트, 진행률을 터미널 하단에 실시간 표시. 기본 statusline으로 설정. 설정은 자동 생성됨 (`~/.claude/plugins/claude-hud/config.json`)                                              |
+| peon-ping              | 멀티 에이전트 음성 알림 | 설치 스크립트      | CESP(Coding Event Sound Pack Specification) 표준 기반. `sc_scv` 사운드 팩을 기본 제공. 작업 완료, 권한 요청, 오류 발생 등 이벤트를 음성으로 알려주어 멀티태스킹 효율 향상. Claude Code 네이티브 훅 + 8종 어댑터로 다양한 AI 도구 지원               |
+| andrej-karpathy-skills | 코딩 행동 지침      | 플러그인 마켓플레이스  | Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution 4대 원칙을 Claude Code 세션에 자동 주입하여 코드 품질 기준선 유지                                                          |
+| claude-mem             | 세션 간 메모리 지속   | 플러그인 마켓플레이스  | 데이터를 `~/.claude-mem/`에 저장하고, AI 기반 압축으로 컨텍스트 효율을 유지. MCP 검색 5종을 지원하여 과거 세션의 결정사항, 패턴, 컨텍스트를 현재 세션에서 참조 가능                                                                           |
 
 **훅**
 
