@@ -16,6 +16,6 @@ echo "=== Brew Packages ==="
 {{ $homebrewPrefix := .homebrewPrefix }}
 eval "$({{ $homebrewPrefix }}/bin/brew shellenv)"
 
-brew bundle --file="{{ .chezmoi.sourceDir }}/Brewfile" --no-lock
+brew bundle --file="{{ .chezmoi.sourceDir }}/Brewfile"
 
 echo "=== Brew Packages complete ==="
