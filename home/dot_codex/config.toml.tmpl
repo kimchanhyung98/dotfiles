@@ -17,3 +17,12 @@ Goal-Driven Execution: Focus on the user's goal and prevent unnecessary expansio
 [profiles.full]
 model = "o3"
 approval_mode = "full-auto"
+
+# MCP Servers
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp@latest"]
+
+[mcp_servers.augment]
+command = "npx"
+args = ["-y", "@suco/su-auggie-mcp@latest"]
