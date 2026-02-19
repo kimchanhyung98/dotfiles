@@ -104,8 +104,8 @@ if ! command -v shellcheck &>/dev/null; then
     PASS=$((PASS + 1))
 else
 SC_FAIL=0
-for script in $(find "$REPO_DIR/home/.chezmoiscripts/darwin" -name '*.sh.tmpl' -type f 2>/dev/null); do
-    rendered=$(mktemp)
+while IFS= read -r -d '' script; do
+    rendered=$(mktemp -p "$TMPHOME")
     if cz execute-template < "$script" > "$rendered" 2>/dev/null; then
         if ! shellcheck -s bash -S warning "$rendered" > /dev/null 2>&1; then
             echo "    WARN: $(basename "$script")"
@@ -116,7 +116,7 @@ for script in $(find "$REPO_DIR/home/.chezmoiscripts/darwin" -name '*.sh.tmpl' -
         echo "    SKIP: $(basename "$script") (template render failed)"
     fi
     rm -f "$rendered"
-done
+done < <(find "$REPO_DIR/home/.chezmoiscripts/darwin" -name '*.sh.tmpl' -type f -print0 2>/dev/null)
 
 if [ "$SC_FAIL" -eq 0 ]; then
     pass "ShellCheck passed for all darwin scripts"
