@@ -44,7 +44,9 @@ ensure_zb_available() {
     fi
     for candidate in "$HOME/.local/bin/zb" "/opt/zerobrew/bin/zb" "/usr/local/zerobrew/bin/zb"; do
         if [ -x "$candidate" ]; then
-            export PATH="$(dirname "$candidate"):$PATH"
+            local dir
+            dir="$(dirname "$candidate")"
+            export PATH="$dir:$PATH"
             return 0
         fi
     done

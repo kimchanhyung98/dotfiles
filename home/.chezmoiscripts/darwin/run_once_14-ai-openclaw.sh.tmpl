@@ -14,7 +14,7 @@ echo "=== AI OpenClaw ==="
 # OpenClaw
 if ! command -v openclaw &>/dev/null; then
     echo "Installing OpenClaw..."
-    npm install -g @openclaw/openclaw
+    npm install -g openclaw@latest
 else
     echo "OpenClaw: already installed ($(openclaw --version 2>/dev/null || echo 'installed'))"
 fi

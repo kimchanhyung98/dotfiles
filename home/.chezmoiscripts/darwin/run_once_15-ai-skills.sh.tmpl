@@ -39,7 +39,7 @@ SELECTED_SKILLS=(
     # Add skill directory names from awesome-agent-skills here
 )
 
-for skill in "${SELECTED_SKILLS[@]}"; do
+for skill in "${SELECTED_SKILLS[@]+"${SELECTED_SKILLS[@]}"}"; do
     if [ -d "$AWESOME_SKILLS_DIR/$skill" ]; then
         for dir in "${SKILL_DIRS[@]}"; do
             if [ ! -d "$dir/$skill" ]; then
