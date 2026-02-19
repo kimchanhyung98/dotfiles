@@ -2,7 +2,7 @@ name: Test Dotfiles
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
   schedule:
     - cron: '0 9 * * 1' # Weekly Monday 09:00 UTC (18:00 KST)
@@ -25,8 +25,8 @@ jobs:
           mkdir -p ~/.config/chezmoi
           cat > ~/.config/chezmoi/chezmoi.toml << 'EOF'
           [data]
-              name = "Test User"
-              email = "test@example.com"
+          name = "Test User"
+          email = "test@example.com"
           EOF
 
       - name: chezmoi version
@@ -117,8 +117,8 @@ jobs:
           mkdir -p ~/.config/chezmoi
           cat > ~/.config/chezmoi/chezmoi.toml << 'EOF'
           [data]
-              name = "Test User"
-              email = "test@example.com"
+          name = "Test User"
+          email = "test@example.com"
           EOF
 
       - name: chezmoi init
@@ -168,21 +168,14 @@ jobs:
           mkdir -p ~/.config/chezmoi
           cat > ~/.config/chezmoi/chezmoi.toml << 'EOF'
           [data]
-              name = "Test User"
-              email = "test@example.com"
+          name = "Test User"
+          email = "test@example.com"
           EOF
 
-      - name: Install Node.js
+      - name: Install dependencies
         run: |
-          if ! command -v node &>/dev/null; then
-            echo "Installing Node.js..."
-            if command -v sudo &>/dev/null; then
-              sudo apt-get update -qq && sudo apt-get install -y -qq nodejs npm
-            else
-              apt-get update -qq && apt-get install -y -qq nodejs npm
-            fi
-          fi
-          node --version
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq zsh git nodejs npm
 
       - name: chezmoi init
         run: chezmoi init --source "$GITHUB_WORKSPACE/home"
