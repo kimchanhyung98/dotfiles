@@ -31,6 +31,7 @@ FEAT: 기능 추가      # 대문자 사용 금지
 ## Scope (선택사항)
 
 Scope는 변경 범위를 명시합니다:
+
 - `feat(api): REST API 추가`
 - `fix(auth): 로그인 버그 수정`
 - `refactor(ui): 컴포넌트 구조 개선`
