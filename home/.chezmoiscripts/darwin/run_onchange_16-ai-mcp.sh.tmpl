@@ -3,7 +3,11 @@
 # AI MCP: register MCP servers (context7, sequential-thinking, augment)
 # Re-runs when MCP config changes
 #
-# MCP config hash: {{ include "dot_claude.json.tmpl" | sha256sum }}{{ include "dot_config/opencode/opencode.json.tmpl" | sha256sum }}{{ include "dot_codex/config.toml.tmpl" | sha256sum }}{{ include "dot_gemini/settings.json.tmpl" | sha256sum }}
+# MCP config hashes:
+# - Claude: {{ include "dot_claude.json.tmpl" | sha256sum }}
+# - OpenCode: {{ include "dot_config/opencode/opencode.json.tmpl" | sha256sum }}
+# - Codex: {{ include "dot_codex/config.toml.tmpl" | sha256sum }}
+# - Gemini: {{ include "dot_gemini/settings.json.tmpl" | sha256sum }}
 
 {{ if ne .chezmoi.os "darwin" }}
 exit 0
