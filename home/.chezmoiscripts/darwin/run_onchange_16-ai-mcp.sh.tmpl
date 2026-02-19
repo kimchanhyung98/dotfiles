@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# AI MCP: register MCP servers (context7, sequential-thinking)
+# AI MCP: register MCP servers (context7, sequential-thinking, augment)
 # Re-runs when MCP config changes
 #
 # MCP config hash: {{ include "dot_claude.json.tmpl" | sha256sum }}
@@ -23,5 +23,9 @@ npm list -g @upstash/context7-mcp &>/dev/null || npm install -g @upstash/context
 # sequential-thinking MCP server
 echo "Ensuring sequential-thinking MCP server..."
 npm list -g @modelcontextprotocol/server-sequential-thinking &>/dev/null || npm install -g @modelcontextprotocol/server-sequential-thinking 2>/dev/null || echo "Warning: sequential-thinking MCP install failed"
+
+# augment MCP server
+echo "Ensuring augment MCP server..."
+npm list -g @suco/su-auggie-mcp &>/dev/null || npm install -g @suco/su-auggie-mcp 2>/dev/null || echo "Warning: augment MCP install failed"
 
 echo "=== AI MCP complete ==="
