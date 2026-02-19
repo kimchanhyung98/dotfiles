@@ -9,9 +9,10 @@
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-sequential-thinking@latest"]
     },
-    "augment": {
-      "command": "npx",
-      "args": ["-y", "@suco/su-auggie-mcp@latest"]
+    "augment-context-engine": {
+      "type": "stdio",
+      "command": "auggie",
+      "args": ["--mcp", "--mcp-auto-workspace"]
     }
   }
 }
