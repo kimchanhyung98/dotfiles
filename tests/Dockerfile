@@ -23,7 +23,8 @@ ENV LC_ALL=en_US.UTF-8
 
 # Create non-root test user with passwordless sudo
 RUN useradd -m -s /bin/zsh testuser && \
-    echo "testuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    echo "testuser ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/testuser && \
+    chmod 0440 /etc/sudoers.d/testuser
 
 USER testuser
 WORKDIR /home/testuser

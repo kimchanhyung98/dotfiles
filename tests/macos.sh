@@ -47,7 +47,9 @@ cz() {
 }
 
 # Initialize chezmoi with project source
-cz init --source "$REPO_DIR/home" 2>&1 || true
+if ! cz init --source "$REPO_DIR/home" 2>&1; then
+    fail "chezmoi init failed"
+fi
 
 # --- 1. Template validation ---
 section "Template validation"
@@ -91,17 +93,18 @@ fi
 
 # --- 5. chezmoi doctor ---
 section "chezmoi doctor"
-if cz doctor 2>&1 | tail -5; then
+if doctor_output="$(cz doctor 2>&1)"; then
+    echo "$doctor_output" | tail -5
     pass "chezmoi doctor"
 else
-    pass "chezmoi doctor (warnings only)"
+    echo "$doctor_output" | tail -5
+    warn "chezmoi doctor (non-zero exit, may include errors)"
 fi
 
 # --- 6. ShellCheck (darwin scripts, post-render via method A) ---
 section "ShellCheck (darwin scripts)"
 if ! command -v shellcheck &>/dev/null; then
     warn "shellcheck not installed, skipping (brew install shellcheck)"
-    PASS=$((PASS + 1))
 else
 SC_FAIL=0
 while IFS= read -r -d '' script; do

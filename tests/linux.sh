@@ -76,7 +76,11 @@ fi
 # --- 6. Deployment verification ---
 section "Deployment verification"
 MANAGED_LIST=$(chezmoi managed 2>/dev/null || true)
-MANAGED_COUNT=$(echo "$MANAGED_LIST" | wc -l | tr -d ' ')
+if [ -z "$MANAGED_LIST" ]; then
+    MANAGED_COUNT=0
+else
+    MANAGED_COUNT=$(echo "$MANAGED_LIST" | wc -l | tr -d ' ')
+fi
 echo "  $MANAGED_COUNT managed files"
 
 if chezmoi verify > /dev/null 2>&1; then

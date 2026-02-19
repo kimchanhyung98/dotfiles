@@ -77,6 +77,8 @@ jobs:
                   shellcheck -s bash -S warning "$rendered" 2>&1 | head -20 || true
                   FAIL=$((FAIL + 1))
                 fi
+              else
+                echo "WARN: template render failed for $(basename "$script") ($dir)"
               fi
               rm -f "$rendered"
             done < <(find "home/.chezmoiscripts/$dir" -name '*.sh.tmpl' -type f -print0 2>/dev/null)
