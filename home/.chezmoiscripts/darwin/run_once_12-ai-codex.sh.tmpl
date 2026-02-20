@@ -9,9 +9,10 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== AI Codex ==="
+echo "[ai-codex]"
 
 # Codex CLI
+# - OpenAI Codex 터미널 AI 코딩 도우미
 if ! command -v codex &>/dev/null; then
     echo "Installing Codex CLI..."
     npm install -g @openai/codex
@@ -20,6 +21,7 @@ else
 fi
 
 # oh-my-codex
+# - Codex CLI 확장 프레임워크 (프로필, 설정 관리)
 if ! command -v oh-my-codex &>/dev/null; then
     echo "Installing oh-my-codex..."
     npm install -g oh-my-codex
@@ -27,7 +29,8 @@ else
     echo "oh-my-codex: already installed"
 fi
 
-# superpowers for Codex (clone + symlink)
+# superpowers for Codex
+# - 공유 스킬 저장소 클론 후 Codex 스킬 경로에 심볼릭 링크
 SUPERPOWERS_DIR="$HOME/.local/share/superpowers"
 CODEX_SKILLS_DIR="$HOME/.agents/skills/superpowers"
 
@@ -42,7 +45,7 @@ if [ ! -L "$CODEX_SKILLS_DIR" ]; then
     ln -sf "$SUPERPOWERS_DIR" "$CODEX_SKILLS_DIR"
 fi
 
-# Initialize default profile
+# 기본 프로필 초기화
 mkdir -p "$HOME/.codex"
 if [ ! -f "$HOME/.codex/.profile-initialized" ]; then
     echo "Initializing Codex default profile..."
@@ -53,4 +56,4 @@ if [ ! -f "$HOME/.codex/.profile-initialized" ]; then
     fi
 fi
 
-echo "=== AI Codex complete ==="
+echo "[ai-codex] done"

@@ -1,26 +1,25 @@
-# Ghostty Configuration
-# Managed by chezmoi
-# Deployed to ~/.config/ghostty/config
+# Ghostty 터미널 설정
+# chezmoi로 관리 → ~/.config/ghostty/config
 
-# Font
+# 폰트
 font-family = JetBrains Mono
 font-size = 14
 
-# Theme
+# 테마
 theme = GruvboxDark
 
-# Window
-window-padding-x = 8
-window-padding-y = 4
-background-opacity = 0.95
-background-blur = 20
+# 창 설정
+window-padding-x = 8        # 좌우 패딩
+window-padding-y = 4        # 상하 패딩
+background-opacity = 0.95   # 배경 투명도
+background-blur = 20        # 배경 블러 강도
 
-# Shell integration
+# 셸 통합
 shell-integration = zsh
-scrollback-limit = 10000
+scrollback-limit = 10000    # 스크롤백 버퍼 크기
 
 {{ if eq .chezmoi.os "darwin" }}
-# macOS
-macos-titlebar-style = hidden
-macos-option-as-alt = true
+# macOS 전용
+macos-titlebar-style = hidden   # 타이틀바 숨기기
+macos-option-as-alt = true      # Option 키를 Alt로 사용
 {{ end }}

@@ -1,4 +1,5 @@
-name: "Lint PR"
+# PR 제목 Conventional Commits 규칙 검증
+name: PR Title Check
 
 on:
   pull_request:

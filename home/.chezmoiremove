@@ -1,2 +1,2 @@
-# Files to remove on next `chezmoi apply`
-# List paths relative to home directory that are no longer managed
+# 다음 `chezmoi apply` 시 삭제할 파일
+# 더 이상 관리하지 않는 홈 디렉토리 상대 경로 기재

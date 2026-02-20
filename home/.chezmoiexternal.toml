@@ -1,6 +1,7 @@
-# External resources managed by chezmoi
-# Auto-downloaded/updated on `chezmoi apply`
+# chezmoi 외부 리소스 관리
+# `chezmoi apply` 시 자동 다운로드/업데이트 (168h = 7일마다 갱신)
 
+# Oh My Zsh 프레임워크
 [".oh-my-zsh"]
 type = "archive"
 url = "https://github.com/ohmyzsh/ohmyzsh/archive/master.tar.gz"
@@ -8,6 +9,7 @@ exact = true
 stripComponents = 1
 refreshPeriod = "168h"
 
+# zsh 플러그인: 명령어 자동 제안
 [".oh-my-zsh/custom/plugins/zsh-autosuggestions"]
 type = "archive"
 url = "https://github.com/zsh-users/zsh-autosuggestions/archive/master.tar.gz"
@@ -15,6 +17,7 @@ exact = true
 stripComponents = 1
 refreshPeriod = "168h"
 
+# zsh 플러그인: 구문 강조
 [".oh-my-zsh/custom/plugins/zsh-syntax-highlighting"]
 type = "archive"
 url = "https://github.com/zsh-users/zsh-syntax-highlighting/archive/master.tar.gz"
@@ -22,6 +25,7 @@ exact = true
 stripComponents = 1
 refreshPeriod = "168h"
 
+# humanizer 스킬 (Claude Code용)
 [".claude/skills/humanizer"]
 type = "archive"
 url = "https://github.com/blader/humanizer/archive/main.tar.gz"
@@ -29,6 +33,7 @@ exact = true
 stripComponents = 1
 refreshPeriod = "168h"
 
+# humanizer 스킬 (Codex용)
 [".agents/skills/humanizer"]
 type = "archive"
 url = "https://github.com/blader/humanizer/archive/main.tar.gz"

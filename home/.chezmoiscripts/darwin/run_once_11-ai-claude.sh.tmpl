@@ -9,9 +9,10 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== AI Claude ==="
+echo "[ai-claude]"
 
 # Claude Code
+# - Anthropic Claude 터미널 AI 코딩 도우미
 if ! command -v claude &>/dev/null; then
     echo "Installing Claude Code..."
     npm install -g @anthropic-ai/claude-code
@@ -20,6 +21,7 @@ else
 fi
 
 # SuperClaude
+# - Claude Code 확장 프레임워크 (페르소나, 명령어, 플래그 시스템)
 if ! command -v superclaude &>/dev/null; then
     echo "Installing SuperClaude..."
     pipx install superclaude
@@ -27,7 +29,8 @@ else
     echo "SuperClaude: already installed"
 fi
 
-# Plugins via marketplace
+# Plugins
+# - Claude Code 마켓플레이스 플러그인 일괄 설치
 echo "Installing Claude Code plugins..."
 PLUGINS=(
     "superpowers"
@@ -42,7 +45,8 @@ for plugin in "${PLUGINS[@]}"; do
     claude plugin install "$plugin" 2>/dev/null || echo "  Warning: failed to install $plugin"
 done
 
-# peon-ping (download-then-execute for supply chain safety)
+# peon-ping
+# - Claude Code 작업 완료 알림 사운드 (임시파일 다운로드 후 실행)
 if [ ! -d "$HOME/.claude/hooks/peon-ping" ]; then
     echo "Installing peon-ping..."
     installer=$(mktemp)
@@ -57,10 +61,11 @@ else
     echo "peon-ping: already installed"
 fi
 
-# everything-claude-code rules (separate install script)
+# everything-claude-code rules
+# - ECC 코딩 규칙 세트 설치
 if command -v claude &>/dev/null; then
     echo "Installing everything-claude-code rules..."
     npx --yes @anthropic-ai/claude-code-ecc-rules 2>/dev/null || echo "Warning: ecc rules installation failed"
 fi
 
-echo "=== AI Claude complete ==="
+echo "[ai-claude] done"

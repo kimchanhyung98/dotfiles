@@ -11,11 +11,13 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== Brew Packages ==="
+echo "[brew-packages]"
 
+# Homebrew 환경 변수 로드
 {{ $homebrewPrefix := .homebrewPrefix }}
 eval "$({{ $homebrewPrefix }}/bin/brew shellenv)"
 
+# Brewfile 기반 패키지 일괄 설치/동기화
 brew bundle --file="{{ .chezmoi.sourceDir }}/Brewfile"
 
-echo "=== Brew Packages complete ==="
+echo "[brew-packages] done"

@@ -9,9 +9,10 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== AI OpenClaw ==="
+echo "[ai-openclaw]"
 
 # OpenClaw
+# - AI 어시스턴트 백그라운드 데몬
 if ! command -v openclaw &>/dev/null; then
     echo "Installing OpenClaw..."
     npm install -g openclaw@latest
@@ -19,7 +20,8 @@ else
     echo "OpenClaw: already installed ($(openclaw --version 2>/dev/null || echo 'installed'))"
 fi
 
-# launchd daemon registration
+# launchd 데몬 등록
+# - macOS 시작 시 OpenClaw 자동 실행 설정
 PLIST_NAME="com.openclaw.daemon"
 PLIST_PATH="$HOME/Library/LaunchAgents/${PLIST_NAME}.plist"
 
@@ -54,7 +56,8 @@ else
     echo "OpenClaw daemon: already registered"
 fi
 
-# claude-mem integration (download-then-execute for supply chain safety)
+# claude-mem 연동
+# - OpenClaw용 Claude 메모리 통합 (임시파일 다운로드 후 실행)
 if [ ! -f "$HOME/.claude-mem/.installed" ]; then
     echo "Setting up claude-mem for OpenClaw..."
     installer=$(mktemp)
@@ -69,4 +72,4 @@ else
     echo "claude-mem: already installed"
 fi
 
-echo "=== AI OpenClaw complete ==="
+echo "[ai-openclaw] done"

@@ -9,9 +9,10 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== AI OpenCode ==="
+echo "[ai-opencode]"
 
 # OpenCode
+# - 오픈소스 터미널 AI 코딩 도우미
 if ! command -v opencode &>/dev/null; then
     echo "Installing OpenCode..."
     npm install -g opencode-ai
@@ -20,6 +21,7 @@ else
 fi
 
 # oh-my-opencode
+# - OpenCode 확장 프레임워크 (설정, 플러그인 관리)
 if ! command -v oh-my-opencode &>/dev/null; then
     echo "Installing oh-my-opencode..."
     npm install -g oh-my-opencode
@@ -27,7 +29,8 @@ else
     echo "oh-my-opencode: already installed"
 fi
 
-# superpowers for OpenCode (clone + symlink + plugin)
+# superpowers for OpenCode
+# - 공유 스킬 저장소 클론 후 OpenCode 플러그인 경로에 심볼릭 링크
 SUPERPOWERS_DIR="$HOME/.local/share/superpowers"
 OPENCODE_PLUGINS_DIR="$HOME/.config/opencode/plugins/superpowers"
 
@@ -42,4 +45,4 @@ if [ ! -L "$OPENCODE_PLUGINS_DIR" ]; then
     ln -sf "$SUPERPOWERS_DIR" "$OPENCODE_PLUGINS_DIR"
 fi
 
-echo "=== AI OpenCode complete ==="
+echo "[ai-opencode] done"

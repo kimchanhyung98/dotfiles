@@ -9,9 +9,10 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== AI Skills ==="
+echo "[ai-skills]"
 
-# Skill target directories (4 tools)
+# 스킬 대상 디렉토리 (4개 AI 도구)
+# - Claude, Codex, Copilot, OpenCode 각각의 스킬 경로
 SKILL_DIRS=(
     "$HOME/.claude/skills"
     "$HOME/.agents/skills"
@@ -19,13 +20,14 @@ SKILL_DIRS=(
     "$HOME/.config/opencode/skills"
 )
 
-# Ensure all skill directories exist
+# 스킬 디렉토리 생성
 for dir in "${SKILL_DIRS[@]}"; do
     mkdir -p "$dir"
     echo "Skill directory ensured: $dir"
 done
 
-# Deploy skills from awesome-agent-skills
+# awesome-agent-skills 저장소에서 스킬 배포
+# - 커뮤니티 공유 스킬 모음 클론
 AWESOME_SKILLS_REPO="https://github.com/VoltAgent/awesome-agent-skills.git"
 AWESOME_SKILLS_DIR="$HOME/.local/share/awesome-agent-skills"
 
@@ -34,11 +36,12 @@ if [ ! -d "$AWESOME_SKILLS_DIR" ]; then
     git clone --depth 1 "$AWESOME_SKILLS_REPO" "$AWESOME_SKILLS_DIR"
 fi
 
-# Selected skills to deploy
+# 배포할 스킬 목록
 SELECTED_SKILLS=(
     # Add skill directory names from awesome-agent-skills here
 )
 
+# - 선택된 스킬을 4개 AI 도구 경로에 복사
 for skill in "${SELECTED_SKILLS[@]+"${SELECTED_SKILLS[@]}"}"; do
     if [ -d "$AWESOME_SKILLS_DIR/$skill" ]; then
         for dir in "${SKILL_DIRS[@]}"; do
@@ -50,8 +53,8 @@ for skill in "${SELECTED_SKILLS[@]+"${SELECTED_SKILLS[@]}"}"; do
     fi
 done
 
-# humanizer is deployed via .chezmoiexternal.toml to Claude and Codex paths
-# Symlink to remaining paths
+# humanizer 스킬 심볼릭 링크
+# - .chezmoiexternal.toml로 Claude/Codex에 배포된 humanizer를 나머지 경로에 링크
 HUMANIZER_SRC="$HOME/.claude/skills/humanizer"
 if [ -d "$HUMANIZER_SRC" ]; then
     for dir in "$HOME/.copilot/skills" "$HOME/.config/opencode/skills"; do
@@ -62,4 +65,4 @@ if [ -d "$HUMANIZER_SRC" ]; then
     done
 fi
 
-echo "=== AI Skills complete ==="
+echo "[ai-skills] done"

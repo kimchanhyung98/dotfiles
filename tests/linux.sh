@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# Linux dotfiles test script (runs inside Docker container)
-# Tests chezmoi template rendering, apply, verify, and ShellCheck
+# Linux dotfiles 테스트 스크립트 (CI 환경에서 실행)
+# chezmoi 템플릿 렌더링, apply, verify, ShellCheck 검증
 
 set -euo pipefail
 
@@ -9,6 +9,7 @@ PASS=0
 FAIL=0
 ERRORS=""
 
+# 테스트 결과 출력 헬퍼 함수
 pass() {
     echo "  ✅ $1"
     PASS=$((PASS + 1))
@@ -25,11 +26,11 @@ section() {
     echo "=== $1 ==="
 }
 
-# --- 1. Version check ---
+# --- 1. 버전 확인 ---
 section "chezmoi version"
 chezmoi --version && pass "chezmoi version" || fail "chezmoi version"
 
-# --- 2. Template validation (via chezmoi cat, with full data context) ---
+# --- 2. 템플릿 렌더링 검증 (chezmoi cat으로 전체 데이터 컨텍스트 확인) ---
 section "Template validation"
 TMPL_FAIL=0
 while IFS= read -r target; do
@@ -45,7 +46,7 @@ else
     fail "$TMPL_FAIL template(s) failed to render"
 fi
 
-# --- 3. chezmoi doctor ---
+# --- 3. chezmoi doctor (환경 진단) ---
 section "chezmoi doctor"
 chezmoi doctor --no-network > /tmp/chezmoi-doctor.log 2>&1 || true
 tail -5 /tmp/chezmoi-doctor.log
@@ -55,7 +56,7 @@ else
     pass "chezmoi doctor"
 fi
 
-# --- 4. Dry-run apply ---
+# --- 4. 드라이런 apply (실제 적용 없이 시뮬레이션) ---
 section "chezmoi apply (dry-run)"
 if chezmoi apply --dry-run > /tmp/chezmoi-dryrun.log 2>&1; then
     pass "chezmoi apply --dry-run"
@@ -63,7 +64,7 @@ else
     fail "chezmoi apply --dry-run"
 fi
 
-# --- 5. Actual apply (log to file to avoid excessive stdout) ---
+# --- 5. 실제 apply (로그를 파일로 저장하여 과도한 출력 방지) ---
 section "chezmoi apply (actual)"
 if chezmoi apply --force --verbose > /tmp/chezmoi-apply.log 2>&1; then
     pass "chezmoi apply --force"
@@ -73,7 +74,7 @@ else
     fail "chezmoi apply --force"
 fi
 
-# --- 6. Deployment verification ---
+# --- 6. 배포 검증 (관리 파일 수 확인, verify 일치 여부) ---
 section "Deployment verification"
 MANAGED_LIST=$(chezmoi managed 2>/dev/null || true)
 if [ -z "$MANAGED_LIST" ]; then
@@ -89,7 +90,7 @@ else
     fail "chezmoi verify (files differ from source)"
 fi
 
-# --- 7. ShellCheck (linux scripts, post-render) ---
+# --- 7. ShellCheck (linux 스크립트 렌더링 후 린트 검사) ---
 section "ShellCheck (linux scripts)"
 SC_FAIL=0
 CHEZMOI_SOURCE="${HOME}/.local/share/chezmoi"
@@ -112,7 +113,7 @@ else
     fail "ShellCheck found issues in $SC_FAIL script(s)"
 fi
 
-# --- Summary ---
+# --- 결과 요약 ---
 echo ""
 echo "=============================="
 echo "  Results: $PASS passed, $FAIL failed"

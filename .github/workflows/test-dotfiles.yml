@@ -1,3 +1,5 @@
+# dotfiles 테스트 워크플로우
+# - 템플릿 렌더링 검증, ShellCheck 린트, macOS/Linux 실제 적용 테스트
 name: Test Dotfiles
 
 on:
@@ -5,9 +7,10 @@ on:
     branches: [ main ]
   pull_request:
   schedule:
-    - cron: '0 9 * * 1' # Weekly Monday 09:00 UTC (18:00 KST)
+    - cron: '0 9 * * 1' # 매주 월요일 09:00 UTC (18:00 KST)
 
 jobs:
+  # 1단계: 템플릿 유효성 검증 및 셸 스크립트 린트
   validate:
     name: Validate templates & lint
     runs-on: ubuntu-latest
@@ -89,6 +92,7 @@ jobs:
           fi
           echo "ShellCheck passed for all scripts"
 
+  # 2단계: macOS 실제 적용 테스트 (Intel + Apple Silicon)
   test-macos:
     name: Test macOS (${{ matrix.runner }})
     needs: validate
@@ -147,6 +151,7 @@ jobs:
           name: chezmoi-apply-log-${{ matrix.runner }}
           path: /tmp/chezmoi-apply.log
 
+  # 3단계: Linux (Ubuntu) 실제 적용 테스트
   test-linux:
     name: Test Linux (Ubuntu)
     needs: validate

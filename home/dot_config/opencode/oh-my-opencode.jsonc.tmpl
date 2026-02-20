@@ -1,21 +1,21 @@
-// ~/.config/opencode/oh-my-opencode.jsonc — oh-my-opencode extension settings
-// Managed by chezmoi
+// ~/.config/opencode/oh-my-opencode.jsonc — oh-my-opencode 확장 설정
+// chezmoi로 관리
 {
-  // Agent overrides
+  // 에이전트 기본 모델 설정
   "agents": {
     "default": {
       "model": "claude-sonnet-4-5-20250929"
     }
   },
 
-  // Hook categories
+  // 훅 카테고리 (코어, 연속 실행, 스킬)
   "hooks": {
     "core": true,
     "continuation": true,
     "skill": true
   },
 
-  // Categories
+  // 품질 검사 카테고리
   "categories": {
     "code-quality": true,
     "security": true,

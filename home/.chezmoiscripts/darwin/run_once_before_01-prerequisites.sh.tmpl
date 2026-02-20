@@ -9,9 +9,10 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== Prerequisites ==="
+echo "[prerequisites]"
 
-# Xcode Command Line Tools
+# 1. Xcode Command Line Tools
+# - macOS 개발 도구 (git, make 등) 설치
 if ! xcode-select -p &>/dev/null; then
     echo "Installing Xcode Command Line Tools..."
     xcode-select --install
@@ -23,7 +24,8 @@ else
     echo "Xcode CLI Tools: already installed."
 fi
 
-# Homebrew
+# 2. Homebrew
+# - macOS 패키지 매니저 설치
 if ! command -v brew &>/dev/null; then
     echo "Installing Homebrew..."
     # Homebrew is intentionally installed via the official bootstrap command.
@@ -37,11 +39,13 @@ else
     echo "Homebrew: already installed."
 fi
 
-# zerobrew
+# 3. zerobrew
+# - Homebrew 대안 패키지 매니저 (빠른 설치 지원)
 ensure_zb_available() {
     if command -v zb &>/dev/null; then
         return 0
     fi
+    # - 여러 설치 경로에서 zb 바이너리 탐색
     for candidate in "$HOME/.local/bin/zb" "/opt/zerobrew/bin/zb" "/usr/local/zerobrew/bin/zb"; do
         if [ -x "$candidate" ]; then
             local dir
@@ -72,7 +76,8 @@ else
 fi
 
 {{ if .isAppleSilicon }}
-# Rosetta 2 (Apple Silicon only)
+# 4. Rosetta 2 (Apple Silicon 전용)
+# - x86_64 바이너리를 ARM에서 실행하기 위한 호환 레이어
 if ! pkgutil --pkgs 2>/dev/null | grep -q "com.apple.pkg.RosettaUpdateAuto"; then
     echo "Installing Rosetta 2..."
     /usr/sbin/softwareupdate --install-rosetta --agree-to-license
@@ -81,4 +86,4 @@ else
 fi
 {{ end }}
 
-echo "=== Prerequisites complete ==="
+echo "[prerequisites] done"

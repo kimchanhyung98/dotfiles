@@ -9,11 +9,12 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== System Baseline ==="
+echo "[system-baseline]"
 
 PROFILE_FILE="$HOME/.profile"
 touch "$PROFILE_FILE"
 
+# 중복 방지하며 ~/.profile에 설정 추가하는 헬퍼 함수
 append_if_missing() {
     local line="$1"
     if ! grep -Fqx "$line" "$PROFILE_FILE" 2>/dev/null; then
@@ -21,7 +22,8 @@ append_if_missing() {
     fi
 }
 
-# Default editor
+# 기본 에디터
+# - vim을 EDITOR/VISUAL 환경 변수로 설정
 if command -v vim &>/dev/null; then
     if ! grep -Fq 'export EDITOR="vim"' "$PROFILE_FILE" 2>/dev/null; then
         echo "Setting vim as default editor..."
@@ -30,10 +32,11 @@ if command -v vim &>/dev/null; then
     fi
 fi
 
-# Ensure ~/.local/bin in PATH
+# PATH 설정
+# - ~/.local/bin을 PATH에 추가 (사용자 로컬 바이너리 경로)
 mkdir -p "$HOME/.local/bin"
 if ! grep -Fq 'export PATH="$HOME/.local/bin:$PATH"' "$PROFILE_FILE" 2>/dev/null; then
     append_if_missing 'export PATH="$HOME/.local/bin:$PATH"'
 fi
 
-echo "=== System Baseline complete ==="
+echo "[system-baseline] done"

@@ -1,53 +1,53 @@
 # Brewfile
-# Managed by chezmoi — synced via `brew bundle`
+# chezmoi로 관리 — `brew bundle`로 동기화
 
-# System CLI
-brew "bash"
-brew "zsh"
-brew "curl"
-brew "wget"
-brew "git"
-brew "gh"
-brew "jq"
-brew "tree"
-brew "gnupg"
+# 시스템 CLI 도구
+brew "bash"         # Bash 셸
+brew "zsh"          # Zsh 셸
+brew "curl"         # URL 데이터 전송
+brew "wget"         # 파일 다운로드
+brew "git"          # 버전 관리
+brew "gh"           # GitHub CLI
+brew "jq"           # JSON 처리
+brew "tree"         # 디렉토리 트리 출력
+brew "gnupg"        # GPG 암호화
 
-# Dev CLI
-brew "tmux"
-brew "ripgrep"
-brew "fzf"
-brew "watchman"
-brew "fswatch"
-brew "direnv"
+# 개발 CLI 도구
+brew "tmux"         # 터미널 멀티플렉서
+brew "ripgrep"      # 빠른 텍스트 검색 (rg)
+brew "fzf"          # 퍼지 파인더
+brew "watchman"     # 파일 변경 감시
+brew "fswatch"      # 파일시스템 이벤트 모니터
+brew "direnv"       # 디렉토리별 환경 변수
 
-# Languages
-brew "node"
-brew "python"
-brew "go"
-brew "rust"
-brew "php"
-brew "ruby"
+# 프로그래밍 언어
+brew "node"         # Node.js
+brew "python"       # Python
+brew "go"           # Go
+brew "rust"         # Rust
+brew "php"          # PHP
+brew "ruby"         # Ruby
 
-# Package/Virtual Env
-brew "pipx"
-brew "uv"
+# 패키지/가상 환경 관리
+brew "pipx"         # Python CLI 도구 격리 설치
+brew "uv"           # 빠른 Python 패키지 매니저
 
-# Data/Utility
-brew "sqlite"
+# 데이터/유틸리티
+brew "sqlite"       # 경량 SQL 데이터베이스
 
-# Font
-cask "font-jetbrains-mono"
+# 폰트
+cask "font-jetbrains-mono"  # JetBrains Mono 개발 폰트
 
-# Terminal
-cask "ghostty"
+# 터미널 에뮬레이터
+cask "ghostty"      # GPU 가속 터미널
 
-# GUI Apps
-cask "docker"
-cask "iterm2"
-cask "google-chrome"
-cask "rectangle"
-cask "slack"
-cask "figma"
+# GUI 앱
+cask "docker"           # 컨테이너 런타임
+cask "iterm2"           # 터미널 에뮬레이터
+cask "google-chrome"    # 웹 브라우저
+cask "rectangle"        # 윈도우 매니저
+cask "slack"            # 팀 메신저
+cask "figma"            # 디자인 도구
 
-# AI Core
-brew "ollama"
+# AI
+brew "ollama"       # 로컬 LLM 실행 엔진

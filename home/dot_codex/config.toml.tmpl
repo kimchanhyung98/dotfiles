@@ -1,12 +1,13 @@
-# ~/.codex/config.toml — Codex CLI core settings
-# Managed by chezmoi
+# ~/.codex/config.toml — Codex CLI 핵심 설정
+# chezmoi로 관리
 
+# 기본 프로필 (o4-mini, 제안 모드)
 [default]
 model = "o4-mini"
 approval_mode = "suggest"
 
+# 기본 지시사항 (andrej-karpathy-skills 4원칙)
 [default.instructions]
-# andrej-karpathy-skills 4 principles
 text = """
 Think Before Coding: Understand the full context before writing code.
 Simplicity First: Choose the simplest solution and avoid unnecessary complexity.
@@ -14,6 +15,7 @@ Surgical Changes: Minimize change scope and don't modify unrelated code.
 Goal-Driven Execution: Focus on the user's goal and prevent unnecessary expansion.
 """
 
+# 고급 프로필 (o3, 전체 자동 승인)
 [profiles.full]
 model = "o3"
 approval_mode = "full-auto"

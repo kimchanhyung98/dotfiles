@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# macOS dotfiles test script (read-only, no file changes)
-# Uses isolated temp HOME to avoid affecting user's chezmoi config
+# macOS dotfiles 테스트 스크립트 (읽기 전용, 파일 변경 없음)
+# 격리된 임시 HOME 디렉토리에서 실행하여 실제 사용자 설정에 영향 없음
 
 set -euo pipefail
 
@@ -10,6 +10,7 @@ PASS=0
 FAIL=0
 ERRORS=""
 
+# 테스트 결과 출력 헬퍼 함수
 pass() {
     echo "  ✅ $1"
     PASS=$((PASS + 1))
@@ -30,7 +31,7 @@ section() {
     echo "--- $1 ---"
 }
 
-# Setup isolated chezmoi environment (does NOT touch real user config)
+# 격리된 chezmoi 환경 설정 (실제 사용자 설정에 영향 없음)
 TMPHOME=$(mktemp -d)
 trap 'rm -rf "$TMPHOME"' EXIT
 
@@ -41,17 +42,17 @@ cat > "$TMPHOME/.config/chezmoi/chezmoi.toml" << 'EOF'
     email = "test@example.com"
 EOF
 
-# Helper: run chezmoi in isolated environment
+# 격리된 환경에서 chezmoi 실행하는 래퍼 함수
 cz() {
     HOME="$TMPHOME" XDG_CONFIG_HOME="$TMPHOME/.config" chezmoi "$@"
 }
 
-# Initialize chezmoi with project source
+# 프로젝트 소스로 chezmoi 초기화
 if ! cz init --source "$REPO_DIR/home" 2>&1; then
     fail "chezmoi init failed"
 fi
 
-# --- 1. Template validation ---
+# --- 1. 템플릿 렌더링 검증 ---
 section "Template validation"
 TMPL_FAIL=0
 while IFS= read -r target; do
@@ -67,7 +68,7 @@ else
     fail "$TMPL_FAIL template(s) failed to render"
 fi
 
-# --- 2. chezmoi diff ---
+# --- 2. chezmoi diff (소스와 대상 차이 확인) ---
 section "chezmoi diff"
 if cz diff > /dev/null 2>&1; then
     pass "chezmoi diff (no differences)"
@@ -75,7 +76,7 @@ else
     warn "chezmoi diff (differences found, expected for fresh init)"
 fi
 
-# --- 3. chezmoi apply --dry-run ---
+# --- 3. chezmoi apply 드라이런 (실제 적용 없이 시뮬레이션) ---
 section "chezmoi apply (dry-run)"
 if cz apply --dry-run --verbose > /dev/null 2>&1; then
     pass "chezmoi apply --dry-run"
@@ -83,7 +84,7 @@ else
     warn "chezmoi apply --dry-run (changes pending)"
 fi
 
-# --- 4. chezmoi verify ---
+# --- 4. chezmoi verify (파일 일치 확인) ---
 section "chezmoi verify"
 if cz verify > /dev/null 2>&1; then
     pass "chezmoi verify (all files match)"
@@ -91,7 +92,7 @@ else
     warn "chezmoi verify (differences found, expected for isolated environment)"
 fi
 
-# --- 5. chezmoi doctor ---
+# --- 5. chezmoi doctor (환경 진단) ---
 section "chezmoi doctor"
 if doctor_output="$(cz doctor 2>&1)"; then
     echo "$doctor_output" | tail -5
@@ -101,7 +102,7 @@ else
     warn "chezmoi doctor (non-zero exit, may include errors)"
 fi
 
-# --- 6. ShellCheck (darwin scripts, post-render via method A) ---
+# --- 6. ShellCheck (darwin 스크립트 렌더링 후 린트 검사) ---
 section "ShellCheck (darwin scripts)"
 if ! command -v shellcheck &>/dev/null; then
     warn "shellcheck not installed, skipping (brew install shellcheck)"
@@ -128,7 +129,7 @@ else
 fi
 fi # end shellcheck available check
 
-# --- Summary ---
+# --- 결과 요약 ---
 echo ""
 echo "=============================="
 echo "  Results: $PASS passed, $FAIL failed"

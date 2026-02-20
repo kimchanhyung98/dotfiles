@@ -1,10 +1,11 @@
-{{/* chezmoi configuration template */}}
-{{/* Supports macOS (Intel & Apple Silicon) and Linux */}}
+{{/* chezmoi 설정 템플릿 */}}
+{{/* macOS (Intel & Apple Silicon) 및 Linux 지원 */}}
 
+{{/* 사용자 기본값 (초기 설정 시 대화형 프롬프트로 덮어씀) */}}
 {{- $name := "YOUR_NAME" -}}
 {{- $email := "YOUR_EMAIL" -}}
 
-{{/* Detect macOS architecture */}}
+{{/* macOS 아키텍처 감지 (Apple Silicon 여부) */}}
 {{- $isAppleSilicon := false -}}
 {{- if eq .chezmoi.os "darwin" -}}
 {{-   if eq .chezmoi.arch "arm64" -}}
@@ -12,26 +13,28 @@
 {{-   end -}}
 {{- end -}}
 
-{{/* Homebrew path varies by architecture */}}
+{{/* Homebrew 설치 경로 (Apple Silicon: /opt/homebrew, Intel: /usr/local) */}}
 {{- $homebrewPrefix := "/usr/local" -}}
 {{- if $isAppleSilicon -}}
 {{-   $homebrewPrefix = "/opt/homebrew" -}}
 {{- end -}}
 
-{{/* Work around unreliable hostname on macOS */}}
+{{/* macOS에서 안정적인 호스트네임 가져오기 (scutil 사용) */}}
 {{- $hostname := .chezmoi.hostname -}}
 {{- if eq .chezmoi.os "darwin" -}}
 {{-   $hostname = output "scutil" "--get" "LocalHostName" | trim -}}
 {{- end -}}
 
-{{/* Interactive prompts for personalization */}}
+{{/* 대화형 터미널에서 이름/이메일 입력 프롬프트 (최초 1회) */}}
 {{- if stdinIsATTY -}}
 {{-   $name = promptStringOnce . "name" "Full name" -}}
 {{-   $email = promptStringOnce . "email" "Email address" -}}
 {{- end -}}
 
+# chezmoi 소스 디렉토리 경로
 sourceDir = {{ .chezmoi.sourceDir | quote }}
 
+# 템플릿 데이터 (스크립트/설정에서 사용)
 [data]
     name = {{ $name | quote }}
     email = {{ $email | quote }}

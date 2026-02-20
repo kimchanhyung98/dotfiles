@@ -1,16 +1,16 @@
-# Files to ignore based on OS
+# OS별 무시할 파일
 {{ if ne .chezmoi.os "darwin" }}
-# Ignore macOS-specific files on non-macOS systems
+# macOS 전용 파일 (macOS가 아닌 경우 무시)
 .chezmoiscripts/darwin/**
 Brewfile
 {{ end }}
 
 {{ if ne .chezmoi.os "linux" }}
-# Ignore Linux-specific files on non-Linux systems
+# Linux 전용 파일 (Linux가 아닌 경우 무시)
 .chezmoiscripts/linux/**
 {{ end }}
 
-# General ignores
+# 공통 무시 (저장소 메타 파일)
 README.md
 LICENSE
 .git

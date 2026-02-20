@@ -9,9 +9,10 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== Runtime ==="
+echo "[runtime]"
 
-# Bun (download-then-execute for supply chain safety)
+# Bun
+# - JavaScript/TypeScript 런타임 설치 (임시파일 다운로드 후 실행)
 if ! command -v bun &>/dev/null; then
     echo "Installing Bun..."
     installer=$(mktemp)
@@ -26,4 +27,4 @@ else
     echo "Bun: already installed ($(bun --version))"
 fi
 
-echo "=== Runtime complete ==="
+echo "[runtime] done"

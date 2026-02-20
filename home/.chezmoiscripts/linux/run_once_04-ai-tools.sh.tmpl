@@ -9,15 +9,16 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== AI Tools ==="
+echo "[ai-tools]"
 
-# Ensure npm is available
+# npm 사전 확인
 if ! command -v npm &>/dev/null; then
     echo "Error: npm not found. Install Node.js first."
     exit 1
 fi
 
 # Claude Code
+# - Anthropic Claude 터미널 AI 코딩 도우미
 if ! command -v claude &>/dev/null; then
     echo "Installing Claude Code..."
     npm install -g @anthropic-ai/claude-code || echo "Warning: Claude Code install failed"
@@ -26,6 +27,7 @@ else
 fi
 
 # Codex CLI
+# - OpenAI Codex 터미널 AI 코딩 도우미
 if ! command -v codex &>/dev/null; then
     echo "Installing Codex CLI..."
     npm install -g @openai/codex || echo "Warning: Codex install failed"
@@ -34,6 +36,7 @@ else
 fi
 
 # oh-my-codex
+# - Codex CLI 확장 프레임워크
 if ! command -v oh-my-codex &>/dev/null; then
     echo "Installing oh-my-codex..."
     npm install -g oh-my-codex || echo "Warning: oh-my-codex install failed"
@@ -42,6 +45,7 @@ else
 fi
 
 # OpenCode
+# - 오픈소스 터미널 AI 코딩 도우미
 if ! command -v opencode &>/dev/null; then
     echo "Installing OpenCode..."
     npm install -g opencode-ai || echo "Warning: OpenCode install failed"
@@ -50,6 +54,7 @@ else
 fi
 
 # oh-my-opencode
+# - OpenCode 확장 프레임워크
 if ! command -v oh-my-opencode &>/dev/null; then
     echo "Installing oh-my-opencode..."
     npm install -g oh-my-opencode || echo "Warning: oh-my-opencode install failed"
@@ -58,6 +63,7 @@ else
 fi
 
 # OpenClaw
+# - AI 어시스턴트 백그라운드 데몬
 if ! command -v openclaw &>/dev/null; then
     echo "Installing OpenClaw..."
     npm install -g @openclaw/openclaw || echo "Warning: OpenClaw install failed"
@@ -65,7 +71,8 @@ else
     echo "OpenClaw: already installed"
 fi
 
-# OpenClaw systemd daemon
+# OpenClaw systemd 데몬 등록
+# - 시스템 시작 시 OpenClaw 자동 실행 설정
 SYSTEMD_DIR="$HOME/.config/systemd/user"
 SERVICE_FILE="$SYSTEMD_DIR/openclaw.service"
 if [ ! -f "$SERVICE_FILE" ] && command -v openclaw &>/dev/null; then
@@ -91,6 +98,7 @@ EOF
 fi
 
 # Gemini CLI
+# - Google Gemini 터미널 AI 도우미
 if ! command -v gemini &>/dev/null; then
     echo "Installing Gemini CLI..."
     npm install -g @google/gemini-cli || echo "Warning: Gemini CLI install failed"
@@ -98,4 +106,4 @@ else
     echo "Gemini CLI: already installed"
 fi
 
-echo "=== AI Tools complete ==="
+echo "[ai-tools] done"

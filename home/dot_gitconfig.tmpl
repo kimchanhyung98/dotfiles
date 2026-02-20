@@ -1,41 +1,51 @@
+# Git 사용자 정보
 [user]
     name = {{ .name | quote }}
     email = {{ .email | quote }}
 
+# 저장소 초기화 기본 설정
 [init]
     defaultBranch = main
 
+# 핵심 설정
 [core]
-    editor = vim
-    autocrlf = input
-    excludesfile = ~/.gitignore_global
+    editor = vim                        # 기본 에디터
+    autocrlf = input                    # 줄바꿈 자동 변환 (LF 유지)
+    excludesfile = ~/.gitignore_global  # 전역 gitignore
 
+# 출력 색상
 [color]
     ui = auto
 
+# Pull 전략
 [pull]
-    rebase = false
+    rebase = false  # merge 방식 사용
 
+# Push 전략
 [push]
-    default = current
-    autoSetupRemote = true
+    default = current       # 현재 브랜치만 push
+    autoSetupRemote = true  # 자동으로 upstream 설정
 
+# 단축 명령어
 [alias]
     st = status
     co = checkout
     br = branch
     ci = commit
     df = diff
-    lg = log --oneline --graph --decorate
-    last = log -1 HEAD
-    unstage = reset HEAD --
-    amend = commit --amend --no-edit
+    lg = log --oneline --graph --decorate   # 그래프 로그
+    last = log -1 HEAD                      # 마지막 커밋
+    unstage = reset HEAD --                 # 스테이징 취소
+    amend = commit --amend --no-edit        # 마지막 커밋 수정
 
+# Diff 설정
 [diff]
-    colorMoved = default
+    colorMoved = default    # 이동된 코드 색상 표시
 
+# Merge 충돌 스타일
 [merge]
-    conflictstyle = diff3
+    conflictstyle = diff3   # 3-way diff (base 포함)
 
+# Fetch 설정
 [fetch]
-    prune = true
+    prune = true    # 삭제된 원격 브랜치 자동 정리

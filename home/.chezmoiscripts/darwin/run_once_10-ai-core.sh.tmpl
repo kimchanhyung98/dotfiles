@@ -9,9 +9,10 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== AI Core ==="
+echo "[ai-core]"
 
 # gemini CLI
+# - Google Gemini 터미널 AI 도우미
 if ! command -v gemini &>/dev/null; then
     echo "Installing gemini CLI..."
     npm install -g @google/gemini-cli
@@ -20,6 +21,7 @@ else
 fi
 
 # SuperGemini
+# - Gemini CLI 확장 프레임워크
 if ! command -v supergemini &>/dev/null; then
     echo "Installing SuperGemini..."
     pipx install supergemini
@@ -27,11 +29,12 @@ else
     echo "SuperGemini: already installed"
 fi
 
-# ollama (installed via Brewfile, verify only)
+# ollama
+# - 로컬 LLM 실행 엔진 (Brewfile에서 설치, 여기서는 확인만)
 if command -v ollama &>/dev/null; then
     echo "ollama: already installed ($(ollama --version 2>/dev/null || echo 'installed'))"
 else
     echo "Warning: ollama not found. It should be installed via Brewfile."
 fi
 
-echo "=== AI Core complete ==="
+echo "[ai-core] done"

@@ -11,17 +11,19 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== AI MCP ==="
+echo "[ai-mcp]"
 
-# MCP servers are declared in ~/.claude.json (dot_claude.json.tmpl)
-# This script ensures the npm packages are available
+# MCP 서버 npm 패키지 설치
+# - ~/.claude.json에 선언된 MCP 서버가 실행 가능하도록 패키지 확보
 
-# context7 MCP server
+# context7
+# - 라이브러리 문서/코드 예제 조회 MCP 서버
 echo "Ensuring context7 MCP server..."
 npm list -g @upstash/context7-mcp &>/dev/null || npm install -g @upstash/context7-mcp 2>/dev/null || echo "Warning: context7 MCP install failed"
 
-# sequential-thinking MCP server
+# sequential-thinking
+# - 구조화된 다단계 추론 MCP 서버
 echo "Ensuring sequential-thinking MCP server..."
 npm list -g @modelcontextprotocol/server-sequential-thinking &>/dev/null || npm install -g @modelcontextprotocol/server-sequential-thinking 2>/dev/null || echo "Warning: sequential-thinking MCP install failed"
 
-echo "=== AI MCP complete ==="
+echo "[ai-mcp] done"
