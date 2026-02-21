@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Install/sync Homebrew packages from Brewfile
+# Install/sync packages from Brewfile
 # Re-runs when Brewfile content changes
 #
 # Brewfile hash: {{ include "Brewfile" | sha256sum }}
@@ -17,7 +17,11 @@ echo "[brew-packages]"
 {{ $homebrewPrefix := .homebrewPrefix }}
 eval "$({{ $homebrewPrefix }}/bin/brew shellenv)"
 
-# Brewfile 기반 패키지 일괄 설치/동기화
-brew bundle --file="{{ .chezmoi.sourceDir }}/Brewfile"
+# Brewfile 기반 패키지 일괄 설치/동기화 (zerobrew 우선, 실패 시 Homebrew 폴백)
+if command -v zb &>/dev/null; then
+    zb bundle --file="{{ .chezmoi.sourceDir }}/Brewfile" || brew bundle --file="{{ .chezmoi.sourceDir }}/Brewfile"
+else
+    brew bundle --file="{{ .chezmoi.sourceDir }}/Brewfile"
+fi
 
 echo "[brew-packages] done"
