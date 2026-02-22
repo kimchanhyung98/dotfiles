@@ -1,7 +1,6 @@
 #!/bin/bash
 #
 # AI OpenClaw: OpenClaw, launchd daemon, claude-mem integration
-# Runs once on first setup
 
 {{ if ne .chezmoi.os "darwin" }}
 exit 0
@@ -15,7 +14,7 @@ echo "[ai-openclaw]"
 # - AI 어시스턴트 백그라운드 데몬
 if ! command -v openclaw &>/dev/null; then
     echo "Installing OpenClaw..."
-    npm install -g openclaw@latest
+    npm install -g openclaw@latest || echo "[ai-openclaw][warning] OpenClaw installation failed"
 else
     echo "OpenClaw: already installed ($(openclaw --version 2>/dev/null || echo 'installed'))"
 fi
@@ -51,7 +50,7 @@ if [ ! -f "$PLIST_PATH" ]; then
 </dict>
 </plist>
 PLIST
-    launchctl bootstrap "gui/$(id -u)" "$PLIST_PATH" 2>/dev/null || echo "Warning: launchd bootstrap failed"
+    launchctl bootstrap "gui/$(id -u)" "$PLIST_PATH" 2>/dev/null || echo "[ai-openclaw][warning] launchd bootstrap failed"
 else
     echo "OpenClaw daemon: already registered"
 fi
@@ -62,11 +61,11 @@ if [ ! -f "$HOME/.claude-mem/.installed" ]; then
     echo "Setting up claude-mem for OpenClaw..."
     installer=$(mktemp)
     if curl -fsSL https://raw.githubusercontent.com/thedotmack/claude-mem/main/install/openclaw.sh -o "$installer" 2>/dev/null; then
-        bash "$installer" || echo "Warning: claude-mem OpenClaw integration failed"
+        bash "$installer" || echo "[ai-openclaw][warning] claude-mem OpenClaw integration failed"
         rm -f "$installer"
     else
         rm -f "$installer"
-        echo "Warning: claude-mem download failed"
+        echo "[ai-openclaw][warning] claude-mem download failed"
     fi
 else
     echo "claude-mem: already installed"

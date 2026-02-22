@@ -1,7 +1,6 @@
 #!/bin/bash
 #
-# AI Claude: Claude Code, SuperClaude, plugins (6)
-# Runs once on first setup
+# AI Claude: SuperClaude, peon-ping
 
 {{ if ne .chezmoi.os "darwin" }}
 exit 0
@@ -11,61 +10,29 @@ set -eufo pipefail
 
 echo "[ai-claude]"
 
-# Claude Code
-# - Anthropic Claude 터미널 AI 코딩 도우미
-if ! command -v claude &>/dev/null; then
-    echo "Installing Claude Code..."
-    npm install -g @anthropic-ai/claude-code
-else
-    echo "Claude Code: already installed ($(claude --version 2>/dev/null || echo 'installed'))"
-fi
-
 # SuperClaude
 # - Claude Code 확장 프레임워크 (페르소나, 명령어, 플래그 시스템)
 if ! command -v superclaude &>/dev/null; then
     echo "Installing SuperClaude..."
-    pipx install superclaude
+    pipx install superclaude || echo "[ai-claude][warning] SuperClaude installation failed"
 else
     echo "SuperClaude: already installed"
 fi
 
-# Plugins
-# - Claude Code 마켓플레이스 플러그인 일괄 설치
-echo "Installing Claude Code plugins..."
-PLUGINS=(
-    "superpowers"
-    "everything-claude-code"
-    "claude-hud"
-    "andrej-karpathy-skills"
-    "claude-mem"
-)
-
-for plugin in "${PLUGINS[@]}"; do
-    echo "  Installing plugin: $plugin"
-    claude plugin install "$plugin" 2>/dev/null || echo "  Warning: failed to install $plugin"
-done
-
 # peon-ping
-# - Claude Code 작업 완료 알림 사운드 (임시파일 다운로드 후 실행)
+# - 작업 완료 알림 사운드 (임시파일 다운로드 후 실행)
 if [ ! -d "$HOME/.claude/hooks/peon-ping" ]; then
     echo "Installing peon-ping..."
     installer=$(mktemp)
     if curl -fsSL https://raw.githubusercontent.com/PeonPing/peon-ping/main/install.sh -o "$installer" 2>/dev/null; then
-        bash "$installer" || echo "Warning: peon-ping installation failed"
+        bash "$installer" -- --packs=sc_marine,sc_scv || echo "[ai-claude][warning] peon-ping installation failed"
         rm -f "$installer"
     else
         rm -f "$installer"
-        echo "Warning: peon-ping download failed"
+        echo "[ai-claude][warning] peon-ping download failed"
     fi
 else
     echo "peon-ping: already installed"
-fi
-
-# everything-claude-code rules
-# - ECC 코딩 규칙 세트 설치
-if command -v claude &>/dev/null; then
-    echo "Installing everything-claude-code rules..."
-    npx --yes @anthropic-ai/claude-code-ecc-rules 2>/dev/null || echo "Warning: ecc rules installation failed"
 fi
 
 echo "[ai-claude] done"
