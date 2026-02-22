@@ -341,7 +341,6 @@ AI CLI(Claude Code, Codex, Gemini, Copilot)는 공식 설치 채널 정책에 �
 | 런타임    | 언어 런타임       | dotnet, go, kotlin, node, openjdk, php, python, ruby, rust                                      |
 | 런타임    | 패키지/가상환경     | composer, npm, pipx, rbenv, uv, xcodes, yarn                                                    |
 | 데이터/도구 | 데이터/유틸       | sqlite                                                                                          |
-| AI     | 알림           | peon-ping (tap: peonping/tap)                                                                    |
 | 터미널/앱  | 폰트           | font-jetbrains-mono                                                                             |
 | 터미널/앱  | 터미널          | ghostty                                                                                         |
 | 터미널/앱  | 개발 앱 (cask)  | docker, figma, flutter, gcloud-cli, github, iterm2, postman, proxyman, visual-studio-code        |
