@@ -12,7 +12,7 @@ echo "[ai-codex]"
 
 # oh-my-codex
 # - Codex CLI 멀티 에이전트 오케스트레이션 (프롬프트, 스킬, 팀 실행)
-if ! command -v oh-my-codex &>/dev/null; then
+if ! command -v omx &>/dev/null; then
     echo "Installing oh-my-codex..."
     npm install -g oh-my-codex || echo "[ai-codex][warning] oh-my-codex installation failed"
 else
@@ -29,14 +29,14 @@ if [ -d "$HOME/superpowers/skills" ] && [ ! -d "$CODEX_SKILLS_DIR" ]; then
     cp -r "$HOME/superpowers/skills" "$CODEX_SKILLS_DIR"
 fi
 
-# 기본 프로필 초기화
+# 초기 설정 및 검증
 mkdir -p "$HOME/.codex"
 if [ ! -f "$HOME/.codex/.profile-initialized" ]; then
-    echo "Initializing Codex default profile..."
-    if oh-my-codex init 2>/dev/null; then
+    echo "Initializing oh-my-codex..."
+    if omx setup 2>/dev/null && omx doctor 2>/dev/null; then
         touch "$HOME/.codex/.profile-initialized"
     else
-        echo "[ai-codex][warning] oh-my-codex init failed"
+        echo "[ai-codex][warning] omx setup/doctor failed"
     fi
 fi
 
