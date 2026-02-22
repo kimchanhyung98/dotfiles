@@ -15,6 +15,7 @@ echo "[ai-gemini]"
 if ! command -v supergemini &>/dev/null; then
     echo "Installing SuperGemini..."
     pipx install supergemini || echo "[ai-gemini][warning] SuperGemini installation failed"
+    SuperGemini install --force --yes || true
 else
     echo "SuperGemini: already installed"
 fi

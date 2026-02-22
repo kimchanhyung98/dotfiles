@@ -15,6 +15,7 @@ echo "[ai-claude]"
 if ! command -v superclaude &>/dev/null; then
     echo "Installing SuperClaude..."
     pipx install superclaude || echo "[ai-claude][warning] SuperClaude installation failed"
+    SuperClaude install --force --yes || true
 else
     echo "SuperClaude: already installed"
 fi
