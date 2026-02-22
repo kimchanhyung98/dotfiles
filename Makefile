@@ -64,7 +64,7 @@ endif
 		exit 1; \
 	fi
 	@echo "[check] Building Linux test container"
-	@docker build -q -t dotfiles-test -f tests/Dockerfile .
+	@docker build --no-cache -q -t dotfiles-test -f tests/Dockerfile .
 	@echo "[check] Running Linux tests (Docker)"
 	@docker run --rm dotfiles-test
 	@echo "[check] All checks completed"
