@@ -1,9 +1,6 @@
 # Brewfile
 # chezmoi로 관리 — `zb bundle`로 동기화
 
-# 커스텀 tap
-tap "peonping/tap"  # PeonPing
-
 # 시스템 CLI 도구
 brew "bash"               # Bash 셸
 brew "curl"               # URL 데이터 전송
@@ -53,9 +50,6 @@ brew "yarn"         # Node.js 패키지 매니저 (대체)
 
 # 데이터/유틸리티
 brew "sqlite"       # 경량 SQL 데이터베이스
-
-# AI
-brew "peon-ping"     # 터미널 알림 사운드
 
 # JetBrains: https://www.jetbrains.com/toolbox-app 에서 설치
 # cask "jetbrains-toolbox"
