@@ -25,7 +25,7 @@ if [ ! -d "$HOME/.claude/hooks/peon-ping" ]; then
     echo "Installing peon-ping..."
     installer=$(mktemp)
     if curl -fsSL https://raw.githubusercontent.com/PeonPing/peon-ping/main/install.sh -o "$installer" 2>/dev/null; then
-        bash "$installer" -- --packs=hal_2001,protoss,sc_marine,sc_scv || echo "[ai-claude][warning] peon-ping installation failed"
+        bash "$installer" --packs=hal_2001,protoss,sc_marine,sc_scv || echo "[ai-claude][warning] peon-ping installation failed"
         rm -f "$installer"
     else
         rm -f "$installer"
