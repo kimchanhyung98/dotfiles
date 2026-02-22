@@ -1,0 +1,63 @@
+{{- /* ~/.gemini/settings.json — Gemini CLI 설정 (훅: peon-ping, MCP 서버: context7, sequential-thinking) */ -}}
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "name": "peon-start",
+            "type": "command",
+            "command": "bash ~/.claude/hooks/peon-ping/adapters/gemini.sh SessionStart"
+          }
+        ]
+      }
+    ],
+    "AfterAgent": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "name": "peon-after-agent",
+            "type": "command",
+            "command": "bash ~/.claude/hooks/peon-ping/adapters/gemini.sh AfterAgent"
+          }
+        ]
+      }
+    ],
+    "AfterTool": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "name": "peon-after-tool",
+            "type": "command",
+            "command": "bash ~/.claude/hooks/peon-ping/adapters/gemini.sh AfterTool"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "name": "peon-notification",
+            "type": "command",
+            "command": "bash ~/.claude/hooks/peon-ping/adapters/gemini.sh Notification"
+          }
+        ]
+      }
+    ]
+  },
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking@latest"]
+    }
+  }
+}
