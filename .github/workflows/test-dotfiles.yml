@@ -130,9 +130,10 @@ jobs:
 
       - name: chezmoi apply
         run: |
-          chezmoi apply --force --keep-going --verbose 2>&1 | tee /tmp/chezmoi-apply.log || {
+          chezmoi apply --force --keep-going --verbose > /tmp/chezmoi-apply.log 2>&1 || {
             echo "::warning::chezmoi apply exited with non-zero status (--keep-going mode)"
           }
+          tail -100 /tmp/chezmoi-apply.log
 
       - name: chezmoi managed
         run: chezmoi managed
@@ -188,9 +189,10 @@ jobs:
 
       - name: chezmoi apply
         run: |
-          chezmoi apply --force --keep-going --verbose 2>&1 | tee /tmp/chezmoi-apply.log || {
+          chezmoi apply --force --keep-going --verbose > /tmp/chezmoi-apply.log 2>&1 || {
             echo "::warning::chezmoi apply exited with non-zero status (--keep-going mode)"
           }
+          tail -100 /tmp/chezmoi-apply.log
 
       - name: chezmoi managed
         run: chezmoi managed
