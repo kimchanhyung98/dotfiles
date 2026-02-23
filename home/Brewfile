@@ -1,53 +1,80 @@
 # Brewfile
-# chezmoi로 관리 — `brew bundle`로 동기화
+# chezmoi로 관리 — `zb bundle`로 동기화
 
 # 시스템 CLI 도구
-brew "bash"         # Bash 셸
-brew "zsh"          # Zsh 셸
-brew "curl"         # URL 데이터 전송
-brew "wget"         # 파일 다운로드
-brew "git"          # 버전 관리
-brew "gh"           # GitHub CLI
-brew "jq"           # JSON 처리
-brew "tree"         # 디렉토리 트리 출력
-brew "gnupg"        # GPG 암호화
+brew "bash"               # Bash 셸
+brew "curl"               # URL 데이터 전송
+brew "gh"                 # GitHub CLI
+brew "git"                # 버전 관리
+brew "git-lfs"            # Git 대용량 파일 지원
+brew "gnupg"              # GPG 암호화
+brew "grep"               # GNU grep
+brew "jq"                 # JSON 처리
+brew "pkg-config"         # 컴파일 플래그 헬퍼
+brew "shellcheck"         # 셸 스크립트 린터
+brew "terminal-notifier"  # macOS 터미널 알림
+brew "tree"               # 디렉토리 트리 출력
+brew "vim"                # 텍스트 에디터
+brew "wget"               # 파일 다운로드
+brew "zsh"                # Zsh 셸
 
 # 개발 CLI 도구
-brew "tmux"         # 터미널 멀티플렉서
-brew "ripgrep"      # 빠른 텍스트 검색 (rg)
-brew "fzf"          # 퍼지 파인더
-brew "watchman"     # 파일 변경 감시
-brew "fswatch"      # 파일시스템 이벤트 모니터
+brew "act"          # GitHub Actions 로컬 실행
+brew "awscli"       # AWS CLI
 brew "direnv"       # 디렉토리별 환경 변수
+brew "fswatch"      # 파일시스템 이벤트 모니터
+brew "fzf"          # 퍼지 파인더
+brew "ripgrep"      # 빠른 텍스트 검색 (rg)
+brew "tmux"         # 터미널 멀티플렉서
+brew "watchman"     # 파일 변경 감시
 
 # 프로그래밍 언어
-brew "node"         # Node.js
-brew "python"       # Python
+brew "dotnet"       # .NET
 brew "go"           # Go
-brew "rust"         # Rust
+brew "kotlin"       # Kotlin
+brew "node"         # Node.js
+brew "openjdk"      # Java (OpenJDK)
 brew "php"          # PHP
+brew "python"       # Python
 brew "ruby"         # Ruby
+brew "rust"         # Rust
 
 # 패키지/가상 환경 관리
+brew "composer"     # PHP 패키지 매니저
+brew "npm"          # Node.js 패키지 매니저
 brew "pipx"         # Python CLI 도구 격리 설치
+brew "rbenv"        # Ruby 버전 매니저
 brew "uv"           # 빠른 Python 패키지 매니저
+brew "xcodes"       # Xcode 버전 매니저
+brew "yarn"         # Node.js 패키지 매니저 (대체)
 
 # 데이터/유틸리티
 brew "sqlite"       # 경량 SQL 데이터베이스
 
-# 폰트
+# JetBrains: https://www.jetbrains.com/toolbox-app 에서 설치
+# cask "jetbrains-toolbox"
 cask "font-jetbrains-mono"  # JetBrains Mono 개발 폰트
 
 # 터미널 에뮬레이터
 cask "ghostty"      # GPU 가속 터미널
 
-# GUI 앱
-cask "docker"           # 컨테이너 런타임
-cask "iterm2"           # 터미널 에뮬레이터
+# 개발 앱
+cask "docker"              # 컨테이너 런타임
+cask "figma"               # 디자인 도구
+cask "flutter"             # Flutter SDK
+cask "gcloud-cli"          # Google Cloud CLI
+cask "github"              # GitHub Desktop
+cask "iterm2"              # 터미널 에뮬레이터
+cask "postman"             # API 테스트 도구
+cask "proxyman"            # HTTP 디버깅 프록시
+cask "visual-studio-code"  # VS Code
+
+# 일반 앱
+cask "appcleaner"       # 앱 제거 도구
 cask "google-chrome"    # 웹 브라우저
+cask "iina"             # 미디어 플레이어
+cask "keka"             # 파일 압축/해제
 cask "rectangle"        # 윈도우 매니저
 cask "slack"            # 팀 메신저
-cask "figma"            # 디자인 도구
-
-# AI
-brew "ollama"       # 로컬 LLM 실행 엔진
+cask "stats"            # 시스템 모니터
+cask "zoom"             # 화상 회의

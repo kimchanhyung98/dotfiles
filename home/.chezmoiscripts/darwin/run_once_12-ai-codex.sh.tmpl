@@ -1,7 +1,6 @@
 #!/bin/bash
 #
-# AI Codex: Codex CLI, oh-my-codex, superpowers (clone+symlink), profile init
-# Runs once on first setup
+# AI Codex: oh-my-codex, superpowers (copy), profile init
 
 {{ if ne .chezmoi.os "darwin" }}
 exit 0
@@ -11,48 +10,33 @@ set -eufo pipefail
 
 echo "[ai-codex]"
 
-# Codex CLI
-# - OpenAI Codex 터미널 AI 코딩 도우미
-if ! command -v codex &>/dev/null; then
-    echo "Installing Codex CLI..."
-    npm install -g @openai/codex
-else
-    echo "Codex CLI: already installed ($(codex --version 2>/dev/null || echo 'installed'))"
-fi
-
 # oh-my-codex
-# - Codex CLI 확장 프레임워크 (프로필, 설정 관리)
-if ! command -v oh-my-codex &>/dev/null; then
+# - Codex CLI 멀티 에이전트 오케스트레이션 (프롬프트, 스킬, 팀 실행)
+if ! command -v omx &>/dev/null; then
     echo "Installing oh-my-codex..."
-    npm install -g oh-my-codex
+    npm install -g oh-my-codex || echo "[ai-codex][warning] oh-my-codex installation failed"
 else
     echo "oh-my-codex: already installed"
 fi
 
 # superpowers for Codex
-# - 공유 스킬 저장소 클론 후 Codex 스킬 경로에 심볼릭 링크
-SUPERPOWERS_DIR="$HOME/.local/share/superpowers"
+# - ~/superpowers에서 Codex 스킬 경로로 복사 (개별 커스텀 가능)
 CODEX_SKILLS_DIR="$HOME/.agents/skills/superpowers"
 
-if [ ! -d "$SUPERPOWERS_DIR" ]; then
-    echo "Cloning superpowers..."
-    git clone https://github.com/obra/superpowers.git "$SUPERPOWERS_DIR"
-fi
-
-if [ ! -L "$CODEX_SKILLS_DIR" ]; then
-    echo "Linking superpowers to Codex skills..."
+if [ -d "$HOME/superpowers/skills" ] && [ ! -d "$CODEX_SKILLS_DIR" ]; then
+    echo "Copying superpowers to Codex skills..."
     mkdir -p "$(dirname "$CODEX_SKILLS_DIR")"
-    ln -sf "$SUPERPOWERS_DIR" "$CODEX_SKILLS_DIR"
+    cp -r "$HOME/superpowers/skills" "$CODEX_SKILLS_DIR"
 fi
 
-# 기본 프로필 초기화
+# 초기 설정 및 검증
 mkdir -p "$HOME/.codex"
 if [ ! -f "$HOME/.codex/.profile-initialized" ]; then
-    echo "Initializing Codex default profile..."
-    if oh-my-codex init 2>/dev/null; then
+    echo "Initializing oh-my-codex..."
+    if omx setup 2>/dev/null && omx doctor 2>/dev/null; then
         touch "$HOME/.codex/.profile-initialized"
     else
-        echo "Warning: oh-my-codex init failed"
+        echo "[ai-codex][warning] omx setup/doctor failed"
     fi
 fi
 

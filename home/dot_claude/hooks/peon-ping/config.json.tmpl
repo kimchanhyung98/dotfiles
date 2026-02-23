@@ -1,14 +1,22 @@
 {{- /* ~/.claude/hooks/peon-ping/config.json — 작업 알림 사운드 설정 (사운드팩, 볼륨, 카테고리) */ -}}
 {
-  "soundPack": "sc_scv",
+  "default_pack": "hal_2001",
+  "pack_rotation": ["hal_2001", "protoss", "sc_marine", "sc_scv", "sc_battlecruiser"],
+  "pack_rotation_mode": "random",
   "volume": 0.7,
+  "enabled": true,
+  "desktop_notifications": true,
+  "annoyed_threshold": 3,
+  "annoyed_window_seconds": 5,
+  "silent_window_seconds": 0,
+  "suppress_subagent_complete": false,
   "categories": {
-    "session": true,
-    "prompt": true,
-    "completion": true,
-    "permission": true,
-    "notification": true,
-    "error": true,
-    "compact": true
+    "session.start": true,
+    "task.acknowledge": true,
+    "task.complete": true,
+    "task.error": true,
+    "input.required": true,
+    "resource.limit": true,
+    "user.spam": true
   }
 }

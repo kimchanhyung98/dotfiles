@@ -1,7 +1,6 @@
 #!/bin/bash
 #
 # Prerequisites: Xcode CLI Tools, Homebrew, zerobrew, Rosetta 2 (Apple Silicon)
-# Runs once on first setup, before dotfiles deployment
 
 {{ if ne .chezmoi.os "darwin" }}
 exit 0
@@ -28,7 +27,7 @@ fi
 # - macOS 패키지 매니저 설치
 if ! command -v brew &>/dev/null; then
     echo "Installing Homebrew..."
-    # Homebrew is intentionally installed via the official bootstrap command.
+    # Homebrew 공식 부트스트랩 명령으로 설치 (의도적으로 curl | bash 사용)
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     {{ if .isAppleSilicon }}
     eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -61,15 +60,15 @@ if ! ensure_zb_available; then
     echo "Installing zerobrew..."
     installer=$(mktemp)
     if curl -fsSL https://zerobrew.rs/install -o "$installer" 2>/dev/null; then
-        bash "$installer" || echo "Warning: zerobrew installation failed"
+        bash "$installer" || echo "[prerequisites][warning] zerobrew installation failed"
     else
-        echo "Warning: zerobrew download failed"
+        echo "[prerequisites][warning] zerobrew download failed"
     fi
     rm -f "$installer"
     if ensure_zb_available; then
         echo "zerobrew: installed ($(command -v zb))"
     else
-        echo "Warning: zerobrew installation failed. Homebrew will be used as fallback."
+        echo "[prerequisites][warning] zerobrew installation failed. Homebrew will be used as fallback."
     fi
 else
     echo "zerobrew: already installed ($(command -v zb))"
