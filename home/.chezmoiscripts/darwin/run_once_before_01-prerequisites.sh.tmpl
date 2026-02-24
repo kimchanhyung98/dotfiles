@@ -58,20 +58,13 @@ ensure_zb_available() {
 
 if ! ensure_zb_available; then
     echo "Installing zerobrew..."
-    installer=$(mktemp)
-    if curl -fsSL https://zerobrew.rs/install -o "$installer" 2>/dev/null; then
-        bash "$installer" || echo "[prerequisites][warning] zerobrew installation failed"
-    else
-        echo "[prerequisites][warning] zerobrew download failed"
-    fi
-    rm -f "$installer"
-    if ensure_zb_available; then
-        echo "zerobrew: installed ($(command -v zb))"
-    else
-        echo "[prerequisites][warning] zerobrew installation failed. Homebrew will be used as fallback."
-    fi
+    curl -fsSL https://zerobrew.rs/install | bash || echo "[prerequisites][warning] zerobrew installation failed"
+fi
+
+if ensure_zb_available; then
+    echo "zerobrew: ready ($(command -v zb))"
 else
-    echo "zerobrew: already installed ($(command -v zb))"
+    echo "[prerequisites][warning] zerobrew not available. Homebrew will be used as fallback."
 fi
 
 {{ if .isAppleSilicon }}
