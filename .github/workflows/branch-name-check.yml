@@ -1,4 +1,3 @@
-# 브랜치 네이밍 규칙 검증 (type/description 형식 강제)
 name: Branch Name Check
 
 on:

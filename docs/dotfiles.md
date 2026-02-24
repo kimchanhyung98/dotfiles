@@ -11,14 +11,14 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 
 ## 검토 완료 레포
 
-| 카테고리     | 저장소                                                                                                                                                                                  |
-|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| System   | lucasgelfond/zerobrew, ghostty-org/ghostty                                                                                                                                           |
+| 카테고리     | 저장소                                                                                                                                                 |
+|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| System   | lucasgelfond/zerobrew, ghostty-org/ghostty                                                                                                          |
 | Claude   | PeonPing/peon-ping, obra/superpowers, jarrodwatts/claude-hud, blader/humanizer, VoltAgent/awesome-agent-skills, forrestchang/andrej-karpathy-skills |
-| Codex    | Yeachan-Heo/oh-my-codex                                                                                                                                                              |
-| Gemini   | (SuperGemini — pipx 패키지)                                                                                                                                                             |
-| OpenCode | anomalyco/opencode, code-yeongyu/oh-my-opencode                                                                                                                                      |
-| OpenClaw | openclaw/openclaw, thedotmack/claude-mem                                                                                                                                             |
+| Codex    | Yeachan-Heo/oh-my-codex                                                                                                                             |
+| Gemini   | (SuperGemini — pipx 패키지)                                                                                                                            |
+| OpenCode | anomalyco/opencode, code-yeongyu/oh-my-opencode                                                                                                     |
+| OpenClaw | openclaw/openclaw, thedotmack/claude-mem                                                                                                            |
 
 ## 검증 스냅샷
 
@@ -152,7 +152,7 @@ dotfiles/
 | `dot_codex/`           | `~/.codex/`           | Codex CLI 설정, 프롬프트, 글로벌 에이전트 지침 |
 | `dot_agents/skills/`   | `~/.agents/skills/`   | Codex 글로벌 스킬                    |
 | `dot_copilot/skills/`  | `~/.copilot/skills/`  | Copilot 글로벌 스킬                  |
-| `dot_gemini/`          | `~/.gemini/`          | Gemini CLI 설정 (MCP 서버)           |
+| `dot_gemini/`          | `~/.gemini/`          | Gemini CLI 설정 (MCP 서버)          |
 | `dot_openclaw/`        | `~/.openclaw/`        | OpenClaw 설정, 워크스페이스             |
 | `dot_local/bin/`       | `~/.local/bin/`       | 사용자 스크립트 (dotfiles-doctor)      |
 
@@ -179,15 +179,15 @@ dotfiles/
 
 **AI 스크립트 (darwin/)**
 
-| 순서 | 스크립트        | 역할                                             | 실행 조건 | 상세                                                                                                                                                           |
-|:--:|-------------|------------------------------------------------|------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 순서 | 스크립트        | 역할                                                           | 실행 조건 | 상세                                                                                                                                |
+|:--:|-------------|--------------------------------------------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------|
 | 10 | ai-core     | Claude Code, Codex CLI, Gemini CLI, Copilot CLI, superpowers | 최초 1회 | 공식 AI CLI 도구 4종 설치 + superpowers를 ~/superpowers에 clone. Claude Code는 공식 설치 스크립트(curl), 나머지 3종은 npm. 확장 환경 구성은 개별 스크립트(11~14)에서 처리 |
-| 11 | ai-claude   | SuperClaude, peon-ping                          | 최초 1회 | SuperClaude 프레임워크(pipx), peon-ping 알림 사운드. 플러그인·MCP는 settings.json·claude.json에서 선언적 관리                                                                             |
-| 12 | ai-codex    | oh-my-codex, superpowers (copy), 프로필 초기화        | 최초 1회 | oh-my-codex(npm), ~/superpowers에서 ~/.agents/skills/superpowers로 복사, 프로필 초기화                                                                                    |
-| 13 | ai-gemini   | SuperGemini, superpowers (copy)                  | 최초 1회 | SuperGemini 확장 프레임워크(pipx), ~/superpowers에서 ~/.gemini/skills/superpowers로 복사. MCP는 settings.json에서 선언적 관리                                                        |
-| 14 | ai-copilot  | superpowers (copy)                               | 최초 1회 | ~/superpowers에서 ~/.copilot/skills/superpowers로 복사. MCP는 mcp-config.json에서 선언적 관리                                                                               |
-| 20 | ai-opencode | OpenCode, oh-my-opencode, superpowers (copy)     | 최초 1회 | OpenCode(npm), oh-my-opencode(npm), ~/superpowers에서 ~/.config/opencode/plugins/superpowers로 복사. MCP는 opencode.json에서 선언적 관리                                     |
-| 21 | ai-openclaw | OpenClaw, 데몬 등록, claude-mem 연동                  | 최초 1회 | OpenClaw(npm), macOS launchd 데몬 등록, claude-mem 연동(별도 설치 스크립트). 로그: `~/Library/Logs/openclaw.log`                                                              |
+| 11 | ai-claude   | SuperClaude, peon-ping                                       | 최초 1회 | SuperClaude 프레임워크(pipx), peon-ping 알림 사운드. 플러그인·MCP는 settings.json·claude.json에서 선언적 관리                                           |
+| 12 | ai-codex    | oh-my-codex, superpowers (copy), 프로필 초기화                     | 최초 1회 | oh-my-codex(npm), ~/superpowers에서 ~/.agents/skills/superpowers로 복사, 프로필 초기화                                                       |
+| 13 | ai-gemini   | SuperGemini, superpowers (copy)                              | 최초 1회 | SuperGemini 확장 프레임워크(pipx), ~/superpowers에서 ~/.gemini/skills/superpowers로 복사. MCP는 settings.json에서 선언적 관리                         |
+| 14 | ai-copilot  | superpowers (copy)                                           | 최초 1회 | ~/superpowers에서 ~/.copilot/skills/superpowers로 복사. MCP는 mcp-config.json에서 선언적 관리                                                  |
+| 20 | ai-opencode | OpenCode, oh-my-opencode, superpowers (copy)                 | 최초 1회 | OpenCode(npm), oh-my-opencode(npm), ~/superpowers에서 ~/.config/opencode/plugins/superpowers로 복사. MCP는 opencode.json에서 선언적 관리       |
+| 21 | ai-openclaw | OpenClaw, 데몬 등록, claude-mem 연동                               | 최초 1회 | OpenClaw(npm), macOS launchd 데몬 등록, claude-mem 연동(별도 설치 스크립트). 로그: `~/Library/Logs/openclaw.log`                                  |
 
 | 순서 | 스크립트           | 역할          | 실행 조건             |
 |:--:|----------------|-------------|-------------------|
@@ -331,31 +331,33 @@ chezmoi init --apply
 
 ## Brewfile 패키지
 
-Brewfile은 `zb bundle`(zerobrew) 명령으로 동기화한다. zerobrew 실패 시 `brew bundle`로 폴백한다. 패키지 추가/제거는 Brewfile만 수정하면 다음 `chezmoi apply`에서 자동 반영된다.
-AI CLI(Claude Code, Codex, Gemini, Copilot)는 공식 설치 채널 정책에 따라 AI 스크립트에서 각 공식 채널(curl/npm)로 관리하고, Brewfile은 Homebrew 직접 관리 대상만 유지한다.
+Brewfile은 `zb bundle`(zerobrew) 명령으로 동기화한다. zerobrew 실패 시 `brew bundle`로 폴백한다. 패키지 추가/제거는 Brewfile만 수정하면 다음
+`chezmoi apply`에서 자동 반영된다.
+AI CLI(Claude Code, Codex, Gemini, Copilot)는 공식 설치 채널 정책에 따라 AI 스크립트에서 각 공식 채널(curl/npm)로 관리하고, Brewfile은 Homebrew 직접 관리
+대상만 유지한다.
 
-| 대주제    | 소주제          | 상세 패키지                                                                                          |
-|--------|--------------|------------------------------------------------------------------------------------------------|
-| 시스템    | 기본 CLI       | bash, zsh, curl, wget, git, git-lfs, gh, grep, jq, gnupg, pkg-config, shellcheck, terminal-notifier, tree, vim |
-| 시스템    | 개발 보조 CLI    | act, awscli, direnv, fswatch, fzf, ripgrep, tmux, watchman                                      |
-| 런타임    | 언어 런타임       | dotnet, go, kotlin, node, openjdk, php, python, ruby, rust                                      |
-| 런타임    | 패키지/가상환경     | composer, npm, pipx, rbenv, uv, xcodes, yarn                                                    |
-| 데이터/도구 | 데이터/유틸       | sqlite                                                                                          |
-| 터미널/앱  | 폰트           | font-jetbrains-mono                                                                             |
-| 터미널/앱  | 터미널          | ghostty                                                                                         |
-| 터미널/앱  | 개발 앱 (cask)  | docker, figma, flutter, gcloud-cli, github, iterm2, postman, proxyman, visual-studio-code        |
-| 터미널/앱  | 일반 앱 (cask)  | appcleaner, google-chrome, iina, keka, rectangle, slack, stats, zoom                             |
+| 대주제    | 소주제         | 상세 패키지                                                                                                         |
+|--------|-------------|----------------------------------------------------------------------------------------------------------------|
+| 시스템    | 기본 CLI      | bash, zsh, curl, wget, git, git-lfs, gh, grep, jq, gnupg, pkg-config, shellcheck, terminal-notifier, tree, vim |
+| 시스템    | 개발 보조 CLI   | act, awscli, direnv, fswatch, fzf, ripgrep, tmux, watchman                                                     |
+| 런타임    | 언어 런타임      | dotnet, go, kotlin, node, openjdk, php, python, ruby, rust                                                     |
+| 런타임    | 패키지/가상환경    | composer, npm, pipx, rbenv, uv, xcodes, yarn                                                                   |
+| 데이터/도구 | 데이터/유틸      | sqlite                                                                                                         |
+| 터미널/앱  | 폰트          | font-jetbrains-mono                                                                                            |
+| 터미널/앱  | 터미널         | ghostty                                                                                                        |
+| 터미널/앱  | 개발 앱 (cask) | docker, figma, flutter, gcloud-cli, github, iterm2, postman, proxyman, visual-studio-code                      |
+| 터미널/앱  | 일반 앱 (cask) | appcleaner, google-chrome, iina, keka, rectangle, slack, stats, zoom                                           |
 
 **AI CLI 설치 채널 (공식 문서 확인 기준)**
 
-| 도구       | 분류   | 공식 설치 채널                                                                        | 기본 운영 채널 |
-|----------|------|-------------------------------------------------------------------------------------|----------|
-| Claude   | 공식   | 공식 스크립트 (`curl -fsSL https://claude.ai/install.sh \| bash`)                        | curl     |
-| Codex    | 공식   | npm (`npm install -g @openai/codex`)                                                | npm      |
-| Gemini   | 공식   | npm (`npm install -g @google/gemini-cli`)                                           | npm      |
-| Copilot  | 공식   | npm (`npm install -g @github/copilot`)                                              | npm      |
-| OpenCode | 외부   | npm (`npm install -g opencode-ai`)                                                  | npm      |
-| OpenClaw | 외부   | npm (`npm install -g openclaw@latest`)                                              | npm      |
+| 도구       | 분류 | 공식 설치 채널                                                    | 기본 운영 채널 |
+|----------|----|-------------------------------------------------------------|----------|
+| Claude   | 공식 | 공식 스크립트 (`curl -fsSL https://claude.ai/install.sh \| bash`) | curl     |
+| Codex    | 공식 | npm (`npm install -g @openai/codex`)                        | npm      |
+| Gemini   | 공식 | npm (`npm install -g @google/gemini-cli`)                   | npm      |
+| Copilot  | 공식 | npm (`npm install -g @github/copilot`)                      | npm      |
+| OpenCode | 외부 | npm (`npm install -g opencode-ai`)                          | npm      |
+| OpenClaw | 외부 | npm (`npm install -g openclaw@latest`)                      | npm      |
 
 ## 외부 리소스
 
@@ -433,18 +435,20 @@ Ghostty는 macOS에서 Homebrew cask(`brew install --cask ghostty`), Linux에서
 
 공통 스킬을 각 도구의 글로벌 스킬 경로에 배포한다. 스킬 형식은 SKILL.md 기반으로 도구에 무관하게 동일하다.
 
-| 도구             | 글로벌 스킬 경로                                                              | 프로젝트 스킬 경로                                                | 배포 방식                                              |
-|----------------|------------------------------------------------------------------------|-----------------------------------------------------------|-----------------------------------------------------|
-| Claude Code    | `~/.claude/skills/`                                                    | `.claude/skills/`                                         | `.chezmoiexternal.toml`로 humanizer 자동 동기화            |
-| Codex          | `~/.agents/skills/`                                                    | `.agents/skills/`                                         | `.chezmoiexternal.toml`로 humanizer 자동 동기화            |
-| Gemini         | `~/.gemini/skills/`                                                    | -                                                         | ai-gemini 스크립트에서 superpowers copy               |
-| GitHub Copilot | `~/.copilot/skills/`                                                   | `.github/skills/`, `.claude/skills/`                      | ai-copilot 스크립트에서 superpowers copy               |
-| OpenCode       | `~/.config/opencode/skills/`, `~/.claude/skills/`, `~/.agents/skills/` | `.opencode/skills/`, `.claude/skills/`, `.agents/skills/` | ai-opencode 스크립트에서 superpowers copy              |
+| 도구             | 글로벌 스킬 경로                                                              | 프로젝트 스킬 경로                                                | 배포 방식                                     |
+|----------------|------------------------------------------------------------------------|-----------------------------------------------------------|-------------------------------------------|
+| Claude Code    | `~/.claude/skills/`                                                    | `.claude/skills/`                                         | `.chezmoiexternal.toml`로 humanizer 자동 동기화 |
+| Codex          | `~/.agents/skills/`                                                    | `.agents/skills/`                                         | `.chezmoiexternal.toml`로 humanizer 자동 동기화 |
+| Gemini         | `~/.gemini/skills/`                                                    | -                                                         | ai-gemini 스크립트에서 superpowers copy         |
+| GitHub Copilot | `~/.copilot/skills/`                                                   | `.github/skills/`, `.claude/skills/`                      | ai-copilot 스크립트에서 superpowers copy        |
+| OpenCode       | `~/.config/opencode/skills/`, `~/.claude/skills/`, `~/.agents/skills/` | `.opencode/skills/`, `.claude/skills/`, `.agents/skills/` | ai-opencode 스크립트에서 superpowers copy       |
 
 **스킬 소스**:
 
-- **humanizer**: AI 글쓰기 패턴 제거 스킬. AI 특유의 과도한 수식어, 반복 구조, 형식적 표현을 자연스러운 문장으로 교정한다. Claude와 Codex는 `.chezmoiexternal.toml`로 자동 배포된다.
-- **superpowers**: 브레인스토밍, TDD, 코드 리뷰, 서브에이전트 기반 개발 등 12종+ 스킬. ai-core(10)에서 ~/superpowers에 한 번 clone하고, Codex/Gemini/Copilot/OpenCode 각 프로바이더 스크립트에서 도구별 스킬 경로로 복사하여 개별 커스텀 가능. Claude는 플러그인 마켓플레이스로 설치.
+- **humanizer**: AI 글쓰기 패턴 제거 스킬. AI 특유의 과도한 수식어, 반복 구조, 형식적 표현을 자연스러운 문장으로 교정한다. Claude와 Codex는 `.chezmoiexternal.toml`
+  로 자동 배포된다.
+- **superpowers**: 브레인스토밍, TDD, 코드 리뷰, 서브에이전트 기반 개발 등 12종+ 스킬. ai-core(10)에서 ~/superpowers에 한 번 clone하고,
+  Codex/Gemini/Copilot/OpenCode 각 프로바이더 스크립트에서 도구별 스킬 경로로 복사하여 개별 커스텀 가능. Claude는 플러그인 마켓플레이스로 설치.
 - **andrej-karpathy-skills**: 코딩 행동 지침 4대 원칙. Claude에서는 플러그인 마켓플레이스로 설치하고, Codex에서는 config.toml의 모델 지침으로 적용한다.
 
 ### AGENTS.md
@@ -479,10 +483,10 @@ Ghostty는 macOS에서 Homebrew cask(`brew install --cask ghostty`), Linux에서
 
 **설치 (스크립트)**
 
-| 스크립트         | 내용                                                                                    | 설치 대상                    |
-|--------------|--------------------------------------------------------------------------------------|--------------------------|
-| 10-ai-core   | Claude Code (공식 설치 스크립트)                                                              | Claude Code CLI 바이너리     |
-| 11-ai-claude | SuperClaude (pipx), peon-ping (설치 스크립트)                                                    | CLI 확장 프레임워크 + 알림 사운드   |
+| 스크립트         | 내용                                      | 설치 대상                 |
+|--------------|-----------------------------------------|-----------------------|
+| 10-ai-core   | Claude Code (공식 설치 스크립트)                | Claude Code CLI 바이너리  |
+| 11-ai-claude | SuperClaude (pipx), peon-ping (설치 스크립트) | CLI 확장 프레임워크 + 알림 사운드 |
 
 **설정 (dot_claude/ → ~/.claude/)**
 
@@ -506,13 +510,13 @@ Ghostty는 macOS에서 Homebrew cask(`brew install --cask ghostty`), Linux에서
 Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록된다. 플러그인 전용 `plugins.json`/`hud.json` 파일은 사용하지 않으며, MCP는
 `~/.claude.json`(사용자)과 `.mcp.json`(프로젝트)으로 관리한다.
 
-| 플러그인                   | 역할            | 설치 방식        | 상세                                                                                                                                                                                  |
-|------------------------|---------------|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| superpowers            | 구조화된 워크플로우    | 플러그인 마켓플레이스  | 브레인스토밍, TDD, 코드 리뷰, 서브에이전트 기반 개발 등 12종+ 스킬을 제공. 코드 작성 전 계획 수립, 검증 후 완료 선언 등 체계적 개발 프로세스를 강제                                                                                         |
-| claude-hud             | 상태 표시줄        | 플러그인 마켓플레이스  | 컨텍스트 사용량, 현재 모델, Git 상태, 활성 도구, 에이전트, 진행률을 터미널 하단에 실시간 표시. 기본 statusline으로 설정. 설정은 자동 생성됨 (`~/.claude/plugins/claude-hud/config.json`)                                              |
-| peon-ping              | 멀티 에이전트 음성 알림 | 설치 스크립트      | CESP(Coding Event Sound Pack Specification) 표준 기반. `sc_marine`, `sc_scv` 사운드 팩을 기본 설치. 작업 완료, 권한 요청, 오류 발생 등 이벤트를 음성으로 알려주어 멀티태스킹 효율 향상. Claude Code 네이티브 훅 + 8종 어댑터로 다양한 AI 도구 지원               |
-| andrej-karpathy-skills | 코딩 행동 지침      | 플러그인 마켓플레이스  | Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution 4대 원칙을 Claude Code 세션에 자동 주입하여 코드 품질 기준선 유지                                                          |
-| claude-mem             | 세션 간 메모리 지속   | 플러그인 마켓플레이스  | 데이터를 `~/.claude-mem/`에 저장하고, AI 기반 압축으로 컨텍스트 효율을 유지. MCP 검색 5종을 지원하여 과거 세션의 결정사항, 패턴, 컨텍스트를 현재 세션에서 참조 가능                                                                           |
+| 플러그인                   | 역할            | 설치 방식       | 상세                                                                                                                                                                                 |
+|------------------------|---------------|-------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| superpowers            | 구조화된 워크플로우    | 플러그인 마켓플레이스 | 브레인스토밍, TDD, 코드 리뷰, 서브에이전트 기반 개발 등 12종+ 스킬을 제공. 코드 작성 전 계획 수립, 검증 후 완료 선언 등 체계적 개발 프로세스를 강제                                                                                        |
+| claude-hud             | 상태 표시줄        | 플러그인 마켓플레이스 | 컨텍스트 사용량, 현재 모델, Git 상태, 활성 도구, 에이전트, 진행률을 터미널 하단에 실시간 표시. 기본 statusline으로 설정. 설정은 자동 생성됨 (`~/.claude/plugins/claude-hud/config.json`)                                             |
+| peon-ping              | 멀티 에이전트 음성 알림 | 설치 스크립트     | CESP(Coding Event Sound Pack Specification) 표준 기반. `sc_marine`, `sc_scv` 사운드 팩을 기본 설치. 작업 완료, 권한 요청, 오류 발생 등 이벤트를 음성으로 알려주어 멀티태스킹 효율 향상. Claude Code 네이티브 훅 + 8종 어댑터로 다양한 AI 도구 지원 |
+| andrej-karpathy-skills | 코딩 행동 지침      | 플러그인 마켓플레이스 | Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution 4대 원칙을 Claude Code 세션에 자동 주입하여 코드 품질 기준선 유지                                                         |
+| claude-mem             | 세션 간 메모리 지속   | 플러그인 마켓플레이스 | 데이터를 `~/.claude-mem/`에 저장하고, AI 기반 압축으로 컨텍스트 효율을 유지. MCP 검색 5종을 지원하여 과거 세션의 결정사항, 패턴, 컨텍스트를 현재 세션에서 참조 가능                                                                          |
 
 **훅**
 
@@ -545,10 +549,10 @@ peon-ping과 claude-mem이 제공하는 훅은 settings.json에 등록되어 Cla
 
 **설치 (스크립트)**
 
-| 스크립트        | 내용                                                                                                      | 설치 대상             |
-|-------------|----------------------------------------------------------------------------------------------------------|-------------------|
-| 10-ai-core  | Codex CLI (npm)                                                                                          | Codex CLI 바이너리    |
-| 12-ai-codex | oh-my-codex (npm), superpowers (~/superpowers에서 copy), 프로필 초기화                                             | Codex 확장 환경 전체 구성 |
+| 스크립트        | 내용                                                             | 설치 대상             |
+|-------------|----------------------------------------------------------------|-------------------|
+| 10-ai-core  | Codex CLI (npm)                                                | Codex CLI 바이너리    |
+| 12-ai-codex | oh-my-codex (npm), superpowers (~/superpowers에서 copy), 프로필 초기화 | Codex 확장 환경 전체 구성 |
 
 **설정 (dot_codex/ → ~/.codex/)**
 
@@ -573,9 +577,9 @@ superpowers도 Codex에 설치된다 (~/superpowers에서 copy). karpathy 지침
 
 **설치 (스크립트)**
 
-| 스크립트           | 내용                                                                                                                    | 설치 대상                |
-|----------------|-----------------------------------------------------------------------------------------------------------------------|----------------------|
-| 20-ai-opencode | OpenCode (npm), oh-my-opencode (npm), superpowers (~/superpowers에서 copy)                                                          | OpenCode 바이너리와 확장 기능 |
+| 스크립트           | 내용                                                                       | 설치 대상                |
+|----------------|--------------------------------------------------------------------------|----------------------|
+| 20-ai-opencode | OpenCode (npm), oh-my-opencode (npm), superpowers (~/superpowers에서 copy) | OpenCode 바이너리와 확장 기능 |
 
 **설정 (dot_config/opencode/ → ~/.config/opencode/)**
 
@@ -637,27 +641,28 @@ OpenClaw는 업데이트가 빠른 편이므로 적용 전에 반드시 `https:/
 
 **설치 (스크립트)**
 
-| 스크립트         | 내용                                                                    | 설치 대상               |
-|--------------|-----------------------------------------------------------------------|---------------------|
-| 10-ai-core   | Gemini CLI (npm)                                                      | Gemini CLI 바이너리     |
-| 13-ai-gemini | SuperGemini (pipx), superpowers (~/superpowers에서 copy)                | Gemini CLI 확장 프레임워크 |
+| 스크립트         | 내용                                                     | 설치 대상               |
+|--------------|--------------------------------------------------------|---------------------|
+| 10-ai-core   | Gemini CLI (npm)                                       | Gemini CLI 바이너리     |
+| 13-ai-gemini | SuperGemini (pipx), superpowers (~/superpowers에서 copy) | Gemini CLI 확장 프레임워크 |
 
-SuperGemini는 Gemini CLI의 확장 프레임워크로, 슬래시 명령어와 AI 에이전트 페르소나를 제공한다. superpowers는 ~/superpowers에서 ~/.gemini/skills/superpowers로 복사된다.
+SuperGemini는 Gemini CLI의 확장 프레임워크로, 슬래시 명령어와 AI 에이전트 페르소나를 제공한다. superpowers는 ~/superpowers에서 ~
+/.gemini/skills/superpowers로 복사된다.
 
 ### Copilot
 
 **설치 (스크립트)**
 
-| 스크립트          | 내용                                                                       | 설치 대상               |
-|---------------|--------------------------------------------------------------------------|---------------------|
-| 10-ai-core    | Copilot CLI (npm)                                                        | Copilot CLI 바이너리    |
-| 14-ai-copilot | superpowers (~/superpowers에서 copy)                                       | Copilot 확장 환경 구성    |
+| 스크립트          | 내용                                 | 설치 대상            |
+|---------------|------------------------------------|------------------|
+| 10-ai-core    | Copilot CLI (npm)                  | Copilot CLI 바이너리 |
+| 14-ai-copilot | superpowers (~/superpowers에서 copy) | Copilot 확장 환경 구성 |
 
 **설정 (dot_copilot/ → ~/.copilot/)**
 
-| 파일      | 배포 경로                | 역할     | 상세                                                         |
-|---------|----------------------|--------|------------------------------------------------------------|
-| skills/ | `~/.copilot/skills/` | 글로벌 스킬 | superpowers 스킬을 배포. 각 스킬은 `<skill-name>/SKILL.md` 형태로 구성    |
+| 파일      | 배포 경로                | 역할     | 상세                                                       |
+|---------|----------------------|--------|----------------------------------------------------------|
+| skills/ | `~/.copilot/skills/` | 글로벌 스킬 | superpowers 스킬을 배포. 각 스킬은 `<skill-name>/SKILL.md` 형태로 구성 |
 
 Copilot 스킬 경로:
 
@@ -685,21 +690,21 @@ peon-ping은 CESP(Coding Event Sound Pack Specification) 표준을 기반으로 
 
 설치 완료 후 헬스체크 스크립트. `~/.local/bin/dotfiles-doctor`로 배포되어 `dotfiles-doctor` 명령으로 실행한다. 각 항목의 설치 여부를 확인하고 누락된 항목을 보고한다.
 
-| 검사 카테고리          | 대상                                                                               | 검사 내용                           |
-|------------------|----------------------------------------------------------------------------------|---------------------------------|
-| System           | macOS/Linux 버전, 아키텍처                                                             | OS 버전과 아키텍처 정보를 표시하여 환경 식별      |
-| Shell            | zsh, git, vim, tmux                                                              | 기초 셸 도구의 설치 여부와 버전 확인           |
-| Terminal         | ghostty                                                                          | Ghostty 터미널의 설치 여부 확인           |
-| Languages        | node, python3, go, rustc, php, ruby                                              | 프로그래밍 언어 런타임의 설치 여부와 버전 확인      |
-| Package Managers | brew, zb, pipx, bun                                                              | 패키지 관리자의 설치 여부 확인. zb는 zerobrew |
-| AI CLI           | claude, codex, gemini, copilot, opencode, openclaw                               | AI 도구 CLI의 설치 여부와 버전 확인         |
-| AI 플러그인          | superpowers, claude-hud, peon-ping, claude-mem, oh-my-codex, oh-my-opencode      | 각 AI 도구의 확장 기능 설치 상태 확인         |
-| 스킬 디렉토리          | Claude, Codex, Gemini, Copilot, OpenCode 5개 경로                                   | 글로벌 스킬 디렉토리 존재 여부와 내용물 확인       |
-| AGENTS.md        | `~/AGENTS.md` 존재 여부                                                              | 공통 에이전트 지침 파일 배포 상태 확인          |
-| claude-mem       | `~/.claude-mem/` 디렉토리, `settings.json`                                           | 세션 메모리 데이터 디렉토리와 설정 파일 존재 확인    |
-| Dotfiles         | ~/.zshrc, ~/.gitconfig, ~/.vimrc, ~/.oh-my-zsh                                   | 핵심 dotfiles의 배포 상태 확인           |
-| Config           | ghostty, opencode, claude, codex, copilot, openclaw                              | 각 도구의 설정 디렉토리 존재 여부 확인          |
-| MCP              | ~/.claude.json                                                                   | MCP 서버 설정 파일 존재 여부 확인           |
+| 검사 카테고리          | 대상                                                                          | 검사 내용                           |
+|------------------|-----------------------------------------------------------------------------|---------------------------------|
+| System           | macOS/Linux 버전, 아키텍처                                                        | OS 버전과 아키텍처 정보를 표시하여 환경 식별      |
+| Shell            | zsh, git, vim, tmux                                                         | 기초 셸 도구의 설치 여부와 버전 확인           |
+| Terminal         | ghostty                                                                     | Ghostty 터미널의 설치 여부 확인           |
+| Languages        | node, python3, go, rustc, php, ruby                                         | 프로그래밍 언어 런타임의 설치 여부와 버전 확인      |
+| Package Managers | brew, zb, pipx, bun                                                         | 패키지 관리자의 설치 여부 확인. zb는 zerobrew |
+| AI CLI           | claude, codex, gemini, copilot, opencode, openclaw                          | AI 도구 CLI의 설치 여부와 버전 확인         |
+| AI 플러그인          | superpowers, claude-hud, peon-ping, claude-mem, oh-my-codex, oh-my-opencode | 각 AI 도구의 확장 기능 설치 상태 확인         |
+| 스킬 디렉토리          | Claude, Codex, Gemini, Copilot, OpenCode 5개 경로                              | 글로벌 스킬 디렉토리 존재 여부와 내용물 확인       |
+| AGENTS.md        | `~/AGENTS.md` 존재 여부                                                         | 공통 에이전트 지침 파일 배포 상태 확인          |
+| claude-mem       | `~/.claude-mem/` 디렉토리, `settings.json`                                      | 세션 메모리 데이터 디렉토리와 설정 파일 존재 확인    |
+| Dotfiles         | ~/.zshrc, ~/.gitconfig, ~/.vimrc, ~/.oh-my-zsh                              | 핵심 dotfiles의 배포 상태 확인           |
+| Config           | ghostty, opencode, claude, codex, copilot, openclaw                         | 각 도구의 설정 디렉토리 존재 여부 확인          |
+| MCP              | ~/.claude.json                                                              | MCP 서버 설정 파일 존재 여부 확인           |
 
 ## 요구사항 요약
 
@@ -720,28 +725,28 @@ peon-ping은 CESP(Coding Event Sound Pack Specification) 표준을 기반으로 
 | Copilot        | superpowers (copy), MCP 2종                                                                     |
 | OpenCode       | OpenCode, oh-my-opencode, superpowers (copy)                                                   |
 | OpenClaw       | OpenClaw, claude-mem 연동                                                                        |
-| Skills         | humanizer (Claude, Codex), superpowers (Claude 플러그인 + Codex/Gemini/Copilot/OpenCode copy)     |
+| Skills         | humanizer (Claude, Codex), superpowers (Claude 플러그인 + Codex/Gemini/Copilot/OpenCode copy)      |
 | Apps           | ghostty, docker, iterm2, chrome, rectangle, slack, figma 등                                     |
 | Shell          | Oh My Zsh + autosuggestions + syntax-highlighting                                              |
 | Linux          | curl, git, vim, zsh, ghostty, 셸/Git baseline, claude, codex, opencode, openclaw, gemini        |
 
 ## 운영 체크리스트
 
-| 항목                  | 확인 포인트                                                                |
-|---------------------|-----------------------------------------------------------------------|
-| 템플릿 데이터 키 일관성       | `.chezmoi.toml.tmpl`에 정의된 변수가 모든 `.tmpl` 파일에서 동일한 이름으로 참조되는지 확인       |
-| 스크립트 번호 체계 일관성      | darwin/(01~04, 10~14, 20~21, 99), linux/(01~05) 번호가 중복 없이 순서대로 유지되는지 확인 |
-| 외부 리소스 선언 파일 최신화    | `.chezmoiexternal.toml`의 URL, 브랜치, 해시가 최신 원격 저장소와 일치하는지 확인            |
-| AI 모듈 경계 준수         | 설치 스크립트는 바이너리 설치만, 설정 파일은 사용자 설정만 담당하는 분리 원칙이 유지되는지 확인                |
+| 항목                  | 확인 포인트                                                                           |
+|---------------------|----------------------------------------------------------------------------------|
+| 템플릿 데이터 키 일관성       | `.chezmoi.toml.tmpl`에 정의된 변수가 모든 `.tmpl` 파일에서 동일한 이름으로 참조되는지 확인                  |
+| 스크립트 번호 체계 일관성      | darwin/(01~04, 10~14, 20~21, 99), linux/(01~05) 번호가 중복 없이 순서대로 유지되는지 확인          |
+| 외부 리소스 선언 파일 최신화    | `.chezmoiexternal.toml`의 URL, 브랜치, 해시가 최신 원격 저장소와 일치하는지 확인                       |
+| AI 모듈 경계 준수         | 설치 스크립트는 바이너리 설치만, 설정 파일은 사용자 설정만 담당하는 분리 원칙이 유지되는지 확인                           |
 | 스킬 디렉토리 동기화 상태      | Claude, Codex, Gemini, Copilot, OpenCode 5개 글로벌 스킬 경로에 humanizer 스킬이 배포되어 있는지 확인 |
-| AGENTS.md 공통 지침 최신화 | `~/AGENTS.md`와 `~/.codex/AGENTS.md`의 4대 원칙과 공통 규칙이 최신 상태인지 확인         |
-| peon-ping 어댑터 등록 상태 | 사용 중인 AI 도구의 peon-ping 어댑터가 올바르게 연결되어 이벤트 알림이 동작하는지 확인                |
-| 플러그인 버전 호환성         | Claude Code, Codex, OpenCode의 플러그인이 현재 도구 버전과 호환되는지 확인                |
-| OpenClaw 데몬 상태      | macOS launchd / Linux systemd에 OpenClaw 데몬이 올바르게 등록되어 동작하는지 확인        |
-| claude-mem 데이터 상태   | `~/.claude-mem/` 디렉토리와 `settings.json`이 존재하고 정상적으로 메모리를 기록하는지 확인      |
-| Linux 기초 설정 누락 여부   | macOS에 추가된 AI 도구가 Linux ai-tools 스크립트에도 반영되어 있는지 확인                   |
-| 진단 스크립트 검사 대상 최신화   | dotfiles-doctor가 새로 추가된 도구, 설정 파일, 스킬 경로를 검사 대상에 포함하는지 확인             |
-| 검증 스냅샷 갱신           | 참조 저장소의 구조가 변경되었을 때 검증 커밋 해시를 최신으로 갱신했는지 확인                           |
+| AGENTS.md 공통 지침 최신화 | `~/AGENTS.md`와 `~/.codex/AGENTS.md`의 4대 원칙과 공통 규칙이 최신 상태인지 확인                    |
+| peon-ping 어댑터 등록 상태 | 사용 중인 AI 도구의 peon-ping 어댑터가 올바르게 연결되어 이벤트 알림이 동작하는지 확인                           |
+| 플러그인 버전 호환성         | Claude Code, Codex, OpenCode의 플러그인이 현재 도구 버전과 호환되는지 확인                           |
+| OpenClaw 데몬 상태      | macOS launchd / Linux systemd에 OpenClaw 데몬이 올바르게 등록되어 동작하는지 확인                   |
+| claude-mem 데이터 상태   | `~/.claude-mem/` 디렉토리와 `settings.json`이 존재하고 정상적으로 메모리를 기록하는지 확인                 |
+| Linux 기초 설정 누락 여부   | macOS에 추가된 AI 도구가 Linux ai-tools 스크립트에도 반영되어 있는지 확인                              |
+| 진단 스크립트 검사 대상 최신화   | dotfiles-doctor가 새로 추가된 도구, 설정 파일, 스킬 경로를 검사 대상에 포함하는지 확인                        |
+| 검증 스냅샷 갱신           | 참조 저장소의 구조가 변경되었을 때 검증 커밋 해시를 최신으로 갱신했는지 확인                                      |
 
 ## 문서 규칙
 
