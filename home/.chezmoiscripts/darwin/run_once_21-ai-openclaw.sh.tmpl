@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# AI OpenClaw: OpenClaw, launchd daemon, claude-mem integration, peon-ping adapter
+# AI OpenClaw: OpenClaw, peon-ping adapter
 
 {{ if ne .chezmoi.os "darwin" }}
 exit 0
@@ -11,7 +11,7 @@ set -eufo pipefail
 echo "[ai-openclaw]"
 
 # OpenClaw
-# - AI 어시스턴트 백그라운드 데몬
+# - 설치 + launchd 데몬 등록을 onboard --install-daemon 으로 한번에 처리
 if ! command -v openclaw &>/dev/null; then
     echo "Installing OpenClaw..."
     npm install -g openclaw@latest || echo "[ai-openclaw][warning] OpenClaw installation failed"
@@ -19,70 +19,20 @@ else
     echo "OpenClaw: already installed ($(openclaw --version 2>/dev/null || echo 'installed'))"
 fi
 
-# launchd 데몬 등록
-# - macOS 시작 시 OpenClaw 자동 실행 설정
-PLIST_NAME="com.openclaw.daemon"
-PLIST_PATH="$HOME/Library/LaunchAgents/${PLIST_NAME}.plist"
-
-if [ ! -f "$PLIST_PATH" ]; then
-    echo "Registering OpenClaw launchd daemon..."
-    OPENCLAW_BIN=$(command -v openclaw 2>/dev/null || echo "$HOME/.local/bin/openclaw")
-    cat > "$PLIST_PATH" << PLIST
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>Label</key>
-    <string>${PLIST_NAME}</string>
-    <key>ProgramArguments</key>
-    <array>
-        <string>${OPENCLAW_BIN}</string>
-        <string>daemon</string>
-    </array>
-    <key>RunAtLoad</key>
-    <true/>
-    <key>KeepAlive</key>
-    <true/>
-    <key>StandardOutPath</key>
-    <string>${HOME}/Library/Logs/openclaw.log</string>
-    <key>StandardErrorPath</key>
-    <string>${HOME}/Library/Logs/openclaw.error.log</string>
-</dict>
-</plist>
-PLIST
-    launchctl bootstrap "gui/$(id -u)" "$PLIST_PATH" 2>/dev/null || echo "[ai-openclaw][warning] launchd bootstrap failed"
-else
-    echo "OpenClaw daemon: already registered"
-fi
-
-# claude-mem 연동
-# - OpenClaw용 Claude 메모리 통합 (임시파일 다운로드 후 실행)
-if [ ! -f "$HOME/.claude-mem/.installed" ]; then
-    echo "Setting up claude-mem for OpenClaw..."
-    installer=$(mktemp)
-    if curl -fsSL https://raw.githubusercontent.com/thedotmack/claude-mem/main/install/openclaw.sh -o "$installer" 2>/dev/null; then
-        bash "$installer" || echo "[ai-openclaw][warning] claude-mem OpenClaw integration failed"
-        rm -f "$installer"
+if command -v openclaw &>/dev/null; then
+    if openclaw daemon status 2>/dev/null | grep -q "installed"; then
+        echo "OpenClaw daemon: already registered"
     else
-        rm -f "$installer"
-        echo "[ai-openclaw][warning] claude-mem download failed"
+        echo "Registering OpenClaw daemon..."
+        openclaw onboard --install-daemon || echo "[ai-openclaw][warning] onboard --install-daemon failed (manual setup required)"
     fi
-else
-    echo "claude-mem: already installed"
 fi
 
 # peon-ping adapter for OpenClaw
-# - OpenClaw용 작업 알림 사운드 어댑터 (임시파일 다운로드 후 실행)
+# - OpenClaw용 작업 알림 사운드 어댑터
 if [ ! -f "$HOME/.openclaw/hooks/peon-ping/.installed" ]; then
     echo "Installing peon-ping adapter for OpenClaw..."
-    installer=$(mktemp)
-    if curl -fsSL https://raw.githubusercontent.com/PeonPing/peon-ping/main/adapters/openclaw.sh -o "$installer" 2>/dev/null; then
-        bash "$installer" || echo "[ai-openclaw][warning] peon-ping adapter installation failed"
-        rm -f "$installer"
-    else
-        rm -f "$installer"
-        echo "[ai-openclaw][warning] peon-ping adapter download failed"
-    fi
+    curl -fsSL https://raw.githubusercontent.com/PeonPing/peon-ping/main/adapters/openclaw.sh | bash || echo "[ai-openclaw][warning] peon-ping adapter installation failed"
 else
     echo "peon-ping adapter: already installed"
 fi
