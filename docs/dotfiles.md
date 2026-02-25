@@ -144,7 +144,7 @@ dotfiles/
 
 | 소스 (chezmoi)           | 배포 대상                 | 용도                              |
 |------------------------|-----------------------|---------------------------------|
-| `dot_claude.json.tmpl` | `~/.claude.json`      | MCP 서버 설정 (홈 루트)                |
+| `dot_claude.json.tmpl` | `~/.claude.json`      | MCP 서버 설정 (홈 루트, `.chezmoiignore`로 제외 — Claude Code 런타임 관리) |
 | `AGENTS.md.tmpl`       | `~/AGENTS.md`         | 공통 에이전트 지침 (홈 루트)               |
 | `dot_config/ghostty/`  | `~/.config/ghostty/`  | Ghostty 터미널 설정                  |
 | `dot_config/opencode/` | `~/.config/opencode/` | OpenCode + oh-my-opencode 설정    |
@@ -162,7 +162,7 @@ dotfiles/
 |-------------------------|----------------------------|----------------------------------------------------------------------------------------------------|
 | `.chezmoiroot`          | source root 경로 고정 (`home`) | chezmoi가 `home/` 디렉토리를 소스 루트로 인식하게 하여, 저장소 루트의 docs/, install.sh 등이 홈 디렉토리에 배포되지 않도록 격리            |
 | `.chezmoiversion`       | 최소 chezmoi 실행 버전 고정        | 이 dotfiles가 요구하는 chezmoi 최소 버전을 명시하여, 이전 버전의 호환성 문제를 사전 차단                                         |
-| `.chezmoiignore`        | OS별 불필요 경로 제외              | 템플릿 조건문으로 현재 OS에 해당하지 않는 설정 파일을 배포 대상에서 제외. macOS에서 Linux 전용 설정을, Linux에서 macOS 전용 설정을 무시          |
+| `.chezmoiignore`        | OS별·런타임 경로 제외              | 템플릿 조건문으로 현재 OS에 해당하지 않는 설정 파일을 배포 대상에서 제외. 저장소 메타 파일(README, LICENSE 등)과 Claude Code 런타임 데이터(`.claude.json`)도 공통 제외 |
 | `.chezmoiexternal.toml` | 외부 리소스 선언적 동기화             | Oh My Zsh, zsh 플러그인, humanizer 등 외부 Git 저장소를 선언하여 `chezmoi apply` 시 자동 다운로드/갱신. 갱신 주기를 리소스별로 개별 설정 |
 | `.chezmoiremove`        | 더 이상 필요 없는 파일 제거 대상 관리     | dotfiles에서 관리를 중단한 파일을 나열하여 다음 apply 시 자동 삭제. 설정 파일 이름이 변경되었거나 도구를 제거한 경우 잔여 파일 정리에 활용             |
 
@@ -262,7 +262,6 @@ chezmoi init --apply
 ├─ dotfiles 배포
 │   ~/.zshrc, ~/.gitconfig, ~/.gitignore_global, ~/.vimrc
 │   ~/AGENTS.md (공통 에이전트 지침)
-│   ~/.claude.json (MCP 설정, 홈 루트)
 │   ~/.config/ghostty/config, ~/.config/opencode/*
 │   ~/.claude/settings.json, ~/.claude/hooks/peon-ping/*
 │   ~/.codex/config.toml, ~/.codex/AGENTS.md, ~/.codex/prompts/*
@@ -301,7 +300,7 @@ chezmoi init --apply
 │
 └─ dotfiles 배포
     ~/.zshrc, ~/.gitconfig, ~/.gitignore_global
-    ~/AGENTS.md, ~/.claude.json
+    ~/AGENTS.md
     ~/.config/ghostty/config, ~/.config/opencode/*
     ~/.claude/*, ~/.codex/*, ~/.agents/*, ~/.copilot/*
     ~/.openclaw/*
@@ -502,8 +501,8 @@ Ghostty는 macOS에서 Homebrew cask(`brew install --cask ghostty`), Linux에서
 | `~/.claude/commands/` | 글로벌 커스텀 슬래시 커맨드 | 마크다운 파일로 정의하는 사용자 커스텀 슬래시 커맨드. `/help`에서 목록 확인 가능          |
 | `~/.claude/agents/`   | 글로벌 커스텀 서브에이전트  | YAML frontmatter가 포함된 마크다운 파일로 정의하는 서브에이전트. 오케스트레이터가 자동 생성 |
 
-**MCP 설정 위치**: 사용자 범위는 `~/.claude.json` (`dot_claude.json.tmpl`), 프로젝트 범위는 `.mcp.json`을 사용한다. `~/.claude/` 디렉토리 내부가 아닌 *
-*홈 디렉토리 루트**에 위치하는 점에 주의. `~/.claude.json`은 사용자 기본 MCP 서버를, `.mcp.json`은 프로젝트별 MCP 서버를 선언한다.
+**MCP 설정 위치**: 사용자 범위는 `~/.claude.json`, 프로젝트 범위는 `.mcp.json`을 사용한다. `~/.claude/` 디렉토리 내부가 아닌 **홈 디렉토리 루트**에 위치하는 점에
+주의. `~/.claude.json`은 Claude Code가 런타임에 직접 관리하며(`.chezmoiignore`로 chezmoi 배포 제외), `.mcp.json`은 프로젝트별 MCP 서버를 선언한다.
 
 **플러그인**
 
