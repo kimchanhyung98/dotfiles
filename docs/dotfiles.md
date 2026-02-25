@@ -342,7 +342,7 @@ AI CLI(Claude Code, Codex, Gemini, Copilot)는 공식 설치 채널 정책에 �
 | 런타임    | 언어 런타임      | dotnet, go, kotlin, node, openjdk, php, python, ruby, rust                                                     |
 | 런타임    | 패키지/가상환경    | composer, npm, pipx, rbenv, uv, xcodes, yarn                                                                   |
 | 데이터/도구 | 데이터/유틸      | sqlite                                                                                                         |
-| 터미널/앱  | 폰트          | font-jetbrains-mono                                                                                            |
+| 터미널/앱  | 폰트          | font-jetbrains-mono, font-jetbrains-mono-nerd-font                                                             |
 | 터미널/앱  | 터미널         | ghostty                                                                                                        |
 | 터미널/앱  | 개발 앱 (cask) | docker, figma, flutter, gcloud-cli, github, iterm2, postman, proxyman, visual-studio-code                      |
 | 터미널/앱  | 일반 앱 (cask) | appcleaner, google-chrome, iina, keka, rectangle, slack, stats, zoom                                           |
@@ -401,14 +401,14 @@ Ghostty는 이 단일 파일에서 모든 설정을 읽는다.
 설정 형식은 `key = value`이며, 주석은 `#`으로 시작한다(인라인 주석 불가, 별도 줄에서만 사용). Ghostty는 설정 파일 변경 시 수동 리로드를 지원한다(macOS: `Cmd+Shift+,`,
 Linux: `Ctrl+Shift+,`). 자동 파일 감시는 제공하지 않으며, 일부 설정은 터미널 재시작이 필요하다.
 
-| 영역    | 설정 항목                                                                   | 상세                                          |
-|-------|-------------------------------------------------------------------------|---------------------------------------------|
-| 폰트    | font-family, font-size                                                  | 코딩용 폰트와 크기. 시스템 폰트 목록에서 자동 탐색               |
-| 테마    | theme, background, foreground, cursor-color                             | 전체 색상 테마. 내장 테마 이름 또는 개별 색상 지정              |
-| 창     | window-padding-x, window-padding-y, background-opacity, background-blur | 텍스트와 창 테두리 사이 여백, 배경 투명도, 블러 효과             |
-| 셸     | shell-integration, scrollback-limit                                     | 셸 통합(프롬프트 감지, 명령 완료 마커), 스크롤백 버퍼 크기         |
-| 키바인딩  | keybind                                                                 | 커스텀 키 바인딩. Ghostty 고유 형식으로 정의               |
-| macOS | macos-titlebar-style, macos-option-as-alt                               | macOS 전용 타이틀바 스타일(숨김/투명), Option 키를 Alt로 매핑 |
+| 영역    | 설정 항목                                                                                                          | 상세                                                        |
+|-------|-----------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| 폰트    | font-family, font-size, font-thicken, adjust-cell-height                                                        | JetBrainsMono Nerd Font 사용. 레티나 선명도, 줄 간격 조정              |
+| 테마    | theme                                                                                                           | 전체 색상 테마. 내장 테마 이름으로 지정 (Gruvbox Dark)                   |
+| 커서    | cursor-style-blink, mouse-hide-while-typing                                                                     | 커서 깜빡임 비활성화, 타이핑 중 마우스 커서 숨김                             |
+| 창     | window-padding-x/y, window-padding-balance, background-opacity, background-blur, unfocused-split-opacity 등      | 여백, 투명도, 블러, split 패널 투명도, 붙여넣기 보호 비활성화, 닫기 확인 다이얼로그    |
+| 셸     | shell-integration, scrollback-limit                                                                             | 셸 통합(프롬프트 감지, 명령 완료 마커), 스크롤백 버퍼 크기                     |
+| macOS | macos-titlebar-style, macos-option-as-alt                                                                       | macOS 전용 타이틀바 스타일(숨김), Option 키를 Alt로 매핑                  |
 
 Ghostty는 macOS에서 Homebrew cask(`brew install --cask ghostty`), Linux에서 배포판 패키지 관리자로 설치한다.
 
