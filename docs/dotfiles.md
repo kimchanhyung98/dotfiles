@@ -130,7 +130,6 @@ dotfiles/
     │   └── skills/
     │
     ├── dot_openclaw/
-    │   ├── openclaw.json.tmpl
     │   └── workspace/
     │       ├── AGENTS.md.tmpl
     │       ├── SOUL.md.tmpl
@@ -153,7 +152,7 @@ dotfiles/
 | `dot_agents/skills/`   | `~/.agents/skills/`   | Codex 글로벌 스킬                    |
 | `dot_copilot/skills/`  | `~/.copilot/skills/`  | Copilot 글로벌 스킬                  |
 | `dot_gemini/`          | `~/.gemini/`          | Gemini CLI 설정 (MCP 서버)          |
-| `dot_openclaw/`        | `~/.openclaw/`        | OpenClaw 설정, 워크스페이스             |
+| `dot_openclaw/`        | `~/.openclaw/`        | OpenClaw 워크스페이스 (행동/성격/도구 정의)   |
 | `dot_local/bin/`       | `~/.local/bin/`       | 사용자 스크립트 (dotfiles-doctor)      |
 
 ## chezmoi special 파일
@@ -187,7 +186,7 @@ dotfiles/
 | 13 | ai-gemini   | SuperGemini, superpowers (copy)                              | 최초 1회 | SuperGemini 확장 프레임워크(pipx), ~/superpowers에서 ~/.gemini/skills/superpowers로 복사. MCP는 settings.json에서 선언적 관리                         |
 | 14 | ai-copilot  | superpowers (copy)                                           | 최초 1회 | ~/superpowers에서 ~/.copilot/skills/superpowers로 복사. MCP는 mcp-config.json에서 선언적 관리                                                  |
 | 20 | ai-opencode | OpenCode, oh-my-opencode, superpowers (copy)                 | 최초 1회 | OpenCode(npm), oh-my-opencode(npm), ~/superpowers에서 ~/.config/opencode/plugins/superpowers로 복사. MCP는 opencode.json에서 선언적 관리       |
-| 21 | ai-openclaw | OpenClaw, 데몬 등록, claude-mem 연동                               | 최초 1회 | OpenClaw(npm), macOS launchd 데몬 등록, claude-mem 연동(별도 설치 스크립트). 로그: `~/Library/Logs/openclaw.log`                                  |
+| 21 | ai-openclaw | OpenClaw, 데몬 등록, peon-ping adapter                            | 최초 1회 | OpenClaw(npm), `openclaw onboard --install-daemon`으로 데몬 등록, peon-ping 어댑터 설치. 설정 파일은 chezmoi 관리 대상이 아님 (인증/토큰 충돌 방지)               |
 
 | 순서 | 스크립트           | 역할          | 실행 조건             |
 |:--:|----------------|-------------|-------------------|
@@ -257,7 +256,7 @@ chezmoi init --apply
 │   OpenCode → oh-my-opencode → superpowers (copy)
 │
 ├─ 21 ai-openclaw
-│   OpenClaw → launchd 데몬 등록 → claude-mem 연동 (별도 스크립트)
+│   OpenClaw → onboard --install-daemon → peon-ping adapter
 │
 ├─ dotfiles 배포
 │   ~/.zshrc, ~/.gitconfig, ~/.gitignore_global, ~/.vimrc
@@ -608,22 +607,22 @@ OpenCode는 프로젝트/글로벌 모두에서 `.opencode/skills/` 외에 `.cla
 
 **설치 (스크립트)**
 
-| 스크립트           | 내용                                                     | 설치 대상                     |
-|----------------|--------------------------------------------------------|---------------------------|
-| 21-ai-openclaw | OpenClaw (npm), 데몬 등록 (launchd/systemd), claude-mem 연동 | OpenClaw 바이너리, 데몬, 메모리 연동 |
+| 스크립트           | 내용                                                                      | 설치 대상                     |
+|----------------|-------------------------------------------------------------------------|---------------------------|
+| 21-ai-openclaw | OpenClaw (npm), 데몬 등록 (`onboard --install-daemon`), peon-ping adapter | OpenClaw 바이너리, 데몬, 알림 어댑터 |
 
 **설정 (dot_openclaw/ → ~/.openclaw/)**
 
-| 파일                 | 배포 경로                       | 역할          | 상세                                                                                                                             |
-|--------------------|-----------------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------|
-| openclaw.json.tmpl | `~/.openclaw/openclaw.json` | 핵심 설정       | AI 모델, 메시징 채널, 게이트웨이, 보안 정책을 정의                                                                                                |
-| extensions/        | `~/.openclaw/extensions/`   | 플러그인 확장     | `openclaw plugins install`로 설치한 플러그인이 저장되는 경로. 각 플러그인은 `openclaw.plugin.json` manifest를 포함                                     |
-| workspace/         | `~/.openclaw/workspace/`    | 행동/성격/도구 정의 | AGENTS.md(행동 지침), SOUL.md(성격 정의), TOOLS.md(도구 접근 정책)를 chezmoi로 관리. USER.md, IDENTITY.md, HEARTBEAT.md는 OpenClaw가 초기 실행 시 자동 생성 |
+| 파일          | 배포 경로                     | 역할          | 상세                                                                                                                             |
+|-------------|---------------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------|
+| extensions/ | `~/.openclaw/extensions/` | 플러그인 확장     | `openclaw plugins install`로 설치한 플러그인이 저장되는 경로. 각 플러그인은 `openclaw.plugin.json` manifest를 포함                                     |
+| workspace/  | `~/.openclaw/workspace/`  | 행동/성격/도구 정의 | AGENTS.md(행동 지침), SOUL.md(성격 정의), TOOLS.md(도구 접근 정책)를 chezmoi로 관리. USER.md, IDENTITY.md, HEARTBEAT.md는 OpenClaw가 초기 실행 시 자동 생성 |
 
 OpenClaw는 코딩 도구가 아닌 **개인 AI 어시스턴트 플랫폼**이다. 메시징 채널(WhatsApp, Telegram, Slack, Discord 등)을 통해 AI 에이전트와 대화하며, 음성 인식과 Talk
 Mode(ElevenLabs)도 지원한다. macOS에서는 launchd, Linux에서는 systemd 데몬으로 상시 실행된다.
 
-claude-mem 연동은 별도 설치 스크립트(`thedotmack/claude-mem/install/openclaw.sh`)로 처리한다. OpenClaw는 플러그인 시스템을 지원하며, 설치된 플러그인은
+`openclaw.json`(핵심 설정)은 인증 토큰과 채널 설정을 포함하므로 chezmoi 관리 대상에서 제외하고, `openclaw onboard` 명령으로 초기 설정한다.
+OpenClaw는 플러그인 시스템을 지원하며, 설치된 플러그인은
 `~/.openclaw/extensions/<plugin-id>/`에 위치하고 `openclaw.plugin.json` manifest를 사용한다. 스킬은 ClawHub 기반으로 별도 확장할 수 있다.
 OpenClaw는 업데이트가 빠른 편이므로 적용 전에 반드시 `https://docs.openclaw.ai`의 최신 설치/설정 문서를 재확인한다.
 
@@ -633,7 +632,7 @@ OpenClaw는 업데이트가 빠른 편이므로 적용 전에 반드시 `https:/
 |------------|--------------------------------------|--------------------------------------------------|
 | 멀티 채널      | WhatsApp, Telegram, Slack, Discord 등 | 다양한 메시징 플랫폼에서 동일한 AI 에이전트에 접근                    |
 | 음성         | 음성 인식, Talk Mode (ElevenLabs)        | 텍스트 외에 음성으로도 AI와 대화. ElevenLabs TTS로 자연스러운 음성 응답 |
-| claude-mem | 세션 간 메모리 지속                          | Claude Code와 동일한 claude-mem을 연동하여 크로스 플랫폼 메모리 공유 |
+| peon-ping  | 작업 알림 사운드                          | CESP 어댑터를 통해 OpenClaw 이벤트를 사운드로 알림                |
 | 데몬         | macOS launchd, Linux systemd 자동 등록   | 사용자가 명시적으로 실행하지 않아도 항상 백그라운드에서 동작                |
 
 ### Gemini
@@ -723,7 +722,7 @@ peon-ping은 CESP(Coding Event Sound Pack Specification) 표준을 기반으로 
 | Gemini         | SuperGemini, superpowers (copy), MCP 2종                                                        |
 | Copilot        | superpowers (copy), MCP 2종                                                                     |
 | OpenCode       | OpenCode, oh-my-opencode, superpowers (copy)                                                   |
-| OpenClaw       | OpenClaw, claude-mem 연동                                                                        |
+| OpenClaw       | OpenClaw, peon-ping adapter                                                                    |
 | Skills         | humanizer (Claude, Codex), superpowers (Claude 플러그인 + Codex/Gemini/Copilot/OpenCode copy)      |
 | Apps           | ghostty, docker, iterm2, chrome, rectangle, slack, figma 등                                     |
 | Shell          | Oh My Zsh + autosuggestions + syntax-highlighting                                              |
