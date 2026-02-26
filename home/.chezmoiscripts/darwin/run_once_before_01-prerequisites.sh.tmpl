@@ -1,7 +1,6 @@
 #!/bin/bash
 #
 # Prerequisites: Xcode CLI Tools, Homebrew, zerobrew, Rosetta 2 (Apple Silicon)
-# Runs once on first setup, before dotfiles deployment
 
 {{ if ne .chezmoi.os "darwin" }}
 exit 0
@@ -9,9 +8,10 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== Prerequisites ==="
+echo "[prerequisites]"
 
-# Xcode Command Line Tools
+# 1. Xcode Command Line Tools
+# - macOS 개발 도구 (git, make 등) 설치
 if ! xcode-select -p &>/dev/null; then
     echo "Installing Xcode Command Line Tools..."
     xcode-select --install
@@ -23,10 +23,11 @@ else
     echo "Xcode CLI Tools: already installed."
 fi
 
-# Homebrew
+# 2. Homebrew
+# - macOS 패키지 매니저 설치
 if ! command -v brew &>/dev/null; then
     echo "Installing Homebrew..."
-    # Homebrew is intentionally installed via the official bootstrap command.
+    # Homebrew 공식 부트스트랩 명령으로 설치 (의도적으로 curl | bash 사용)
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     {{ if .isAppleSilicon }}
     eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -37,14 +38,18 @@ else
     echo "Homebrew: already installed."
 fi
 
-# zerobrew
+# 3. zerobrew
+# - Homebrew 대안 패키지 매니저 (빠른 설치 지원)
 ensure_zb_available() {
     if command -v zb &>/dev/null; then
         return 0
     fi
+    # - 여러 설치 경로에서 zb 바이너리 탐색
     for candidate in "$HOME/.local/bin/zb" "/opt/zerobrew/bin/zb" "/usr/local/zerobrew/bin/zb"; do
         if [ -x "$candidate" ]; then
-            export PATH="$(dirname "$candidate"):$PATH"
+            local dir
+            dir="$(dirname "$candidate")"
+            export PATH="$dir:$PATH"
             return 0
         fi
     done
@@ -55,22 +60,23 @@ if ! ensure_zb_available; then
     echo "Installing zerobrew..."
     installer=$(mktemp)
     if curl -fsSL https://zerobrew.rs/install -o "$installer" 2>/dev/null; then
-        bash "$installer" || echo "Warning: zerobrew installation failed"
+        bash "$installer" || echo "[prerequisites][warning] zerobrew installation failed"
     else
-        echo "Warning: zerobrew download failed"
+        echo "[prerequisites][warning] zerobrew download failed"
     fi
     rm -f "$installer"
     if ensure_zb_available; then
         echo "zerobrew: installed ($(command -v zb))"
     else
-        echo "Warning: zerobrew installation failed. Homebrew will be used as fallback."
+        echo "[prerequisites][warning] zerobrew installation failed. Homebrew will be used as fallback."
     fi
 else
     echo "zerobrew: already installed ($(command -v zb))"
 fi
 
 {{ if .isAppleSilicon }}
-# Rosetta 2 (Apple Silicon only)
+# 4. Rosetta 2 (Apple Silicon 전용)
+# - x86_64 바이너리를 ARM에서 실행하기 위한 호환 레이어
 if ! pkgutil --pkgs 2>/dev/null | grep -q "com.apple.pkg.RosettaUpdateAuto"; then
     echo "Installing Rosetta 2..."
     /usr/sbin/softwareupdate --install-rosetta --agree-to-license
@@ -79,4 +85,4 @@ else
 fi
 {{ end }}
 
-echo "=== Prerequisites complete ==="
+echo "[prerequisites] done"

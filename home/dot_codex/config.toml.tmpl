@@ -1,12 +1,20 @@
-# ~/.codex/config.toml — Codex CLI core settings
-# Managed by chezmoi
+# ~/.codex/config.toml — Codex CLI 핵심 설정
 
-[default]
-model = "o4-mini"
-approval_mode = "suggest"
+model = "gpt-5.3-codex"
+model_reasoning_effort = "xhigh"
 
+approval_policy = "never"
+sandbox_mode = "danger-full-access"
+web_search = "live"
+
+# peon-ping 알림 연동
+notify = ["bash", "{{ .chezmoi.homeDir }}/.claude/hooks/peon-ping/adapters/codex.sh"]
+
+[features]
+collaboration_modes = true
+
+# 기본 지시사항 (andrej-karpathy-skills 4원칙)
 [default.instructions]
-# andrej-karpathy-skills 4 principles
 text = """
 Think Before Coding: Understand the full context before writing code.
 Simplicity First: Choose the simplest solution and avoid unnecessary complexity.
@@ -14,10 +22,13 @@ Surgical Changes: Minimize change scope and don't modify unrelated code.
 Goal-Driven Execution: Focus on the user's goal and prevent unnecessary expansion.
 """
 
-[profiles.full]
-model = "o3"
-approval_mode = "full-auto"
+# MCP servers
+[mcp_servers.openai_developer_docs]
+command = "npx"
+args = ["-y", "mcp-remote", "https://developers.openai.com/mcp"]
+enabled = true
 
-[mcp_servers.augment-context-engine]
-command = "auggie"
-args = ["--mcp", "--mcp-auto-workspace"]
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp@latest"]
+enabled = true

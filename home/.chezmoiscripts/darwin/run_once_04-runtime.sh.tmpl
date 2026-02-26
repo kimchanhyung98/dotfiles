@@ -1,7 +1,6 @@
 #!/bin/bash
 #
 # Runtime: Bun (JavaScript/TypeScript)
-# Runs once on first setup
 
 {{ if ne .chezmoi.os "darwin" }}
 exit 0
@@ -9,21 +8,22 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== Runtime ==="
+echo "[runtime]"
 
-# Bun (download-then-execute for supply chain safety)
+# Bun
+# - JavaScript/TypeScript 런타임 설치 (임시파일 다운로드 후 실행)
 if ! command -v bun &>/dev/null; then
     echo "Installing Bun..."
     installer=$(mktemp)
     if curl -fsSL https://bun.sh/install -o "$installer"; then
-        bash "$installer" || echo "Warning: Bun installation failed"
+        bash "$installer" || echo "[runtime][warning] Bun installation failed"
         rm -f "$installer"
     else
         rm -f "$installer"
-        echo "Warning: Bun download failed"
+        echo "[runtime][warning] Bun download failed"
     fi
 else
     echo "Bun: already installed ($(bun --version))"
 fi
 
-echo "=== Runtime complete ==="
+echo "[runtime] done"

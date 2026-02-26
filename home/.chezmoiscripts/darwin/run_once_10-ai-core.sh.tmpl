@@ -1,7 +1,6 @@
 #!/bin/bash
 #
-# AI Core: gemini CLI, SuperGemini, ollama
-# Runs once on first setup
+# AI CLI 설치
 
 {{ if ne .chezmoi.os "darwin" }}
 exit 0
@@ -9,29 +8,47 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== AI Core ==="
+echo "[ai-core]"
 
-# gemini CLI
+# Claude Code
+if ! command -v claude &>/dev/null; then
+    echo "Installing Claude Code..."
+    curl -fsSL https://claude.ai/install.sh | bash || echo "[ai-core][warning] Claude Code installation failed"
+else
+    echo "Claude Code: already installed ($(claude --version 2>/dev/null || echo 'unknown'))"
+fi
+
+# Codex CLI
+if ! command -v codex &>/dev/null; then
+    echo "Installing Codex CLI..."
+    npm install -g @openai/codex || echo "[ai-core][warning] Codex CLI installation failed"
+else
+    echo "Codex CLI: already installed ($(codex --version 2>/dev/null || echo 'unknown'))"
+fi
+
+# Gemini CLI
 if ! command -v gemini &>/dev/null; then
-    echo "Installing gemini CLI..."
-    npm install -g @google/gemini-cli
+    echo "Installing Gemini CLI..."
+    npm install -g @google/gemini-cli || echo "[ai-core][warning] Gemini CLI installation failed"
 else
-    echo "gemini CLI: already installed ($(gemini --version 2>/dev/null || echo 'installed'))"
+    echo "Gemini CLI: already installed ($(gemini --version 2>/dev/null || echo 'unknown'))"
 fi
 
-# SuperGemini
-if ! command -v supergemini &>/dev/null; then
-    echo "Installing SuperGemini..."
-    pipx install supergemini
+# Copilot CLI
+if ! command -v copilot &>/dev/null; then
+    echo "Installing Copilot CLI..."
+    npm install -g @github/copilot || echo "[ai-core][warning] Copilot CLI installation failed"
 else
-    echo "SuperGemini: already installed"
+    echo "Copilot CLI: already installed ($(copilot --version 2>/dev/null || echo 'unknown'))"
 fi
 
-# ollama (installed via Brewfile, verify only)
-if command -v ollama &>/dev/null; then
-    echo "ollama: already installed ($(ollama --version 2>/dev/null || echo 'installed'))"
+# superpowers
+# - 공유 스킬 저장소 (각 AI 도구에서 개별 복사하여 사용)
+if [ ! -d "$HOME/superpowers" ]; then
+    echo "Cloning superpowers..."
+    git clone https://github.com/obra/superpowers.git "$HOME/superpowers" || echo "[ai-core][warning] superpowers clone failed"
 else
-    echo "Warning: ollama not found. It should be installed via Brewfile."
+    echo "superpowers: already cloned"
 fi
 
-echo "=== AI Core complete ==="
+echo "[ai-core] done"

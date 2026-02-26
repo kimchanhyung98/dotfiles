@@ -9,16 +9,18 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== Git Baseline ==="
+echo "[git-baseline]"
 
-# Git user config (handled by dot_gitconfig.tmpl, verify only)
+# Git 사용자 설정 확인
+# - dot_gitconfig.tmpl에서 설정됨, 여기서는 확인만
 if git config --global user.name &>/dev/null; then
     echo "Git user: $(git config --global user.name) <$(git config --global user.email)>"
 else
     echo "Warning: Git user not configured. Check ~/.gitconfig"
 fi
 
-# SSH key basics
+# SSH 키 기본 설정
+# - ~/.ssh 디렉토리 생성 및 권한 설정
 SSH_DIR="$HOME/.ssh"
 if [ ! -d "$SSH_DIR" ]; then
     echo "Creating SSH directory..."
@@ -26,9 +28,10 @@ if [ ! -d "$SSH_DIR" ]; then
     chmod 700 "$SSH_DIR"
 fi
 
+# - Ed25519 SSH 키 존재 여부 확인
 if [ ! -f "$SSH_DIR/id_ed25519" ]; then
     echo "Note: No SSH key found. Generate one with:"
     echo '  ssh-keygen -t ed25519 -C {{ .email | quote }}'
 fi
 
-echo "=== Git Baseline complete ==="
+echo "[git-baseline] done"

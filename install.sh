@@ -6,7 +6,7 @@
 
 set -eufo pipefail
 
-# Colors for output
+# 출력 색상 정의
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -24,7 +24,7 @@ echo_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Check if running on a supported OS
+# 지원 OS 확인 (macOS, Linux만 지원)
 OS="$(uname -s)"
 if [[ "$OS" != "Darwin" && "$OS" != "Linux" ]]; then
     echo_error "This script supports macOS and Linux only."
@@ -35,7 +35,7 @@ echo_info "Detected OS: $OS"
 
 echo_info "Starting dotfiles installation..."
 
-# Install chezmoi if not present
+# chezmoi 설치 (dotfile 관리 도구)
 if ! command -v chezmoi &>/dev/null; then
     echo_info "Installing chezmoi..."
     sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
@@ -44,7 +44,7 @@ else
     echo_info "chezmoi is already installed."
 fi
 
-# Initialize and apply dotfiles
+# dotfiles 초기화 및 적용
 echo_info "Applying dotfiles with chezmoi..."
 chezmoi init --apply kimchanhyung98
 

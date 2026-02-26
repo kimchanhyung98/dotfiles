@@ -1,0 +1,213 @@
+# dotfiles 테스트 워크플로우
+# - 템플릿 렌더링 검증, ShellCheck 린트, macOS/Linux 실제 적용 테스트
+name: Test Dotfiles
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  schedule:
+    - cron: '0 9 * * 1' # 매주 월요일 09:00 UTC (18:00 KST)
+
+jobs:
+  # 1단계: 템플릿 유효성 검증 및 셸 스크립트 린트
+  validate:
+    name: Validate templates & lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install chezmoi
+        run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+
+      - name: Add chezmoi to PATH
+        run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Inject test config
+        run: |
+          mkdir -p ~/.config/chezmoi
+          cat > ~/.config/chezmoi/chezmoi.toml << 'EOF'
+          [data]
+          name = "Test User"
+          email = "test@example.com"
+          EOF
+
+      - name: chezmoi version
+        run: chezmoi --version
+
+      - name: chezmoi init
+        run: chezmoi init --source "$GITHUB_WORKSPACE/home"
+
+      - name: Validate all templates
+        run: |
+          FAIL=0
+          while IFS= read -r target; do
+            if ! chezmoi cat "$HOME/$target" > /dev/null 2>&1; then
+              echo "FAIL: $target"
+              FAIL=$((FAIL + 1))
+            fi
+          done < <(chezmoi managed --include=files)
+          if [ "$FAIL" -gt 0 ]; then
+            echo "$FAIL template(s) failed to render"
+            exit 1
+          fi
+          echo "All templates render successfully"
+
+      - name: chezmoi doctor
+        run: chezmoi doctor --no-network || true
+
+      - name: Install ShellCheck
+        run: |
+          if ! command -v shellcheck &>/dev/null; then
+            echo "Installing ShellCheck..."
+            if command -v sudo &>/dev/null; then
+              sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+            else
+              apt-get update -qq && apt-get install -y -qq shellcheck
+            fi
+          fi
+          shellcheck --version
+
+      - name: ShellCheck (all scripts, post-render)
+        run: |
+          FAIL=0
+          for dir in darwin linux; do
+            while IFS= read -r -d '' script; do
+              rendered=$(mktemp)
+              if chezmoi execute-template < "$script" > "$rendered" 2>/dev/null; then
+                if ! shellcheck -s bash -S warning "$rendered" > /dev/null 2>&1; then
+                  echo "WARN: ShellCheck issues in $(basename "$script") ($dir)"
+                  shellcheck -s bash -S warning "$rendered" 2>&1 | head -20 || true
+                  FAIL=$((FAIL + 1))
+                fi
+              else
+                echo "WARN: template render failed for $(basename "$script") ($dir)"
+              fi
+              rm -f "$rendered"
+            done < <(find "home/.chezmoiscripts/$dir" -name '*.sh.tmpl' -type f -print0 2>/dev/null)
+          done
+          if [ "$FAIL" -gt 0 ]; then
+            echo "ShellCheck found issues in $FAIL script(s)"
+            exit 1
+          fi
+          echo "ShellCheck passed for all scripts"
+
+  # 2단계: macOS 실제 적용 테스트 (Intel + Apple Silicon)
+  test-macos:
+    name: Test macOS (${{ matrix.runner }})
+    needs: validate
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - macos-15
+          - macos-15-intel
+          - macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install chezmoi
+        run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+
+      - name: Add chezmoi to PATH
+        run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: chezmoi version
+        run: chezmoi --version
+
+      - name: Inject test config
+        run: |
+          mkdir -p ~/.config/chezmoi
+          cat > ~/.config/chezmoi/chezmoi.toml << 'EOF'
+          [data]
+          name = "Test User"
+          email = "test@example.com"
+          EOF
+
+      - name: chezmoi init
+        run: chezmoi init --source "$GITHUB_WORKSPACE/home"
+
+      - name: chezmoi apply
+        run: |
+          chezmoi apply --force --keep-going --verbose > /tmp/chezmoi-apply.log 2>&1 || {
+            echo "::warning::chezmoi apply exited with non-zero status (--keep-going mode)"
+          }
+          tail -100 /tmp/chezmoi-apply.log
+
+      - name: chezmoi managed
+        run: chezmoi managed
+
+      - name: chezmoi verify
+        run: |
+          if ! chezmoi verify; then
+            echo "verify failed — showing diff:"
+            chezmoi diff --no-pager || true
+            exit 1
+          fi
+
+      - name: Upload apply log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chezmoi-apply-log-${{ matrix.runner }}
+          path: /tmp/chezmoi-apply.log
+
+  # 3단계: Linux (Ubuntu) 실제 적용 테스트
+  test-linux:
+    name: Test Linux (Ubuntu)
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install chezmoi
+        run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+
+      - name: Add chezmoi to PATH
+        run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: chezmoi version
+        run: chezmoi --version
+
+      - name: Inject test config
+        run: |
+          mkdir -p ~/.config/chezmoi
+          cat > ~/.config/chezmoi/chezmoi.toml << 'EOF'
+          [data]
+          name = "Test User"
+          email = "test@example.com"
+          EOF
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq zsh git nodejs npm
+
+      - name: chezmoi init
+        run: chezmoi init --source "$GITHUB_WORKSPACE/home"
+
+      - name: chezmoi apply
+        run: |
+          chezmoi apply --force --keep-going --verbose > /tmp/chezmoi-apply.log 2>&1 || {
+            echo "::warning::chezmoi apply exited with non-zero status (--keep-going mode)"
+          }
+          tail -100 /tmp/chezmoi-apply.log
+
+      - name: chezmoi managed
+        run: chezmoi managed
+
+      - name: chezmoi verify
+        run: |
+          if ! chezmoi verify; then
+            echo "verify failed — showing diff:"
+            chezmoi diff --no-pager || true
+            exit 1
+          fi
+
+      - name: Upload apply log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chezmoi-apply-log-linux
+          path: /tmp/chezmoi-apply.log

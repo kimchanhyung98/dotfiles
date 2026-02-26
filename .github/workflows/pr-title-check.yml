@@ -1,4 +1,4 @@
-name: "Lint PR"
+name: PR Title Check
 
 on:
   pull_request:

@@ -1,89 +1,88 @@
-{{- /* ~/.claude/settings.json — Claude Code core settings */ -}}
+{{- /* ~/.claude/settings.json — Claude Code 핵심 설정 (권한, 플러그인, 훅) */ -}}
 {
-  "permissions": {
-    "allow": [],
-    "deny": []
+  "respectGitignore": true,
+  "cleanupPeriodDays": 21,
+  "attribution": {
+    "commit": "Co-Authored-By: Claude <noreply@anthropic.com>",
+    "pr": ""
   },
-  "enabledPlugins": [
-    "superpowers",
-    "everything-claude-code",
-    "claude-hud",
-    "peon-ping",
-    "andrej-karpathy-skills",
-    "claude-mem"
-  ],
-  "hooks": {
-    "SessionStart": [
-      {
-        "type": "command",
-        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh session-start || true"
-      },
-      {
-        "type": "command",
-        "command": "[ -f ~/.claude-mem/hooks/session-start.sh ] && bash ~/.claude-mem/hooks/session-start.sh || true"
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "type": "command",
-        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh user-prompt-submit || true"
-      },
-      {
-        "type": "command",
-        "command": "[ -f ~/.claude-mem/hooks/user-prompt-submit.sh ] && bash ~/.claude-mem/hooks/user-prompt-submit.sh || true"
-      }
-    ],
-    "Stop": [
-      {
-        "type": "command",
-        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh stop || true"
-      },
-      {
-        "type": "command",
-        "command": "[ -f ~/.claude-mem/hooks/stop.sh ] && bash ~/.claude-mem/hooks/stop.sh || true"
-      }
-    ],
-    "PermissionRequest": [
-      {
-        "type": "command",
-        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh permission-request || true"
-      }
-    ],
-    "Notification": [
-      {
-        "type": "command",
-        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh notification || true"
-      }
-    ],
-    "SessionEnd": [
-      {
-        "type": "command",
-        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh session-end || true"
-      }
-    ],
-    "PostToolUseFailure": [
-      {
-        "type": "command",
-        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh post-tool-use-failure || true"
-      }
-    ],
-    "PreCompact": [
-      {
-        "type": "command",
-        "command": "[ -f ~/.claude/hooks/peon-ping/peon.sh ] && bash ~/.claude/hooks/peon-ping/peon.sh pre-compact || true"
-      }
-    ],
-    "Setup": [
-      {
-        "type": "command",
-        "command": "[ -f ~/.claude-mem/hooks/setup.sh ] && bash ~/.claude-mem/hooks/setup.sh || true"
-      }
-    ],
-    "PostToolUse": [
-      {
-        "type": "command",
-        "command": "[ -f ~/.claude-mem/hooks/post-tool-use.sh ] && bash ~/.claude-mem/hooks/post-tool-use.sh || true"
-      }
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "deny": [
+      "Read(.env)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/*.p12)",
+      "Read(**/*.pfx)",
+      "Read(**/*.crt)",
+      "Read(**/*.cer)",
+      "Edit(../**)"
     ]
-  }
+  },
+  "enabledPlugins": {
+    "agent-sdk-dev@claude-plugins-official": false,
+    "asana@claude-plugins-official": false,
+    "atlassian@claude-plugins-official": false,
+    "circleback@claude-plugins-official": false,
+    "clangd-lsp@claude-plugins-official": false,
+    "claude-code-setup@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "csharp-lsp@claude-plugins-official": false,
+    "explanatory-output-style@claude-plugins-official": false,
+    "feature-dev@claude-plugins-official": false,
+    "figma@claude-plugins-official": false,
+    "firebase@claude-plugins-official": false,
+    "frontend-design@claude-plugins-official": false,
+    "github@claude-plugins-official": false,
+    "gitlab@claude-plugins-official": false,
+    "gopls-lsp@claude-plugins-official": false,
+    "greptile@claude-plugins-official": false,
+    "hookify@claude-plugins-official": true,
+    "huggingface-skills@claude-plugins-official": false,
+    "jdtls-lsp@claude-plugins-official": false,
+    "kotlin-lsp@claude-plugins-official": false,
+    "laravel-boost@claude-plugins-official": false,
+    "learning-output-style@claude-plugins-official": false,
+    "linear@claude-plugins-official": false,
+    "lua-lsp@claude-plugins-official": false,
+    "Notion@claude-plugins-official": false,
+    "php-lsp@claude-plugins-official": false,
+    "pinecone@claude-plugins-official": false,
+    "playwright@claude-plugins-official": false,
+    "plugin-dev@claude-plugins-official": false,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": false,
+    "ralph-loop@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": false,
+    "security-guidance@claude-plugins-official": true,
+    "sentry@claude-plugins-official": false,
+    "serena@claude-plugins-official": false,
+    "slack@claude-plugins-official": false,
+    "stripe@claude-plugins-official": false,
+    "supabase@claude-plugins-official": false,
+    "superpowers@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": false,
+    "typescript-lsp@claude-plugins-official": false,
+    "vercel@claude-plugins-official": false,
+    "claude-supermemory@supermemory-plugins": true
+  },
+  "extraKnownMarketplaces": {
+    "supermemory-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "supermemoryai/claude-supermemory"
+      }
+    }
+  },
+  "language": "korean",
+  "spinnerTipsEnabled": false,
+  "alwaysThinkingEnabled": true,
+  "companyAnnouncements": [
+    "\nWelcome!\nRun 'make init' on first launch."
+  ],
+  "autoUpdatesChannel": "latest"
 }

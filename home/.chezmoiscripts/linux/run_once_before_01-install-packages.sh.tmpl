@@ -9,10 +9,12 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== Install Packages ==="
+echo "[install-packages]"
 
+# 필수 패키지 목록
 packages=(curl git vim zsh)
 
+# 미설치 패키지 확인
 install_needed=()
 for pkg in "${packages[@]}"; do
     if ! command -v "$pkg" &>/dev/null; then
@@ -25,6 +27,7 @@ if [ ${#install_needed[@]} -eq 0 ]; then
 else
     echo "Installing packages: ${install_needed[*]}"
 
+    # root가 아닌 경우 sudo 사용
     sudo_cmd=""
     if [ "$(id -u)" -ne 0 ]; then
         if command -v sudo &>/dev/null; then
@@ -36,6 +39,7 @@ else
         fi
     fi
 
+    # 배포판별 패키지 매니저 자동 감지 (apt-get, dnf, yum)
     if command -v apt-get &>/dev/null; then
         $sudo_cmd apt-get update -qq
         $sudo_cmd apt-get install -y -qq "${install_needed[@]}"
@@ -50,10 +54,11 @@ else
     fi
 fi
 
-# Ghostty (separate install — not in standard repos)
+# Ghostty
+# - GPU 가속 터미널 에뮬레이터 (표준 저장소 미포함, 수동 설치 필요)
 if ! command -v ghostty &>/dev/null; then
     echo "Note: Ghostty requires manual installation on Linux."
     echo "  See: https://ghostty.org/docs/install/linux"
 fi
 
-echo "=== Install Packages complete ==="
+echo "[install-packages] done"

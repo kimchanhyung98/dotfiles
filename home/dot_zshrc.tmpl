@@ -1,7 +1,7 @@
 # ~/.zshrc
-# Managed by chezmoi
+# chezmoi로 관리
 
-# Homebrew (base)
+# Homebrew 환경 로드 (macOS 전용, 아키텍처별 경로)
 {{ if eq .chezmoi.os "darwin" }}
 {{ if .isAppleSilicon }}
 eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -10,45 +10,45 @@ eval "$(/usr/local/bin/brew shellenv)"
 {{ end }}
 {{ end }}
 
-# Path
+# PATH 설정
 export PATH="$HOME/.local/bin:$PATH"
 
 {{ if eq .chezmoi.os "darwin" }}
-# zerobrew: faster package manager, fallback to Homebrew
+# zerobrew 래퍼 (zerobrew 우선, 실패 시 Homebrew 폴백)
 if command -v zb &>/dev/null; then
     pkg_install() { zb install "$@" || \brew install "$@"; }
 fi
 {{ end }}
 
-# Oh My Zsh
+# Oh My Zsh 설정
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell"
 plugins=(
-    git
-    zsh-autosuggestions
-    zsh-syntax-highlighting
+    git                         # git 단축 명령어
+    zsh-autosuggestions         # 명령어 자동 제안
+    zsh-syntax-highlighting     # 구문 강조
 )
 [ -f "$ZSH/oh-my-zsh.sh" ] && source "$ZSH/oh-my-zsh.sh"
 
-# History
+# 히스토리 설정
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
-setopt SHARE_HISTORY
-setopt HIST_IGNORE_DUPS
-setopt HIST_IGNORE_SPACE
+setopt SHARE_HISTORY        # 세션 간 히스토리 공유
+setopt HIST_IGNORE_DUPS     # 중복 명령어 무시
+setopt HIST_IGNORE_SPACE    # 공백 시작 명령어 무시
 
-# Key bindings
-bindkey -e
-bindkey '^[[A' history-search-backward
-bindkey '^[[B' history-search-forward
+# 키 바인딩
+bindkey -e                          # emacs 모드
+bindkey '^[[A' history-search-backward  # 위 화살표: 히스토리 역방향 검색
+bindkey '^[[B' history-search-forward   # 아래 화살표: 히스토리 순방향 검색
 
-# Aliases
+# 파일 탐색 단축키
 alias ll='ls -la'
 alias la='ls -A'
 alias l='ls -CF'
 
-# Git aliases
+# Git 단축키
 alias gs='git status'
 alias ga='git add'
 alias gc='git commit'
@@ -58,21 +58,21 @@ alias gd='git diff'
 alias gco='git checkout'
 alias gb='git branch'
 
-# Editor
+# 기본 에디터
 export EDITOR="vim"
 export VISUAL="vim"
 
-# direnv
+# direnv (디렉토리별 환경 변수 자동 로드)
 if command -v direnv &>/dev/null; then
     eval "$(direnv hook zsh)"
 fi
 
-# fzf
+# fzf (퍼지 파인더 셸 통합)
 if command -v fzf &>/dev/null; then
     source <(fzf --zsh) 2>/dev/null || true
 fi
 
-# Bun
+# Bun 런타임 환경 설정
 if [ -d "$HOME/.bun" ]; then
     export BUN_INSTALL="$HOME/.bun"
     export PATH="$BUN_INSTALL/bin:$PATH"

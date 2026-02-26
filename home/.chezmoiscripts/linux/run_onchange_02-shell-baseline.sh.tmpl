@@ -9,9 +9,10 @@ exit 0
 
 set -eufo pipefail
 
-echo "=== Shell Baseline ==="
+echo "[shell-baseline]"
 
-# Set zsh as default shell
+# 기본 셸 설정
+# - zsh를 기본 로그인 셸로 변경
 ZSH_PATH=$(command -v zsh 2>/dev/null)
 if [ -n "$ZSH_PATH" ] && [ "$SHELL" != "$ZSH_PATH" ]; then
     echo "Setting zsh as default shell..."
@@ -25,7 +26,8 @@ else
     echo "zsh: already default shell."
 fi
 
-# Locale
+# 로케일
+# - en_US.UTF-8 로케일 활성화
 if [ -f /etc/locale.gen ]; then
     if ! locale -a 2>/dev/null | grep -q "en_US.utf8"; then
         echo "Setting locale to en_US.UTF-8..."
@@ -34,7 +36,8 @@ if [ -f /etc/locale.gen ]; then
     fi
 fi
 
-# Timezone
+# 타임존
+# - Asia/Seoul (KST) 시간대 설정
 if [ -f /etc/timezone ]; then
     CURRENT_TZ=$(cat /etc/timezone 2>/dev/null || echo "")
     if [ "$CURRENT_TZ" != "Asia/Seoul" ]; then
@@ -44,4 +47,4 @@ if [ -f /etc/timezone ]; then
     fi
 fi
 
-echo "=== Shell Baseline complete ==="
+echo "[shell-baseline] done"

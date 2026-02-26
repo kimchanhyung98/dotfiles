@@ -129,7 +129,6 @@ Icon?
 .augment/*
 .amazonq/*
 .codebuddy/*
-.codex/*
 .cursor/*
 .gemini/*
 .kilocode/*
@@ -146,6 +145,11 @@ Icon?
 .claude/settings.local.json
 .claude/.supermemory-claude/config.json
 
+# Codex
+.codex/commands/speckit.*
+.codex/memory/*
+!.codex/memory/.gitkeep
+
 # GitHub
 .github/agents/*
 .github/prompts/*
@@ -158,3 +162,4 @@ agent-os/
 .specify/
 .speckit/
 specs/
+tasks/

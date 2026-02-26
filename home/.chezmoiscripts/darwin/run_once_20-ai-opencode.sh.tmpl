@@ -1,0 +1,67 @@
+#!/bin/bash
+#
+# AI OpenCode: OpenCode, oh-my-opencode, superpowers (copy), peon-ping adapter
+
+{{ if ne .chezmoi.os "darwin" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "[ai-opencode]"
+
+# OpenCode
+# - 오픈소스 터미널 AI 코딩 도우미
+if ! command -v opencode &>/dev/null; then
+    echo "Installing OpenCode..."
+    npm install -g opencode-ai || echo "[ai-opencode][warning] OpenCode installation failed"
+else
+    echo "OpenCode: already installed ($(opencode --version 2>/dev/null || echo 'installed'))"
+fi
+
+# oh-my-opencode
+# - OpenCode 멀티 에이전트 오케스트레이션 (에이전트, 훅, MCP 통합)
+if ! command -v oh-my-opencode &>/dev/null; then
+    echo "Installing oh-my-opencode..."
+    npm install -g oh-my-opencode || echo "[ai-opencode][warning] oh-my-opencode installation failed"
+else
+    echo "oh-my-opencode: already installed"
+fi
+
+# superpowers for OpenCode
+# - ~/superpowers에서 OpenCode 플러그인 + 스킬 경로로 복사
+# - 플러그인: ~/.config/opencode/plugins/superpowers.js
+# - 스킬: ~/.config/opencode/skills/superpowers/
+OPENCODE_DIR="$HOME/.config/opencode"
+
+if [ -d "$HOME/superpowers" ]; then
+    mkdir -p "$OPENCODE_DIR/plugins" "$OPENCODE_DIR/skills"
+
+    if [ -f "$HOME/superpowers/.opencode/plugins/superpowers.js" ] && [ ! -f "$OPENCODE_DIR/plugins/superpowers.js" ]; then
+        echo "Copying superpowers plugin to OpenCode..."
+        cp "$HOME/superpowers/.opencode/plugins/superpowers.js" "$OPENCODE_DIR/plugins/superpowers.js"
+    fi
+
+    if [ -d "$HOME/superpowers/skills" ] && [ ! -d "$OPENCODE_DIR/skills/superpowers" ]; then
+        echo "Copying superpowers skills to OpenCode..."
+        cp -r "$HOME/superpowers/skills" "$OPENCODE_DIR/skills/superpowers"
+    fi
+fi
+
+# peon-ping adapter for OpenCode
+# - OpenCode용 작업 알림 사운드 어댑터 (임시파일 다운로드 후 실행)
+if [ ! -d "$HOME/.config/opencode/hooks/peon-ping" ]; then
+    echo "Installing peon-ping adapter for OpenCode..."
+    installer=$(mktemp)
+    if curl -fsSL https://raw.githubusercontent.com/PeonPing/peon-ping/main/adapters/opencode.sh -o "$installer" 2>/dev/null; then
+        bash "$installer" || echo "[ai-opencode][warning] peon-ping adapter installation failed"
+        rm -f "$installer"
+    else
+        rm -f "$installer"
+        echo "[ai-opencode][warning] peon-ping adapter download failed"
+    fi
+else
+    echo "peon-ping adapter: already installed"
+fi
+
+echo "[ai-opencode] done"

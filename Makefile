@@ -50,12 +50,24 @@ init: ## Setup Project environment
 	@echo "[init] Installing npm packages"
 	@docker run --rm -v $$(pwd):/app -w /app node:22-alpine sh -c "apk add --no-cache git && npm install"
 
-check: ## Run tests and lint checks
-	@echo "[check] Running tests..."
-	# Run test command here (e.g., npm test, pytest, go test, etc.)
-	@echo "[check] Running lint checks..."
-	# Run lint command here (e.g., npm run lint, flake8, golangci-lint, etc.)
-	@echo "[check] All checks passed."
+check: ## Run dotfiles tests (macOS + Linux Docker)
+ifeq ($(shell uname),Darwin)
+	@echo "[check] Running macOS tests (read-only)"
+	@bash tests/macos.sh
+endif
+	@if ! command -v docker >/dev/null 2>&1; then \
+		echo "[check] 'docker' not found"; \
+		exit 1; \
+	fi
+	@if ! docker info >/dev/null 2>&1; then \
+		echo "[check] Docker is not running, please start Docker first"; \
+		exit 1; \
+	fi
+	@echo "[check] Building Linux test container"
+	@docker build --no-cache -q -t dotfiles-test -f tests/Dockerfile .
+	@echo "[check] Running Linux tests (Docker)"
+	@docker run --rm dotfiles-test
+	@echo "[check] All checks completed"
 
 %:
 	@:
