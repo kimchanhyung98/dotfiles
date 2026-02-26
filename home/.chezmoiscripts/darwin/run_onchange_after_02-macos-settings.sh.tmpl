@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# macOS system settings: Dock, Finder, Keyboard, Trackpad, Screenshot
+# macOS system settings: Dock, Finder, Keyboard, Trackpad, Screenshot, System
 # Re-applies when this script changes
 
 {{ if ne .chezmoi.os "darwin" }}
@@ -70,6 +70,7 @@ defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 defaults write com.apple.AppleMultitouchTrackpad Clicking -bool false
 # 탭하여 클릭 (글로벌) 비활성화
 defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 0
+defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 0
 
 # - Screenshot
 # 스크린샷 저장 경로를 Desktop으로 지정
