@@ -58,7 +58,7 @@ ensure_zb_available() {
 
 if ! ensure_zb_available; then
     echo "Installing zerobrew..."
-    curl -fsSL https://zerobrew.rs/install | bash || echo "[prerequisites][warning] zerobrew installation failed"
+    curl -fsSL https://zerobrew.rs/install | bash
 fi
 
 if ensure_zb_available; then
