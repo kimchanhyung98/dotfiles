@@ -4,8 +4,6 @@
 # - 폰트
 font-family = JetBrainsMono Nerd Font
 font-size = 13
-# macOS 레티나 디스플레이에서 텍스트 선명하게 표시
-font-thicken = true
 # 줄 간격 조정
 adjust-cell-height = 1
 
@@ -33,8 +31,8 @@ background-blur = 20
 unfocused-split-opacity = 0.7
 # 탭/split 닫을 때 확인 다이얼로그 표시
 confirm-close-surface = true
-# 클립보드 붙여넣기 보호 비활성화
-clipboard-paste-protection = false
+# 클립보드 붙여넣기 보호
+clipboard-paste-protection = true
 
 # - 셸 통합
 shell-integration = zsh
@@ -43,6 +41,8 @@ scrollback-limit = 10000
 
 {{ if eq .chezmoi.os "darwin" }}
 # - macOS 전용
+# macOS 레티나 디스플레이에서 텍스트 선명하게 표시
+font-thicken = true
 # 타이틀바 숨기기
 macos-titlebar-style = hidden
 # Option 키를 Alt로 사용
