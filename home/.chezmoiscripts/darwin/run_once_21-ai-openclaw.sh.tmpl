@@ -20,7 +20,7 @@ else
 fi
 
 if command -v openclaw &>/dev/null; then
-    if openclaw daemon status 2>/dev/null | grep -q "installed"; then
+    if openclaw daemon status --json 2>/dev/null | grep -q '"loaded".*true'; then
         echo "OpenClaw daemon: already registered"
     else
         echo "Registering OpenClaw daemon..."
