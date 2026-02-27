@@ -18,7 +18,7 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 | Codex    | Yeachan-Heo/oh-my-codex                                                                                                                             |
 | Gemini   | (SuperGemini — pipx 패키지)                                                                                                                            |
 | OpenCode | anomalyco/opencode, code-yeongyu/oh-my-opencode                                                                                                     |
-| OpenClaw | openclaw/openclaw, thedotmack/claude-mem                                                                                                            |
+| OpenClaw | openclaw/openclaw                                                                                                                                   |
 
 ## 검증 스냅샷
 
@@ -39,7 +39,6 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 | code-yeongyu/oh-my-opencode         | `7d2c798` |
 | Yeachan-Heo/oh-my-codex             | `c25edb0` |
 | openclaw/openclaw                   | `a177f7b` |
-| thedotmack/claude-mem               | `e975555` |
 
 ## 설계 원칙
 
@@ -130,7 +129,6 @@ dotfiles/
     │   └── skills/
     │
     ├── dot_openclaw/
-    │   ├── openclaw.json.tmpl
     │   └── workspace/
     │       ├── AGENTS.md.tmpl
     │       ├── SOUL.md.tmpl
@@ -153,7 +151,7 @@ dotfiles/
 | `dot_agents/skills/`   | `~/.agents/skills/`   | Codex 글로벌 스킬                    |
 | `dot_copilot/skills/`  | `~/.copilot/skills/`  | Copilot 글로벌 스킬                  |
 | `dot_gemini/`          | `~/.gemini/`          | Gemini CLI 설정 (MCP 서버)          |
-| `dot_openclaw/`        | `~/.openclaw/`        | OpenClaw 설정, 워크스페이스             |
+| `dot_openclaw/`        | `~/.openclaw/`        | OpenClaw 워크스페이스 (행동/성격/도구 정의)   |
 | `dot_local/bin/`       | `~/.local/bin/`       | 사용자 스크립트 (dotfiles-doctor)      |
 
 ## chezmoi special 파일
@@ -187,7 +185,7 @@ dotfiles/
 | 13 | ai-gemini   | SuperGemini, superpowers (copy)                              | 최초 1회 | SuperGemini 확장 프레임워크(pipx), ~/superpowers에서 ~/.gemini/skills/superpowers로 복사. MCP는 settings.json에서 선언적 관리                         |
 | 14 | ai-copilot  | superpowers (copy)                                           | 최초 1회 | ~/superpowers에서 ~/.copilot/skills/superpowers로 복사. MCP는 mcp-config.json에서 선언적 관리                                                  |
 | 20 | ai-opencode | OpenCode, oh-my-opencode, superpowers (copy)                 | 최초 1회 | OpenCode(npm), oh-my-opencode(npm), ~/superpowers에서 ~/.config/opencode/plugins/superpowers로 복사. MCP는 opencode.json에서 선언적 관리       |
-| 21 | ai-openclaw | OpenClaw, 데몬 등록, claude-mem 연동                               | 최초 1회 | OpenClaw(npm), macOS launchd 데몬 등록, claude-mem 연동(별도 설치 스크립트). 로그: `~/Library/Logs/openclaw.log`                                  |
+| 21 | ai-openclaw | OpenClaw, 데몬 등록, peon-ping adapter                            | 최초 1회 | OpenClaw(npm), `openclaw onboard --install-daemon`으로 데몬 등록, peon-ping 어댑터 설치. 설정 파일은 chezmoi 관리 대상이 아님 (인증/토큰 충돌 방지)               |
 
 | 순서 | 스크립트           | 역할          | 실행 조건             |
 |:--:|----------------|-------------|-------------------|
@@ -257,7 +255,7 @@ chezmoi init --apply
 │   OpenCode → oh-my-opencode → superpowers (copy)
 │
 ├─ 21 ai-openclaw
-│   OpenClaw → launchd 데몬 등록 → claude-mem 연동 (별도 스크립트)
+│   OpenClaw → onboard --install-daemon → peon-ping adapter
 │
 ├─ dotfiles 배포
 │   ~/.zshrc, ~/.gitconfig, ~/.gitignore_global, ~/.vimrc
@@ -419,7 +417,6 @@ Ghostty는 macOS에서 Homebrew cask(`brew install --cask ghostty`), Linux에서
 - **인증 정보 보안**: 인증 정보는 사용자 홈 범위의 보안 저장소(환경 변수, OS 키체인)에 유지한다. 설정 파일에 API 키나 토큰을 직접 기재하지 않는다.
 - **기본 제한 정책**: 워크스페이스 권한은 기본 제한 정책에서 시작한다. 필요한 권한만 명시적으로 허용하여, 의도하지 않은 파일 수정이나 시스템 변경을 방지한다.
 - **템플릿 관리**: 모든 설정 파일은 `.tmpl`로 관리하여 OS, 아키텍처, 사용자 정보에 따른 환경별 분기가 가능하다.
-- **세션 간 컨텍스트**: claude-mem (`~/.claude-mem/`)을 통해 세션 간 메모리를 지속한다. 이전 세션의 중요한 결정, 패턴, 컨텍스트가 새 세션에서 자동으로 참조된다.
 - **멀티 에이전트 알림**: peon-ping의 CESP 어댑터를 통해 Claude, Codex, OpenCode, OpenClaw 등 모든 AI 도구의 이벤트 알림을 하나의 사운드 팩으로 통합한다.
 
 ### 모듈화 기준
@@ -515,11 +512,10 @@ Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록
 | claude-hud             | 상태 표시줄        | 플러그인 마켓플레이스 | 컨텍스트 사용량, 현재 모델, Git 상태, 활성 도구, 에이전트, 진행률을 터미널 하단에 실시간 표시. 기본 statusline으로 설정. 설정은 자동 생성됨 (`~/.claude/plugins/claude-hud/config.json`)                                             |
 | peon-ping              | 멀티 에이전트 음성 알림 | 설치 스크립트     | CESP(Coding Event Sound Pack Specification) 표준 기반. `sc_marine`, `sc_scv` 사운드 팩을 기본 설치. 작업 완료, 권한 요청, 오류 발생 등 이벤트를 음성으로 알려주어 멀티태스킹 효율 향상. Claude Code 네이티브 훅 + 8종 어댑터로 다양한 AI 도구 지원 |
 | andrej-karpathy-skills | 코딩 행동 지침      | 플러그인 마켓플레이스 | Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution 4대 원칙을 Claude Code 세션에 자동 주입하여 코드 품질 기준선 유지                                                         |
-| claude-mem             | 세션 간 메모리 지속   | 플러그인 마켓플레이스 | 데이터를 `~/.claude-mem/`에 저장하고, AI 기반 압축으로 컨텍스트 효율을 유지. MCP 검색 5종을 지원하여 과거 세션의 결정사항, 패턴, 컨텍스트를 현재 세션에서 참조 가능                                                                          |
 
 **훅**
 
-peon-ping과 claude-mem이 제공하는 훅은 settings.json에 등록되어 Claude Code의 생명주기 이벤트에 반응한다.
+peon-ping이 제공하는 훅은 settings.json에 등록되어 Claude Code의 생명주기 이벤트에 반응한다.
 
 | 제공         | 이벤트                | 동작          | 상세                                                      |
 |------------|--------------------|-------------|---------------------------------------------------------|
@@ -531,11 +527,6 @@ peon-ping과 claude-mem이 제공하는 훅은 settings.json에 등록되어 Cla
 | peon-ping  | SessionEnd         | 세션 종료 알림    | 세션 종료 시 종료 사운드를 재생                                      |
 | peon-ping  | PostToolUseFailure | 도구 실패 알림    | Bash 도구 실행 실패 시 오류 사운드를 재생하여 즉시 인지 가능                   |
 | peon-ping  | PreCompact         | 컨텍스트 압축 알림  | 컨텍스트 압축 직전에 알림 사운드를 재생                                  |
-| claude-mem | Setup              | 초기 설정 확인    | 플러그인 초기 설정 상태를 확인하고 필요한 디렉토리와 설정 파일을 자동 생성              |
-| claude-mem | SessionStart       | 관련 컨텍스트 주입  | 세션 시작 시 과거 세션의 관련 메모리를 검색하여 현재 작업 컨텍스트에 자동 주입           |
-| claude-mem | UserPromptSubmit   | 사용자 입력 관찰   | 사용자의 프롬프트를 관찰하여 중요한 의도와 패턴을 메모리에 기록할 후보로 식별             |
-| claude-mem | PostToolUse        | 도구 사용 관찰 기록 | 도구 사용 결과를 관찰하여 중요한 결정사항과 변경 이력을 메모리에 기록                 |
-| claude-mem | Stop               | 메모리 처리      | 세션 중 수집된 관찰 데이터를 처리하여 영구 메모리로 저장                        |
 
 **MCP 서버**
 
@@ -608,22 +599,22 @@ OpenCode는 프로젝트/글로벌 모두에서 `.opencode/skills/` 외에 `.cla
 
 **설치 (스크립트)**
 
-| 스크립트           | 내용                                                     | 설치 대상                     |
-|----------------|--------------------------------------------------------|---------------------------|
-| 21-ai-openclaw | OpenClaw (npm), 데몬 등록 (launchd/systemd), claude-mem 연동 | OpenClaw 바이너리, 데몬, 메모리 연동 |
+| 스크립트           | 내용                                                                      | 설치 대상                     |
+|----------------|-------------------------------------------------------------------------|---------------------------|
+| 21-ai-openclaw | OpenClaw (npm), 데몬 등록 (`onboard --install-daemon`), peon-ping adapter | OpenClaw 바이너리, 데몬, 알림 어댑터 |
 
 **설정 (dot_openclaw/ → ~/.openclaw/)**
 
-| 파일                 | 배포 경로                       | 역할          | 상세                                                                                                                             |
-|--------------------|-----------------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------|
-| openclaw.json.tmpl | `~/.openclaw/openclaw.json` | 핵심 설정       | AI 모델, 메시징 채널, 게이트웨이, 보안 정책을 정의                                                                                                |
-| extensions/        | `~/.openclaw/extensions/`   | 플러그인 확장     | `openclaw plugins install`로 설치한 플러그인이 저장되는 경로. 각 플러그인은 `openclaw.plugin.json` manifest를 포함                                     |
-| workspace/         | `~/.openclaw/workspace/`    | 행동/성격/도구 정의 | AGENTS.md(행동 지침), SOUL.md(성격 정의), TOOLS.md(도구 접근 정책)를 chezmoi로 관리. USER.md, IDENTITY.md, HEARTBEAT.md는 OpenClaw가 초기 실행 시 자동 생성 |
+| 파일          | 배포 경로                     | 역할          | 상세                                                                                                                             |
+|-------------|---------------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------|
+| extensions/ | `~/.openclaw/extensions/` | 플러그인 확장     | `openclaw plugins install`로 설치한 플러그인이 저장되는 경로. 각 플러그인은 `openclaw.plugin.json` manifest를 포함                                     |
+| workspace/  | `~/.openclaw/workspace/`  | 행동/성격/도구 정의 | AGENTS.md(행동 지침), SOUL.md(성격 정의), TOOLS.md(도구 접근 정책)를 chezmoi로 관리. USER.md, IDENTITY.md, HEARTBEAT.md는 OpenClaw가 초기 실행 시 자동 생성 |
 
 OpenClaw는 코딩 도구가 아닌 **개인 AI 어시스턴트 플랫폼**이다. 메시징 채널(WhatsApp, Telegram, Slack, Discord 등)을 통해 AI 에이전트와 대화하며, 음성 인식과 Talk
 Mode(ElevenLabs)도 지원한다. macOS에서는 launchd, Linux에서는 systemd 데몬으로 상시 실행된다.
 
-claude-mem 연동은 별도 설치 스크립트(`thedotmack/claude-mem/install/openclaw.sh`)로 처리한다. OpenClaw는 플러그인 시스템을 지원하며, 설치된 플러그인은
+`openclaw.json`(핵심 설정)은 인증 토큰과 채널 설정을 포함하므로 chezmoi 관리 대상에서 제외하고, `openclaw onboard` 명령으로 초기 설정한다.
+OpenClaw는 플러그인 시스템을 지원하며, 설치된 플러그인은
 `~/.openclaw/extensions/<plugin-id>/`에 위치하고 `openclaw.plugin.json` manifest를 사용한다. 스킬은 ClawHub 기반으로 별도 확장할 수 있다.
 OpenClaw는 업데이트가 빠른 편이므로 적용 전에 반드시 `https://docs.openclaw.ai`의 최신 설치/설정 문서를 재확인한다.
 
@@ -633,7 +624,7 @@ OpenClaw는 업데이트가 빠른 편이므로 적용 전에 반드시 `https:/
 |------------|--------------------------------------|--------------------------------------------------|
 | 멀티 채널      | WhatsApp, Telegram, Slack, Discord 등 | 다양한 메시징 플랫폼에서 동일한 AI 에이전트에 접근                    |
 | 음성         | 음성 인식, Talk Mode (ElevenLabs)        | 텍스트 외에 음성으로도 AI와 대화. ElevenLabs TTS로 자연스러운 음성 응답 |
-| claude-mem | 세션 간 메모리 지속                          | Claude Code와 동일한 claude-mem을 연동하여 크로스 플랫폼 메모리 공유 |
+| peon-ping  | 작업 알림 사운드                          | CESP 어댑터를 통해 OpenClaw 이벤트를 사운드로 알림                |
 | 데몬         | macOS launchd, Linux systemd 자동 등록   | 사용자가 명시적으로 실행하지 않아도 항상 백그라운드에서 동작                |
 
 ### Gemini
@@ -697,10 +688,9 @@ peon-ping은 CESP(Coding Event Sound Pack Specification) 표준을 기반으로 
 | Languages        | node, python3, go, rustc, php, ruby                                         | 프로그래밍 언어 런타임의 설치 여부와 버전 확인      |
 | Package Managers | brew, zb, pipx, bun                                                         | 패키지 관리자의 설치 여부 확인. zb는 zerobrew |
 | AI CLI           | claude, codex, gemini, copilot, opencode, openclaw                          | AI 도구 CLI의 설치 여부와 버전 확인         |
-| AI 플러그인          | superpowers, claude-hud, peon-ping, claude-mem, oh-my-codex, oh-my-opencode | 각 AI 도구의 확장 기능 설치 상태 확인         |
+| AI 플러그인          | superpowers, claude-hud, peon-ping, oh-my-codex, oh-my-opencode             | 각 AI 도구의 확장 기능 설치 상태 확인         |
 | 스킬 디렉토리          | Claude, Codex, Gemini, Copilot, OpenCode 5개 경로                              | 글로벌 스킬 디렉토리 존재 여부와 내용물 확인       |
 | AGENTS.md        | `~/AGENTS.md` 존재 여부                                                         | 공통 에이전트 지침 파일 배포 상태 확인          |
-| claude-mem       | `~/.claude-mem/` 디렉토리, `settings.json`                                      | 세션 메모리 데이터 디렉토리와 설정 파일 존재 확인    |
 | Dotfiles         | ~/.zshrc, ~/.gitconfig, ~/.vimrc, ~/.oh-my-zsh                              | 핵심 dotfiles의 배포 상태 확인           |
 | Config           | ghostty, opencode, claude, codex, copilot, openclaw                         | 각 도구의 설정 디렉토리 존재 여부 확인          |
 | MCP              | ~/.claude.json                                                              | MCP 서버 설정 파일 존재 여부 확인           |
@@ -718,12 +708,12 @@ peon-ping은 CESP(Coding Event Sound Pack Specification) 표준을 기반으로 
 | Pkg Managers   | composer, npm, pipx, rbenv, uv, xcodes, yarn                                                   |
 | Runtime        | Bun                                                                                            |
 | AI Core        | Claude Code, Codex CLI, Gemini CLI, Copilot CLI                                                |
-| Claude         | SuperClaude, superpowers, claude-hud, peon-ping, karpathy-skills, claude-mem, MCP 4종           |
+| Claude         | SuperClaude, superpowers, claude-hud, peon-ping, karpathy-skills, MCP 4종                       |
 | Codex          | oh-my-codex, superpowers (copy)                                                                |
 | Gemini         | SuperGemini, superpowers (copy), MCP 2종                                                        |
 | Copilot        | superpowers (copy), MCP 2종                                                                     |
 | OpenCode       | OpenCode, oh-my-opencode, superpowers (copy)                                                   |
-| OpenClaw       | OpenClaw, claude-mem 연동                                                                        |
+| OpenClaw       | OpenClaw, peon-ping adapter                                                                    |
 | Skills         | humanizer (Claude, Codex), superpowers (Claude 플러그인 + Codex/Gemini/Copilot/OpenCode copy)      |
 | Apps           | ghostty, docker, iterm2, chrome, rectangle, slack, figma 등                                     |
 | Shell          | Oh My Zsh + autosuggestions + syntax-highlighting                                              |
@@ -742,7 +732,6 @@ peon-ping은 CESP(Coding Event Sound Pack Specification) 표준을 기반으로 
 | peon-ping 어댑터 등록 상태 | 사용 중인 AI 도구의 peon-ping 어댑터가 올바르게 연결되어 이벤트 알림이 동작하는지 확인                           |
 | 플러그인 버전 호환성         | Claude Code, Codex, OpenCode의 플러그인이 현재 도구 버전과 호환되는지 확인                           |
 | OpenClaw 데몬 상태      | macOS launchd / Linux systemd에 OpenClaw 데몬이 올바르게 등록되어 동작하는지 확인                   |
-| claude-mem 데이터 상태   | `~/.claude-mem/` 디렉토리와 `settings.json`이 존재하고 정상적으로 메모리를 기록하는지 확인                 |
 | Linux 기초 설정 누락 여부   | macOS에 추가된 AI 도구가 Linux ai-tools 스크립트에도 반영되어 있는지 확인                              |
 | 진단 스크립트 검사 대상 최신화   | dotfiles-doctor가 새로 추가된 도구, 설정 파일, 스킬 경로를 검사 대상에 포함하는지 확인                        |
 | 검증 스냅샷 갱신           | 참조 저장소의 구조가 변경되었을 때 검증 커밋 해시를 최신으로 갱신했는지 확인                                      |
@@ -798,7 +787,5 @@ peon-ping은 CESP(Coding Event Sound Pack Specification) 표준을 기반으로 
 - [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode)
 - [oh-my-codex](https://github.com/Yeachan-Heo/oh-my-codex)
 - [OpenClaw](https://github.com/openclaw/openclaw)
-- [claude-mem](https://github.com/thedotmack/claude-mem)
 - [OpenClaw Docs](https://docs.openclaw.ai)
-- [claude-mem Installation](https://docs.claude-mem.ai/installation)
 - [Gemini CLI](https://github.com/google-gemini/gemini-cli)
