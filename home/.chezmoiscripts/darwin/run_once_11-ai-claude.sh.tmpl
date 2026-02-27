@@ -30,7 +30,11 @@ if ! claude mcp list 2>/dev/null | grep -q "auggie"; then
     fi
     if [ -n "${AUG_TOKEN:-}" ] && [ -n "${AUG_URL:-}" ]; then
         echo "Adding Augment MCP to Claude Code..."
-        claude mcp add-json auggie --scope user "{\"type\":\"stdio\",\"command\":\"auggie\",\"args\":[\"--mcp\",\"--mcp-auto-workspace\"],\"env\":{\"AUGMENT_API_TOKEN\":\"$AUG_TOKEN\",\"AUGMENT_API_URL\":\"$AUG_URL\"}}" || echo "[ai-claude][warning] Augment MCP addition failed"
+        MCP_JSON=$(jq -n \
+            --arg token "$AUG_TOKEN" \
+            --arg url "$AUG_URL" \
+            '{type:"stdio",command:"auggie",args:["--mcp","--mcp-auto-workspace"],env:{AUGMENT_API_TOKEN:$token,AUGMENT_API_URL:$url}}')
+        claude mcp add-json auggie --scope user "$MCP_JSON" || echo "[ai-claude][warning] Augment MCP addition failed"
     else
         echo "[ai-claude][warning] Augment token not found, skipping MCP registration (run 'auggie login' first)"
     fi
