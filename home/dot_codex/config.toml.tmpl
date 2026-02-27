@@ -32,3 +32,8 @@ enabled = true
 command = "npx"
 args = ["-y", "@upstash/context7-mcp@latest"]
 enabled = true
+
+[mcp_servers.augment-context-engine]
+command = "auggie"
+args = ["--mcp", "--mcp-auto-workspace"]
+enabled = true

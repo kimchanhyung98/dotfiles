@@ -181,8 +181,8 @@ dotfiles/
 
 | 순서 | 스크립트        | 역할                                                           | 실행 조건 | 상세                                                                                                                                |
 |:--:|-------------|--------------------------------------------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------|
-| 10 | ai-core     | Claude Code, Codex CLI, Gemini CLI, Copilot CLI, superpowers | 최초 1회 | 공식 AI CLI 도구 4종 설치 + superpowers를 ~/superpowers에 clone. Claude Code는 공식 설치 스크립트(curl), 나머지 3종은 npm. 확장 환경 구성은 개별 스크립트(11~14)에서 처리 |
-| 11 | ai-claude   | SuperClaude, peon-ping                                       | 최초 1회 | SuperClaude 프레임워크(pipx), peon-ping 알림 사운드. 플러그인·MCP는 settings.json·claude.json에서 선언적 관리                                           |
+| 10 | ai-core     | Claude Code, Codex CLI, Gemini CLI, Copilot CLI, Auggie CLI, superpowers | 최초 1회 | 공식 AI CLI 도구 4종 + Auggie CLI 설치 + superpowers를 ~/superpowers에 clone. Claude Code는 공식 설치 스크립트(curl), 나머지는 npm. 확장 환경 구성은 개별 스크립트(11~14)에서 처리 |
+| 11 | ai-claude   | SuperClaude, peon-ping, Augment MCP 등록                      | 최초 1회 | SuperClaude 프레임워크(pipx), peon-ping 알림 사운드, `claude mcp add-json`으로 Augment Context Engine MCP 등록. 플러그인은 settings.json에서 선언적 관리    |
 | 12 | ai-codex    | oh-my-codex, superpowers (copy), 프로필 초기화                     | 최초 1회 | oh-my-codex(npm), ~/superpowers에서 ~/.agents/skills/superpowers로 복사, 프로필 초기화                                                       |
 | 13 | ai-gemini   | SuperGemini, superpowers (copy)                              | 최초 1회 | SuperGemini 확장 프레임워크(pipx), ~/superpowers에서 ~/.gemini/skills/superpowers로 복사. MCP는 settings.json에서 선언적 관리                         |
 | 14 | ai-copilot  | superpowers (copy)                                           | 최초 1회 | ~/superpowers에서 ~/.copilot/skills/superpowers로 복사. MCP는 mcp-config.json에서 선언적 관리                                                  |
@@ -238,11 +238,11 @@ chezmoi init --apply
 │   Bun (JavaScript/TypeScript 런타임)
 │
 ├─ 10 ai-core
-│   Claude Code, Codex CLI, Gemini CLI, Copilot CLI, superpowers
-│   Claude Code(curl 스크립트), Codex·Gemini·Copilot(npm) 설치, superpowers를 ~/superpowers에 clone
+│   Claude Code, Codex CLI, Gemini CLI, Copilot CLI, Auggie CLI, superpowers
+│   Claude Code(curl 스크립트), Codex·Gemini·Copilot·Auggie(npm) 설치, superpowers를 ~/superpowers에 clone
 │
 ├─ 11 ai-claude
-│   SuperClaude, peon-ping (플러그인·MCP는 설정 파일로 관리)
+│   SuperClaude, peon-ping, Augment MCP 등록 (claude mcp add-json)
 │
 ├─ 12 ai-codex
 │   oh-my-codex → superpowers (copy) → 프로필 초기화
@@ -539,10 +539,13 @@ peon-ping과 claude-mem이 제공하는 훅은 settings.json에 등록되어 Cla
 
 **MCP 서버**
 
-| 서버                  | 역할             | 상세                                                                                              |
-|---------------------|----------------|-------------------------------------------------------------------------------------------------|
-| context7            | 라이브러리 공식 문서 조회 | resolve-library-id로 라이브러리를 식별한 뒤 get-library-docs로 공식 문서와 코드 예제를 검색. 외부 라이브러리 사용 시 최신 공식 패턴을 참조 |
-| sequential-thinking | 체계적 다단계 분석     | 복잡한 문제를 구조화된 사고 단계로 분해하여 분석. 디버깅, 아키텍처 설계, 코드 리뷰 등 다단계 추론이 필요한 작업에 활용                           |
+`~/.claude.json`은 Claude Code가 런타임에 직접 관리하며, `claude mcp add-json` 명령으로 MCP 서버를 등록한다. ai-claude(11) 스크립트가 초기 설정 시 자동 등록.
+
+| 서버                      | 역할             | 상세                                                                                              |
+|-------------------------|----------------|-------------------------------------------------------------------------------------------------|
+| context7                | 라이브러리 공식 문서 조회 | resolve-library-id로 라이브러리를 식별한 뒤 get-library-docs로 공식 문서와 코드 예제를 검색. 외부 라이브러리 사용 시 최신 공식 패턴을 참조 |
+| sequential-thinking     | 체계적 다단계 분석     | 복잡한 문제를 구조화된 사고 단계로 분해하여 분석. 디버깅, 아키텍처 설계, 코드 리뷰 등 다단계 추론이 필요한 작업에 활용                           |
+| augment-context-engine  | 코드베이스 전체 컨텍스트  | Augment Context Engine MCP. 코드베이스의 아키텍처, 의존성, 변경 이력을 포함한 심층 시맨틱 이해를 제공. `auggie --mcp --mcp-auto-workspace`로 실행 |
 
 ### Codex
 
@@ -572,6 +575,14 @@ peon-ping과 claude-mem이 제공하는 훅은 settings.json에 등록되어 Cla
 
 superpowers도 Codex에 설치된다 (~/superpowers에서 copy). karpathy 지침은 config.toml의 모델 지침으로 적용한다.
 
+**MCP 서버** (`~/.codex/config.toml`의 `[mcp_servers.*]`에서 선언적 관리)
+
+| 서버                      | 역할               | 상세                                                                                              |
+|-------------------------|------------------|-------------------------------------------------------------------------------------------------|
+| openai_developer_docs   | OpenAI 공식 문서 조회  | MCP Remote를 통해 OpenAI 개발자 문서에 접근                                                                |
+| context7                | 라이브러리 공식 문서 조회   | resolve-library-id로 라이브러리를 식별한 뒤 get-library-docs로 공식 문서와 코드 예제를 검색                               |
+| augment-context-engine  | 코드베이스 전체 컨텍스트    | Augment Context Engine MCP. `auggie --mcp --mcp-auto-workspace`로 실행                             |
+
 ### OpenCode
 
 **설치 (스크립트)**
@@ -600,6 +611,13 @@ superpowers도 Codex에 설치된다 (~/superpowers에서 copy). karpathy 지침
 | LSP/AST-Grep | 결정론적 리팩토링 도구               | 언어 서버 프로토콜(LSP)과 AST 기반 코드 검색(AST-Grep)을 활용하여 정확한 코드 리팩토링을 수행. AI 추론이 아닌 구문 분석 기반으로 동작             |
 
 superpowers도 OpenCode에 설치된다 (~/superpowers에서 copy).
+
+**MCP 서버** (`~/.config/opencode/opencode.json`에서 선언적 관리)
+
+| 서버                      | 설정 키         | 역할             | 상세                                                                                              |
+|-------------------------|--------------|----------------|-------------------------------------------------------------------------------------------------|
+| context7                | `mcpServers` | 라이브러리 공식 문서 조회 | resolve-library-id로 라이브러리를 식별한 뒤 get-library-docs로 공식 문서와 코드 예제를 검색                               |
+| augment-context-engine  | `mcp`        | 코드베이스 전체 컨텍스트  | Augment Context Engine MCP. `type: "local"`, `command: ["auggie", "--mcp", "--mcp-auto-workspace"]`로 설정 |
 
 OpenCode는 프로젝트/글로벌 모두에서 `.opencode/skills/` 외에 `.claude/skills/`와 `.agents/skills/`도 자동 탐색한다. 별도 설정 없이 Claude, Codex와
 동일한 스킬을 자동으로 인식한다.
@@ -648,6 +666,14 @@ OpenClaw는 업데이트가 빠른 편이므로 적용 전에 반드시 `https:/
 SuperGemini는 Gemini CLI의 확장 프레임워크로, 슬래시 명령어와 AI 에이전트 페르소나를 제공한다. superpowers는 ~/superpowers에서 ~
 /.gemini/skills/superpowers로 복사된다.
 
+**MCP 서버** (`~/.gemini/settings.json`의 `mcpServers`에서 선언적 관리)
+
+| 서버                      | 역할             | 상세                                                                                              |
+|-------------------------|----------------|-------------------------------------------------------------------------------------------------|
+| context7                | 라이브러리 공식 문서 조회 | resolve-library-id로 라이브러리를 식별한 뒤 get-library-docs로 공식 문서와 코드 예제를 검색                               |
+| sequential-thinking     | 체계적 다단계 분석     | 복잡한 문제를 구조화된 사고 단계로 분해하여 분석                                                                     |
+| augment-context-engine  | 코드베이스 전체 컨텍스트  | Augment Context Engine MCP. `auggie --mcp --mcp-auto-workspace`로 실행                             |
+
 ### Copilot
 
 **설치 (스크립트)**
@@ -659,9 +685,18 @@ SuperGemini는 Gemini CLI의 확장 프레임워크로, 슬래시 명령어와 A
 
 **설정 (dot_copilot/ → ~/.copilot/)**
 
-| 파일      | 배포 경로                | 역할     | 상세                                                       |
-|---------|----------------------|--------|----------------------------------------------------------|
-| skills/ | `~/.copilot/skills/` | 글로벌 스킬 | superpowers 스킬을 배포. 각 스킬은 `<skill-name>/SKILL.md` 형태로 구성 |
+| 파일                    | 배포 경로                         | 역할      | 상세                                                       |
+|-----------------------|-------------------------------|---------|----------------------------------------------------------|
+| mcp-config.json.tmpl  | `~/.copilot/mcp-config.json`  | MCP 설정  | MCP 서버 목록을 선언적으로 관리                                       |
+| skills/               | `~/.copilot/skills/`          | 글로벌 스킬  | superpowers 스킬을 배포. 각 스킬은 `<skill-name>/SKILL.md` 형태로 구성 |
+
+**MCP 서버** (`~/.copilot/mcp-config.json`의 `mcpServers`에서 선언적 관리)
+
+| 서버                      | 역할             | 상세                                                                                              |
+|-------------------------|----------------|-------------------------------------------------------------------------------------------------|
+| context7                | 라이브러리 공식 문서 조회 | resolve-library-id로 라이브러리를 식별한 뒤 get-library-docs로 공식 문서와 코드 예제를 검색                               |
+| sequential-thinking     | 체계적 다단계 분석     | 복잡한 문제를 구조화된 사고 단계로 분해하여 분석                                                                     |
+| augment-context-engine  | 코드베이스 전체 컨텍스트  | Augment Context Engine MCP. `auggie --mcp --mcp-auto-workspace`로 실행                             |
 
 Copilot 스킬 경로:
 
@@ -696,14 +731,14 @@ peon-ping은 CESP(Coding Event Sound Pack Specification) 표준을 기반으로 
 | Terminal         | ghostty                                                                     | Ghostty 터미널의 설치 여부 확인           |
 | Languages        | node, python3, go, rustc, php, ruby                                         | 프로그래밍 언어 런타임의 설치 여부와 버전 확인      |
 | Package Managers | brew, zb, pipx, bun                                                         | 패키지 관리자의 설치 여부 확인. zb는 zerobrew |
-| AI CLI           | claude, codex, gemini, copilot, opencode, openclaw                          | AI 도구 CLI의 설치 여부와 버전 확인         |
+| AI CLI           | claude, codex, gemini, copilot, opencode, openclaw, auggie                  | AI 도구 CLI의 설치 여부와 버전 확인         |
 | AI 플러그인          | superpowers, claude-hud, peon-ping, claude-mem, oh-my-codex, oh-my-opencode | 각 AI 도구의 확장 기능 설치 상태 확인         |
 | 스킬 디렉토리          | Claude, Codex, Gemini, Copilot, OpenCode 5개 경로                              | 글로벌 스킬 디렉토리 존재 여부와 내용물 확인       |
 | AGENTS.md        | `~/AGENTS.md` 존재 여부                                                         | 공통 에이전트 지침 파일 배포 상태 확인          |
 | claude-mem       | `~/.claude-mem/` 디렉토리, `settings.json`                                      | 세션 메모리 데이터 디렉토리와 설정 파일 존재 확인    |
 | Dotfiles         | ~/.zshrc, ~/.gitconfig, ~/.vimrc, ~/.oh-my-zsh                              | 핵심 dotfiles의 배포 상태 확인           |
 | Config           | ghostty, opencode, claude, codex, copilot, openclaw                         | 각 도구의 설정 디렉토리 존재 여부 확인          |
-| MCP              | ~/.claude.json                                                              | MCP 서버 설정 파일 존재 여부 확인           |
+| MCP              | ~/.claude.json, ~/.codex/config.toml, ~/.gemini/settings.json, ~/.copilot/mcp-config.json, ~/.config/opencode/opencode.json | MCP 서버 설정 파일 존재 여부 확인           |
 
 ## 요구사항 요약
 
@@ -717,17 +752,17 @@ peon-ping은 CESP(Coding Event Sound Pack Specification) 표준을 기반으로 
 | Languages      | dotnet, go, kotlin, node, openjdk, php, python, ruby, rust                                     |
 | Pkg Managers   | composer, npm, pipx, rbenv, uv, xcodes, yarn                                                   |
 | Runtime        | Bun                                                                                            |
-| AI Core        | Claude Code, Codex CLI, Gemini CLI, Copilot CLI                                                |
+| AI Core        | Claude Code, Codex CLI, Gemini CLI, Copilot CLI, Auggie CLI                                    |
 | Claude         | SuperClaude, superpowers, claude-hud, peon-ping, karpathy-skills, claude-mem, MCP 4종           |
-| Codex          | oh-my-codex, superpowers (copy)                                                                |
-| Gemini         | SuperGemini, superpowers (copy), MCP 2종                                                        |
-| Copilot        | superpowers (copy), MCP 2종                                                                     |
-| OpenCode       | OpenCode, oh-my-opencode, superpowers (copy)                                                   |
+| Codex          | oh-my-codex, superpowers (copy), MCP 3종                                                       |
+| Gemini         | SuperGemini, superpowers (copy), MCP 3종                                                        |
+| Copilot        | superpowers (copy), MCP 3종                                                                     |
+| OpenCode       | OpenCode, oh-my-opencode, superpowers (copy), MCP 2종                                          |
 | OpenClaw       | OpenClaw, claude-mem 연동                                                                        |
 | Skills         | humanizer (Claude, Codex), superpowers (Claude 플러그인 + Codex/Gemini/Copilot/OpenCode copy)      |
 | Apps           | ghostty, docker, iterm2, chrome, rectangle, slack, figma 등                                     |
 | Shell          | Oh My Zsh + autosuggestions + syntax-highlighting                                              |
-| Linux          | curl, git, vim, zsh, ghostty, 셸/Git baseline, claude, codex, opencode, openclaw, gemini        |
+| Linux          | curl, git, vim, zsh, ghostty, 셸/Git baseline, claude, codex, opencode, openclaw, gemini, auggie |
 
 ## 운영 체크리스트
 
@@ -780,6 +815,7 @@ peon-ping은 CESP(Coding Event Sound Pack Specification) 표준을 기반으로 
 - [Codex Agent Skills](https://developers.openai.com/codex/skills/)
 - [Codex AGENTS.md](https://developers.openai.com/codex/guides/agents-md/)
 - [Gemini CLI](https://ai.google.dev/gemini-api/docs/gemini-cli)
+- [Augment Context Engine MCP](https://docs.augmentcode.com/context-services/mcp/overview)
 - [GitHub Copilot CLI](https://docs.github.com/en/copilot/using-github-copilot/using-github-copilot-in-the-command-line)
 - [GitHub Copilot Skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)
 - [Ghostty Configuration](https://ghostty.org/docs/config)
@@ -802,3 +838,4 @@ peon-ping은 CESP(Coding Event Sound Pack Specification) 표준을 기반으로 
 - [OpenClaw Docs](https://docs.openclaw.ai)
 - [claude-mem Installation](https://docs.claude-mem.ai/installation)
 - [Gemini CLI](https://github.com/google-gemini/gemini-cli)
+- [Augment Context Engine Plugin](https://github.com/augmentcode/context-engine-plugin)

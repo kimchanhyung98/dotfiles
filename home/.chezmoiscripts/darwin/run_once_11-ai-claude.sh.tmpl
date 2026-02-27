@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# AI Claude: SuperClaude, peon-ping
+# AI Claude: SuperClaude, peon-ping, Augment Context Engine MCP
 
 {{ if ne .chezmoi.os "darwin" }}
 exit 0
@@ -34,6 +34,19 @@ if [ ! -d "$HOME/.claude/hooks/peon-ping" ]; then
     fi
 else
     echo "peon-ping: already installed"
+fi
+
+# Augment Context Engine MCP
+# - claude mcp add-json으로 사용자 범위 MCP 서버 등록 (auggie CLI 필요)
+if command -v claude &>/dev/null && command -v auggie &>/dev/null; then
+    if ! claude mcp list 2>/dev/null | grep -q "auggie-mcp"; then
+        echo "Registering Augment Context Engine MCP..."
+        claude mcp add-json auggie-mcp --scope user '{"type":"stdio","command":"auggie","args":["--mcp","--mcp-auto-workspace"]}' || echo "[ai-claude][warning] Augment MCP registration failed"
+    else
+        echo "Augment Context Engine MCP: already registered"
+    fi
+else
+    echo "[ai-claude][warning] claude or auggie not found, skipping Augment MCP registration"
 fi
 
 echo "[ai-claude] done"

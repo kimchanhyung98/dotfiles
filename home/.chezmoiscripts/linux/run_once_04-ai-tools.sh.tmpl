@@ -106,4 +106,13 @@ else
     echo "Gemini CLI: already installed"
 fi
 
+# Auggie CLI (Augment Context Engine MCP)
+# - 코드베이스 전체 컨텍스트를 AI 워크플로우에 제공하는 MCP 서버
+if ! command -v auggie &>/dev/null; then
+    echo "Installing Auggie CLI..."
+    npm install -g @augmentcode/auggie@latest || echo "Warning: Auggie CLI install failed"
+else
+    echo "Auggie CLI: already installed"
+fi
+
 echo "[ai-tools] done"
