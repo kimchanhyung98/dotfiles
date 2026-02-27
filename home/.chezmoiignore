@@ -15,3 +15,6 @@ README.md
 LICENSE
 .git
 .github
+
+# Claude Code 런타임 데이터
+.claude.json

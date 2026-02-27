@@ -5,7 +5,7 @@ Chanhyung's dotfiles, managed with [`chezmoi`](https://www.chezmoi.io/).
 Install them with:
 
 ```console
-$ chezmoi init kimchanhyung98
+$ chezmoi init --apply kimchanhyung98
 ```
 
 Or use the bootstrap script:
