@@ -49,20 +49,19 @@ if ! command -v auggie &>/dev/null; then
     npm install -g @augmentcode/auggie@latest || echo "[ai-core][warning] auggie installation failed"
 fi
 if command -v auggie &>/dev/null; then
-    if ! auggie --print-augment-token &>/dev/null; then
+    if ! auggie token print &>/dev/null; then
         echo "Authenticating auggie..."
-        auggie --login || echo "[ai-core][warning] auggie login failed (run 'auggie --login' manually)"
+        auggie login || echo "[ai-core][warning] auggie login failed (run 'auggie login' manually)"
     fi
     # 토큰 저장 (TOKEN={"accessToken":"...","tenantURL":"..."} 형식)
-    TOKEN_LINE=$(auggie --print-augment-token 2>/dev/null | grep '^TOKEN=' || true)
-    if [ -n "$TOKEN_LINE" ]; then
-        TOKEN_JSON="${TOKEN_LINE#TOKEN=}"
+    TOKEN_RAW=$(auggie token print 2>/dev/null || true)
+    if [ -n "$TOKEN_RAW" ]; then
+        TOKEN_JSON=$(echo "$TOKEN_RAW" | sed 's/^TOKEN=//')
         mkdir -p "$HOME/.config/augment"
         echo "$TOKEN_JSON" > "$HOME/.config/augment/credentials.json"
-        chmod 600 "$HOME/.config/augment/credentials.json"
         echo "auggie: credentials saved"
     else
-        echo "[ai-core][warning] auggie token not available (run 'auggie --login' manually)"
+        echo "[ai-core][warning] auggie token not available (run 'auggie login' manually)"
     fi
 else
     echo "auggie: not installed, skipping login"
