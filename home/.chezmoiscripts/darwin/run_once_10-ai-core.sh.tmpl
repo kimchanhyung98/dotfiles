@@ -54,11 +54,12 @@ if command -v auggie &>/dev/null; then
         auggie login || echo "[ai-core][warning] auggie login failed (run 'auggie login' manually)"
     fi
     # 토큰 저장 (TOKEN={"accessToken":"...","tenantURL":"..."} 형식)
-    TOKEN_RAW=$(auggie token print 2>/dev/null || true)
+    TOKEN_RAW=$(auggie token print 2>/dev/null | grep '^TOKEN=' || true)
     if [ -n "$TOKEN_RAW" ]; then
-        TOKEN_JSON=$(echo "$TOKEN_RAW" | sed 's/^TOKEN=//')
+        TOKEN_JSON="${TOKEN_RAW#TOKEN=}"
         mkdir -p "$HOME/.config/augment"
         echo "$TOKEN_JSON" > "$HOME/.config/augment/credentials.json"
+        chmod 600 "$HOME/.config/augment/credentials.json"
         echo "auggie: credentials saved"
     else
         echo "[ai-core][warning] auggie token not available (run 'auggie login' manually)"
