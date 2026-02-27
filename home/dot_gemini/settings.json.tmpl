@@ -1,4 +1,4 @@
-{{- /* ~/.gemini/settings.json — Gemini CLI 설정 (훅: peon-ping, MCP 서버: context7, sequential-thinking) */ -}}
+{{- /* ~/.gemini/settings.json — Gemini CLI 설정 (훅: peon-ping, MCP 서버: context7, sequential-thinking, augment) */ -}}
 {
   "hooks": {
     "SessionStart": [
@@ -58,6 +58,10 @@
     "sequential-thinking": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-sequential-thinking@latest"]
+    },
+    "augment-context-engine": {
+      "command": "auggie",
+      "args": ["--mcp", "--mcp-auto-workspace"]
     }
   }
 }

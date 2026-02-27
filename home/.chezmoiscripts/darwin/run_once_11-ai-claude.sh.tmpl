@@ -20,6 +20,24 @@ else
     echo "SuperClaude: already installed"
 fi
 
+# Augment Context Engine MCP
+# - credentials.json 에서 토큰을 읽어 env 포함 (토큰 없으면 등록하지 않음)
+if ! claude mcp list 2>/dev/null | grep -q "auggie"; then
+    AUGMENT_CRED="$HOME/.config/augment/credentials.json"
+    if [ -f "$AUGMENT_CRED" ]; then
+        AUG_TOKEN=$(jq -r '.accessToken // empty' "$AUGMENT_CRED" 2>/dev/null)
+        AUG_URL=$(jq -r '.tenantURL // empty' "$AUGMENT_CRED" 2>/dev/null)
+    fi
+    if [ -n "${AUG_TOKEN:-}" ] && [ -n "${AUG_URL:-}" ]; then
+        echo "Adding Augment MCP to Claude Code..."
+        claude mcp add-json auggie --scope user "{\"type\":\"stdio\",\"command\":\"auggie\",\"args\":[\"--mcp\",\"--mcp-auto-workspace\"],\"env\":{\"AUGMENT_API_TOKEN\":\"$AUG_TOKEN\",\"AUGMENT_API_URL\":\"$AUG_URL\"}}" || echo "[ai-claude][warning] Augment MCP addition failed"
+    else
+        echo "[ai-claude][warning] Augment token not found, skipping MCP registration (run 'auggie login' first)"
+    fi
+else
+    echo "Augment MCP: already configured"
+fi
+
 # peon-ping
 # - 작업 완료 알림 사운드 (임시파일 다운로드 후 실행)
 if [ ! -d "$HOME/.claude/hooks/peon-ping" ]; then
