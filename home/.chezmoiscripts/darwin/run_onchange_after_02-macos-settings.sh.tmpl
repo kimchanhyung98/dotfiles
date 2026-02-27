@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# macOS system settings: Dock, Finder, Keyboard, Trackpad, Screenshot
+# macOS system settings: Dock, Finder, Keyboard, Trackpad, Screenshot, System
 # Re-applies when this script changes
 
 {{ if ne .chezmoi.os "darwin" }}
@@ -11,49 +11,78 @@ set -eufo pipefail
 
 echo "[macos-settings]"
 
-# Dock
-# - Dock 자동 숨기기 활성화
+# - Dock
+# Dock 자동 숨기기 활성화
 defaults write com.apple.dock autohide -bool true
-# - Dock 돋보기 효과 활성화
+# Dock 돋보기 효과 활성화
 defaults write com.apple.dock magnification -bool true
-# - Dock 아이콘 기본 크기 설정 (48pt)
+# Dock 아이콘 기본 크기 설정 (48pt)
 defaults write com.apple.dock tilesize -int 48
-# - Dock 최근 사용 앱 표시 비활성화
+# Dock 최근 사용 앱 표시 비활성화
 defaults write com.apple.dock show-recents -bool false
+# 최소화 애니메이션을 scale로 변경
+defaults write com.apple.dock mineffect -string "scale"
+# 숨긴 앱 아이콘 반투명 표시
+defaults write com.apple.dock showhidden -bool true
+# Spaces 자동 재정렬 비활성화
+defaults write com.apple.dock mru-spaces -bool false
 
-# Finder
-# - 경로 막대 표시
+# - Finder
+# 경로 막대 표시
 defaults write com.apple.finder ShowPathbar -bool true
-# - 상태 막대 표시
+# 상태 막대 표시
 defaults write com.apple.finder ShowStatusBar -bool true
-# - 모든 파일 확장자 표시
+# 모든 파일 확장자 표시
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-# - 확장자 변경 경고 비활성화
+# 확장자 변경 경고 비활성화
 defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+# 폴더를 항상 상단에 정렬
+defaults write com.apple.finder _FXSortFoldersFirst -bool true
+# 검색 시 현재 폴더 범위로 기본 설정
+defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+# 네트워크 볼륨에 .DS_Store 생성 방지
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+# USB 볼륨에 .DS_Store 생성 방지
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+# 숨김 파일 표시
+defaults write com.apple.finder AppleShowAllFiles -bool true
 
-# Keyboard
-# - 키 반복 속도 빠르게
+# - Keyboard
+# 키 반복 속도 빠르게
 defaults write NSGlobalDomain KeyRepeat -int 2
-# - 키 반복 시작 지연 단축
+# 키 반복 시작 지연 단축
 defaults write NSGlobalDomain InitialKeyRepeat -int 15
-# - 길게 누르기 팝오버 비활성화 (키 반복 우선)
+# 길게 누르기 팝오버 비활성화 (키 반복 우선)
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-# - 맞춤법 자동 수정 비활성화
+# 맞춤법 자동 수정 비활성화
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+# 자동 대문자 비활성화
+defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
+# 스마트 대시 비활성화
+defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+# 자동 마침표 비활성화
+defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+# 스마트 따옴표 비활성화
+defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 
-# Trackpad
-# - 탭하여 클릭 활성화
-defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
-# - 탭하여 클릭 (글로벌) 활성화
-defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+# - Trackpad
+# 탭하여 클릭 비활성화
+defaults write com.apple.AppleMultitouchTrackpad Clicking -bool false
+# 탭하여 클릭 (글로벌) 비활성화
+defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 0
+defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 0
 
-# Screenshot
-# - 스크린샷 저장 경로를 Desktop으로 지정
+# - Screenshot
+# 스크린샷 저장 경로를 Desktop으로 지정
 defaults write com.apple.screencapture location -string "$HOME/Desktop"
-# - 스크린샷 포맷을 PNG로 설정
+# 스크린샷 포맷을 PNG로 설정
 defaults write com.apple.screencapture type -string "png"
-# - 스크린샷 그림자 비활성화
+# 스크린샷 그림자 비활성화
 defaults write com.apple.screencapture disable-shadow -bool true
+
+# - System
+# 새 문서를 iCloud 대신 로컬 디스크에 저장
+defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
 
 # 변경사항 적용을 위해 관련 프로세스 재시작
 killall Dock 2>/dev/null || true
