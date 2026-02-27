@@ -1,25 +1,50 @@
 # Ghostty 터미널 설정
 # chezmoi로 관리 → ~/.config/ghostty/config
 
-# 폰트
-font-family = JetBrains Mono
-font-size = 14
+# - 폰트
+font-family = JetBrainsMono Nerd Font
+font-size = 13
+# 줄 간격 조정
+adjust-cell-height = 1
 
-# 테마
-theme = GruvboxDark
+# - 테마
+theme = Gruvbox Dark
 
-# 창 설정
-window-padding-x = 8        # 좌우 패딩
-window-padding-y = 4        # 상하 패딩
-background-opacity = 0.95   # 배경 투명도
-background-blur = 20        # 배경 블러 강도
+# - 커서
+# 커서 깜빡임 비활성화
+cursor-style-blink = false
+# 타이핑 중 마우스 커서 숨김
+mouse-hide-while-typing = true
 
-# 셸 통합
+# - 창 설정
+# 좌우 패딩
+window-padding-x = 8
+# 상하 패딩
+window-padding-y = 4
+# 창 크기에 맞게 패딩 자동 균등 분배
+window-padding-balance = true
+# 배경 투명도
+background-opacity = 0.95
+# 배경 블러 강도
+background-blur = 20
+# 비활성 split 패널 투명도
+unfocused-split-opacity = 0.7
+# 탭/split 닫을 때 확인 다이얼로그 표시
+confirm-close-surface = true
+# 클립보드 붙여넣기 보호
+clipboard-paste-protection = true
+
+# - 셸 통합
 shell-integration = zsh
-scrollback-limit = 10000    # 스크롤백 버퍼 크기
+# 스크롤백 버퍼 크기
+scrollback-limit = 10000
 
 {{ if eq .chezmoi.os "darwin" }}
-# macOS 전용
-macos-titlebar-style = hidden   # 타이틀바 숨기기
-macos-option-as-alt = true      # Option 키를 Alt로 사용
+# - macOS 전용
+# macOS 레티나 디스플레이에서 텍스트 선명하게 표시
+font-thicken = true
+# 타이틀바 숨기기
+macos-titlebar-style = hidden
+# Option 키를 Alt로 사용
+macos-option-as-alt = true
 {{ end }}
