@@ -14,5 +14,12 @@
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp@latest"]
     }
+  },
+  "mcp": {
+    "augment-context-engine": {
+      "type": "local",
+      "command": ["auggie", "--mcp", "--mcp-auto-workspace"],
+      "enabled": true
+    }
   }
 }

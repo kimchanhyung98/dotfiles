@@ -42,6 +42,31 @@ else
     echo "Copilot CLI: already installed ($(copilot --version 2>/dev/null || echo 'unknown'))"
 fi
 
+# Augment Context Engine (auggie)
+# - 설치 → 로그인 → 토큰 저장 (각 AI 서비스 MCP 설정에서 참조)
+if ! command -v auggie &>/dev/null; then
+    echo "Installing auggie..."
+    npm install -g @augmentcode/auggie@latest || echo "[ai-core][warning] auggie installation failed"
+fi
+if command -v auggie &>/dev/null; then
+    if ! auggie token print &>/dev/null; then
+        echo "Authenticating auggie..."
+        auggie login || echo "[ai-core][warning] auggie login failed (run 'auggie login' manually)"
+    fi
+    # 토큰 저장 (TOKEN={"accessToken":"...","tenantURL":"..."} 형식)
+    TOKEN_RAW=$(auggie token print 2>/dev/null | grep '^TOKEN=' || true)
+    if [ -n "$TOKEN_RAW" ]; then
+        TOKEN_JSON="${TOKEN_RAW#TOKEN=}"
+        mkdir -p "$HOME/.config/augment"
+        echo "$TOKEN_JSON" > "$HOME/.config/augment/credentials.json"
+        echo "auggie: credentials saved"
+    else
+        echo "[ai-core][warning] auggie token not available (run 'auggie login' manually)"
+    fi
+else
+    echo "auggie: not installed, skipping login"
+fi
+
 # superpowers
 # - 공유 스킬 저장소 (각 AI 도구에서 개별 복사하여 사용)
 if [ ! -d "$HOME/superpowers" ]; then
