@@ -6,7 +6,7 @@
 
 - chezmoi로 관리되는 dotfiles의 정상 동작을 검증하기 위한 테스트 전략
 - macOS와 Linux 환경 모두 지원 필요
-- 템플릿 15개, 스크립트 17개(darwin 12, linux 5)를 대상으로 함
+- 설정 템플릿 15개, 스크립트 17개(darwin 12, linux 5)를 대상으로 함
 
 ---
 
