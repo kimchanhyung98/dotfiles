@@ -23,10 +23,6 @@ init: ## Setup Project environment
 		echo "[init] .env file is required"; \
 		exit 1; \
 	fi
-	@if [ ! -f .claude/.supermemory-claude/config.json ]; then \
-		echo "[init] .claude/.supermemory-claude/config.json file is required"; \
-		exit 1; \
-	fi
 	@if [ "$(shell uname)" = "Darwin" ]; then \
 		echo "[init] Checking macOS permissions"; \
 		bash .claude/hooks/check-permissions.sh || true; \
