@@ -57,6 +57,7 @@ cask "font-jetbrains-mono"  # JetBrains Mono 개발 폰트
 cask "font-jetbrains-mono-nerd-font"  # JetBrainsMono Nerd Font (아이콘 글리프 포함)
 
 # 터미널 에뮬레이터
+cask "cmux"         # Ghostty 기반 macOS 터미널 (AI 에이전트 워크플로우)
 cask "ghostty"      # GPU 가속 터미널
 
 # 개발 앱
