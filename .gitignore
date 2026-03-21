@@ -143,7 +143,6 @@ Icon?
 .claude/memory/*
 !.claude/memory/.gitkeep
 .claude/settings.local.json
-.claude/.supermemory-claude/config.json
 
 # Codex
 .codex/commands/speckit.*
