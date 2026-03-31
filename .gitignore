@@ -4,6 +4,9 @@
 
 # Distribution / packaging
 .Python
+__pycache__/
+*.py[cod]
+*$py.class
 build/
 develop-eggs/
 dist/
@@ -44,6 +47,7 @@ hs_err_pid*
 ENV/
 venv/
 venv.bak/
+.venv/
 
 # Cloud
 .serverless/
@@ -106,7 +110,12 @@ credentials.json
 .c9/
 *.launch
 .settings/
+*.sublime-project
 *.sublime-workspace
+*.iml
+*.iws
+*.ipr
+out/
 
 # OS
 .AppleDouble
@@ -123,6 +132,7 @@ ehthumbs_vista.db
 Icon?
 *.stackdump
 [Dd]esktop.ini
+$RECYCLE.BIN/
 
 # AI Agent
 .agents/*
@@ -142,6 +152,7 @@ Icon?
 .claude/hooks/.permissions-checked
 .claude/memory/*
 !.claude/memory/.gitkeep
+.claude/plans
 .claude/settings.local.json
 
 # Codex
@@ -151,6 +162,7 @@ Icon?
 
 # GitHub
 .github/agents/*
+!.github/agents/*.agent.md
 .github/prompts/*
 
 # Agent-OS
@@ -161,4 +173,3 @@ agent-os/
 .specify/
 .speckit/
 specs/
-tasks/

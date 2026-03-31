@@ -1,7 +1,7 @@
 # Project-local Codex CLI settings.
 # This file is merged with ~/.codex/config.toml and overrides global defaults.
 
-model = "gpt-5.3-codex"
+model = "gpt-5.4"
 model_reasoning_effort = "xhigh"
 
 approval_policy = "never"
