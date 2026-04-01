@@ -21,9 +21,9 @@ fi
 # - Anthropic Claude 터미널 AI 코딩 도우미
 if ! command -v claude &>/dev/null; then
     echo "Installing Claude Code..."
-    npm install -g @anthropic-ai/claude-code || echo "Warning: Claude Code install failed"
+    curl -fsSL https://claude.ai/install.sh | bash || echo "Warning: Claude Code install failed"
 else
-    echo "Claude Code: already installed"
+    echo "Claude Code: already installed ($(claude --version 2>/dev/null || echo 'unknown'))"
 fi
 
 # Codex CLI
