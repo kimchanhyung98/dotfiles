@@ -102,7 +102,6 @@ section "AI CLI"
 check "claude" "command -v claude"
 check "codex" "command -v codex"
 check "opencode" "command -v opencode"
-check "openclaw" "command -v openclaw"
 check "ollama" "command -v ollama"
 check "gemini" "command -v gemini"
 
@@ -146,7 +145,6 @@ check_path "opencode" "$HOME/.config/opencode/opencode.json"
 check_path "claude" "$HOME/.claude/settings.json"
 check_path "codex" "$HOME/.codex/config.toml"
 check_path "copilot" "$HOME/.copilot/skills"
-check_path "openclaw" "$HOME/.openclaw/openclaw.json"
 
 # MCP
 section "MCP"
