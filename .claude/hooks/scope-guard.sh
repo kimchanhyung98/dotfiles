@@ -1,7 +1,24 @@
 #!/bin/bash
 
 INPUT=$(cat)
-TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name')
+
+# jq 존재 여부 확인 (fail-closed: jq 없으면 차단)
+if ! command -v jq >/dev/null 2>&1; then
+  cat <<'EOF'
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Blocked: jq is required but not installed"}}
+EOF
+  exit 0
+fi
+
+TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty' 2>/dev/null)
+
+# jq 파싱 실패 시 차단
+if [ -z "$TOOL_NAME" ]; then
+  cat <<'EOF'
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Blocked: failed to parse tool input"}}
+EOF
+  exit 0
+fi
 
 PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 RESOLVED_ROOT=$(cd "$PROJECT_ROOT" 2>/dev/null && pwd -P) || RESOLVED_ROOT="$PROJECT_ROOT"
@@ -54,25 +71,41 @@ if [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" ]]; then
   exit 0
 fi
 
-# Bash: rm 명령어의 대상 경로 검증
-# 구분자(&&, ||, ;)로 분리 후 rm으로 시작하는 실제 명령만 검증 (문자열 인자 내 오탐 방지)
+# Bash: 파괴적 명령어의 대상 경로 검증
+# 구분자(&&, ||, ;, |)로 분리 후 대상 명령으로 시작하는 실제 명령만 검증
 if [[ "$TOOL_NAME" == "Bash" ]]; then
   COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
   [ -z "$COMMAND" ] && exit 0
 
+  # 검사 대상 명령어 패턴 (파괴적 + 데이터 이동)
+  DESTRUCTIVE_PATTERN='^(rm|mv|cp|chmod|chown|shred|dd|unlink|rmdir)[[:space:]]'
+
   while IFS= read -r cmd; do
     cmd="${cmd#"${cmd%%[![:space:]]*}"}"
-    [[ ! "$cmd" =~ ^rm[[:space:]] ]] && continue
+
+    # 서브쉘/명령 치환 패턴 감지
+    if [[ "$cmd" == *'$('*'rm '* ]] || [[ "$cmd" == *'`'*'rm '* ]]; then
+      deny "subshell with destructive command detected."
+    fi
+
+    [[ ! "$cmd" =~ $DESTRUCTIVE_PATTERN ]] && continue
 
     for arg in $cmd; do
-      [[ "$arg" == "rm" ]] && continue
+      # 명령어 자체와 옵션은 건너뜀
+      [[ "$arg" =~ ^(rm|mv|cp|chmod|chown|shred|dd|unlink|rmdir)$ ]] && continue
       [[ "$arg" == -* ]] && continue
 
+      # 따옴표 제거
+      arg="${arg%\"}"
+      arg="${arg#\"}"
+      arg="${arg%\'}"
+      arg="${arg#\'}"
+
       if is_outside_project "$arg"; then
-        deny "'rm' target '$arg' is outside the project directory ($RESOLVED_ROOT)."
+        deny "target '$arg' is outside the project directory ($RESOLVED_ROOT)."
       fi
     done
-  done < <(printf '%s' "$COMMAND" | awk '{gsub(/&&/,"\n"); gsub(/\|\|/,"\n"); gsub(/;/,"\n"); print}')
+  done < <(printf '%s' "$COMMAND" | awk '{gsub(/&&/,"\n"); gsub(/\|\|/,"\n"); gsub(/;/,"\n"); gsub(/\|/,"\n"); print}')
   exit 0
 fi
 

@@ -29,21 +29,21 @@ endif
 	@echo "[check] all checks passed"
 
 claude: ## Claude Code 환경 설정
-	@echo "[claude] downloading AGENT.md..."
+	@echo "[claude] downloading AGENTS.md..."
 	@tmp_claude=$$(mktemp); \
 	claude_url="https://raw.githubusercontent.com/forrestchang/andrej-karpathy-skills/main/CLAUDE.md"; \
 	if ! curl -fsSL "$$claude_url" -o "$$tmp_claude"; then \
 		rm -f "$$tmp_claude"; \
-		echo "[claude] AGENT.md download failed"; \
+		echo "[claude] AGENTS.md download failed"; \
 		exit 1; \
 	fi; \
-	if [ -f AGENT.md ] && grep -qF "Behavioral guidelines to reduce common LLM coding mistakes" AGENT.md; then \
-		echo "[claude] AGENT.md already up to date"; \
-	elif [ -f AGENT.md ]; then \
-		printf '\n' >> AGENT.md; \
-		cat "$$tmp_claude" >> AGENT.md; \
+	if [ -f AGENTS.md ] && grep -qF "Behavioral guidelines to reduce common LLM coding mistakes" AGENTS.md; then \
+		echo "[claude] AGENTS.md already up to date"; \
+	elif [ -f AGENTS.md ]; then \
+		printf '\n' >> AGENTS.md; \
+		cat "$$tmp_claude" >> AGENTS.md; \
 	else \
-		mv "$$tmp_claude" AGENT.md; \
+		mv "$$tmp_claude" AGENTS.md; \
 	fi; \
 	rm -f "$$tmp_claude"
 
@@ -71,17 +71,10 @@ init: ## 프로젝트 환경 설정
 	@echo "[init] installing npm packages..."
 	@docker run --rm -v $$(pwd):/app -w /app node:22-alpine sh -c "apk add --no-cache git && npm install"
 
-speckit: ## speckit 설치 (기본값: claude)
+speckit: ## speckit 설치 (AGENT=claude, 예: make speckit AGENT=copilot)
 	@if ! command -v specify >/dev/null 2>&1; then \
 		echo "[speckit] specify not found"; \
 		echo "[speckit] run: uv tool install specify-cli --from git+https://github.com/github/spec-kit.git"; \
 		exit 1; \
 	fi
-	@agent="$(filter-out speckit,$(MAKECMDGOALS))"; \
-	if [ -z "$$agent" ]; then \
-		agent="claude"; \
-	fi; \
-	yes | specify init --here --ai "$$agent" --script sh
-
-%:
-	@:
+	@yes | specify init --here --ai "$(or $(AGENT),claude)" --script sh
