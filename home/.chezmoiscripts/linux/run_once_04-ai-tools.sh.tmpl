@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# AI Tools: claude, codex, oh-my-codex, opencode, oh-my-opencode, openclaw, gemini
+# AI Tools and extensions (Linux minimal): claude, codex, oh-my-codex, opencode, oh-my-opencode, gemini
 # Runs once on first setup
 
 {{ if ne .chezmoi.os "linux" }}
@@ -60,41 +60,6 @@ if ! command -v oh-my-opencode &>/dev/null; then
     npm install -g oh-my-opencode || echo "Warning: oh-my-opencode install failed"
 else
     echo "oh-my-opencode: already installed"
-fi
-
-# OpenClaw
-# - AI 어시스턴트 백그라운드 데몬
-if ! command -v openclaw &>/dev/null; then
-    echo "Installing OpenClaw..."
-    npm install -g @openclaw/openclaw || echo "Warning: OpenClaw install failed"
-else
-    echo "OpenClaw: already installed"
-fi
-
-# OpenClaw systemd 데몬 등록
-# - 시스템 시작 시 OpenClaw 자동 실행 설정
-SYSTEMD_DIR="$HOME/.config/systemd/user"
-SERVICE_FILE="$SYSTEMD_DIR/openclaw.service"
-if [ ! -f "$SERVICE_FILE" ] && command -v openclaw &>/dev/null; then
-    echo "Registering OpenClaw systemd daemon..."
-    mkdir -p "$SYSTEMD_DIR"
-    OPENCLAW_BIN=$(command -v openclaw)
-    cat > "$SERVICE_FILE" << EOF
-[Unit]
-Description=OpenClaw AI Assistant Daemon
-After=network.target
-
-[Service]
-ExecStart=${OPENCLAW_BIN} daemon
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=default.target
-EOF
-    systemctl --user daemon-reload 2>/dev/null || true
-    systemctl --user enable openclaw 2>/dev/null || true
-    systemctl --user start openclaw 2>/dev/null || true
 fi
 
 # Gemini CLI
