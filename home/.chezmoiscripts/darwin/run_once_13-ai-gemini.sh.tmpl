@@ -14,8 +14,11 @@ echo "[ai-gemini]"
 # - Gemini CLI 확장 프레임워크 (슬래시 명령어, AI 에이전트 페르소나)
 if ! command -v supergemini &>/dev/null; then
     echo "Installing SuperGemini..."
-    pipx install supergemini || echo "[ai-gemini][warning] SuperGemini installation failed"
-    SuperGemini install --force --yes || true
+    if pipx install supergemini; then
+        SuperGemini install --force --yes || echo "[ai-gemini][warning] SuperGemini post-install setup failed"
+    else
+        echo "[ai-gemini][warning] SuperGemini installation failed (requires pipx)"
+    fi
 else
     echo "SuperGemini: already installed"
 fi

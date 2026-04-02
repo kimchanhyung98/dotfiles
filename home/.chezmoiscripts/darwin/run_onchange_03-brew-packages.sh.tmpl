@@ -24,4 +24,11 @@ else
     brew bundle --file="{{ .chezmoi.sourceDir }}/Brewfile" || true
 fi
 
+# 핵심 패키지 사후 검증
+for cmd in git node npm; do
+    if ! command -v "$cmd" &>/dev/null; then
+        echo "[brew-packages][error] $cmd not found after brew bundle — downstream scripts may fail"
+    fi
+done
+
 echo "[brew-packages] done"

@@ -14,8 +14,11 @@ echo "[ai-claude]"
 # - Claude Code 확장 프레임워크 (페르소나, 명령어, 플래그 시스템)
 if ! command -v superclaude &>/dev/null; then
     echo "Installing SuperClaude..."
-    pipx install superclaude || echo "[ai-claude][warning] SuperClaude installation failed"
-    SuperClaude install --force --yes || true
+    if pipx install superclaude; then
+        SuperClaude install --force --yes || echo "[ai-claude][warning] SuperClaude post-install setup failed"
+    else
+        echo "[ai-claude][warning] SuperClaude installation failed (requires pipx)"
+    fi
 else
     echo "SuperClaude: already installed"
 fi

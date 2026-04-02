@@ -10,10 +10,21 @@ set -eufo pipefail
 
 echo "[ai-core]"
 
+if ! command -v npm &>/dev/null; then
+    echo "[ai-core][error] npm not found. Ensure Node.js was installed via Brewfile."
+    exit 1
+fi
+
 # Claude Code
 if ! command -v claude &>/dev/null; then
     echo "Installing Claude Code..."
-    curl -fsSL https://claude.ai/install.sh | bash || echo "[ai-core][warning] Claude Code installation failed"
+    installer=$(mktemp)
+    if curl -fsSL https://claude.ai/install.sh -o "$installer"; then
+        bash "$installer" || echo "[ai-core][warning] Claude Code installation failed"
+    else
+        echo "[ai-core][warning] Claude Code download failed"
+    fi
+    rm -f "$installer"
 else
     echo "Claude Code: already installed ($(claude --version 2>/dev/null || echo 'unknown'))"
 fi
