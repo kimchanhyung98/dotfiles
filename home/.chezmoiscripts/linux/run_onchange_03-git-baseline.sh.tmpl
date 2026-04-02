@@ -16,7 +16,7 @@ echo "[git-baseline]"
 if git config --global user.name &>/dev/null; then
     echo "Git user: $(git config --global user.name) <$(git config --global user.email)>"
 else
-    echo "Warning: Git user not configured. Check ~/.gitconfig"
+    echo "[git-baseline][warning] Git user not configured. Check ~/.gitconfig"
 fi
 
 # SSH 키 기본 설정
@@ -30,7 +30,7 @@ fi
 
 # - Ed25519 SSH 키 존재 여부 확인
 if [ ! -f "$SSH_DIR/id_ed25519" ]; then
-    echo "Note: No SSH key found. Generate one with:"
+    echo "[git-baseline][info] No SSH key found. Generate one with:"
     echo '  ssh-keygen -t ed25519 -C {{ .email | quote }}'
 fi
 

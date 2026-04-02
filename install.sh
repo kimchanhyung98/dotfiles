@@ -5,6 +5,7 @@
 #
 
 set -eufo pipefail
+trap 'echo "[install][error] Installation interrupted. Please re-run the script." >&2' EXIT
 
 # 출력 색상 정의
 RED='\033[0;31m'
@@ -50,3 +51,5 @@ chezmoi init --apply kimchanhyung98
 
 echo_info "Dotfiles installation complete!"
 echo_info "Please restart your terminal to apply changes."
+
+trap - EXIT

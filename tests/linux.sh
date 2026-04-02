@@ -48,7 +48,13 @@ fi
 
 # --- 3. chezmoi doctor (환경 진단) ---
 section "chezmoi doctor"
-chezmoi doctor --no-network > /tmp/chezmoi-doctor.log 2>&1 || true
+set +e
+chezmoi doctor --no-network > /tmp/chezmoi-doctor.log 2>&1
+doctor_exit=$?
+set -e
+if [ $doctor_exit -ne 0 ]; then
+    echo "[warning] chezmoi doctor exited with code $doctor_exit"
+fi
 tail -5 /tmp/chezmoi-doctor.log
 if grep -q "^error" /tmp/chezmoi-doctor.log; then
     fail "chezmoi doctor reported errors"
