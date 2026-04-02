@@ -10,7 +10,7 @@ let currentBranch;
 try {
     currentBranch = execSync('git rev-parse --abbrev-ref HEAD', {encoding: 'utf8'}).trim();
 } catch (err) {
-    console.error('브랜치명 확인 오류');
+    console.error(`브랜치명 확인 오류: ${err.message}`);
     process.exit(1);
 }
 

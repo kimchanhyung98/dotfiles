@@ -17,12 +17,12 @@ let commitMsg;
 try {
     commitMsg = fs.readFileSync(commitMsgFile, 'utf8').trim();
 } catch (err) {
-    console.error('커밋 메시지 확인 오류');
+    console.error(`커밋 메시지 확인 오류: ${err.message}`);
     process.exit(1);
 }
 
-// merge/revert 커밋은 제외
-if (commitMsg.startsWith('Merge') || commitMsg.startsWith('Revert')) {
+// merge/revert/initial 커밋은 제외
+if (/^Merge /.test(commitMsg) || /^Revert "/.test(commitMsg) || commitMsg === 'Initial commit') {
     process.exit(0);
 }
 
