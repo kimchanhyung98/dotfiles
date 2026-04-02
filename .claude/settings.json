@@ -14,7 +14,8 @@
       "Read(**/*.pfx)",
       "Read(**/*.crt)",
       "Read(**/*.cer)",
-      "Edit(../**)"
+      "Edit(../**)",
+      "Write(../**)"
     ],
     "defaultMode": "bypassPermissions"
   },

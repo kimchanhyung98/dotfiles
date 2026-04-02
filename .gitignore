@@ -148,6 +148,8 @@ $RECYCLE.BIN/
 .windsurf/*
 
 # Claude
+**/CLAUDE.md
+!CLAUDE.md
 .claude/commands/speckit.*
 .claude/hooks/.permissions-checked
 .claude/memory/*
