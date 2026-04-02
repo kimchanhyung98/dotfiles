@@ -22,7 +22,12 @@
 {{/* macOS에서 안정적인 호스트네임 가져오기 (scutil 사용) */}}
 {{- $hostname := .chezmoi.hostname -}}
 {{- if eq .chezmoi.os "darwin" -}}
-{{-   $hostname = output "scutil" "--get" "LocalHostName" | trim -}}
+{{-   if lookPath "scutil" -}}
+{{-     $scutilHost := output "scutil" "--get" "LocalHostName" | trim -}}
+{{-     if $scutilHost -}}
+{{-       $hostname = $scutilHost -}}
+{{-     end -}}
+{{-   end -}}
 {{- end -}}
 
 {{/* 대화형 터미널에서 이름/이메일 입력 프롬프트 (최초 1회) */}}
