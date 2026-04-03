@@ -14,19 +14,14 @@ echo "[install-packages]"
 # 필수 패키지 목록
 packages=(curl git vim zsh bat)
 
-is_package_installed() {
-    local pkg="$1"
-    if [ "$pkg" = "bat" ]; then
-        command -v bat &>/dev/null || command -v batcat &>/dev/null
-        return $?
-    fi
-    command -v "$pkg" &>/dev/null
-}
-
 # 미설치 패키지 확인
 install_needed=()
 for pkg in "${packages[@]}"; do
-    if ! is_package_installed "$pkg"; then
+    if ! command -v "$pkg" &>/dev/null; then
+        # Debian/Ubuntu: bat 패키지는 batcat으로 설치됨
+        if [ "$pkg" = "bat" ] && command -v batcat &>/dev/null; then
+            continue
+        fi
         install_needed+=("$pkg")
     fi
 done
@@ -61,6 +56,13 @@ else
         echo "Please install manually: ${install_needed[*]}"
         exit 1
     fi
+fi
+
+# bat → batcat 심볼릭 링크 (Debian/Ubuntu에서 bat 패키지는 batcat으로 설치됨)
+if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
+    mkdir -p "$HOME/.local/bin"
+    ln -sf "$(command -v batcat)" "$HOME/.local/bin/bat"
+    echo "Created symlink: bat → batcat"
 fi
 
 # Ghostty
