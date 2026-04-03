@@ -17,15 +17,10 @@ packages=(curl git vim zsh bat)
 is_package_installed() {
     local pkg="$1"
     if [ "$pkg" = "bat" ]; then
-        if command -v bat &>/dev/null || command -v batcat &>/dev/null; then
-            return 0
-        fi
-        return 1
+        command -v bat &>/dev/null || command -v batcat &>/dev/null
+        return $?
     fi
-    if command -v "$pkg" &>/dev/null; then
-        return 0
-    fi
-    return 1
+    command -v "$pkg" &>/dev/null
 }
 
 # 미설치 패키지 확인
