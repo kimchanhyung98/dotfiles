@@ -1,0 +1,3 @@
+# bat 기본 설정
+--style=plain
+--paging=never

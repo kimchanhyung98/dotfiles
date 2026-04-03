@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Install essential packages: curl, git, vim, zsh, ghostty
+# Install essential packages: curl, git, vim, zsh, bat, ghostty
 # Runs once on first setup
 
 {{ if ne .chezmoi.os "linux" }}
@@ -12,11 +12,14 @@ set -eufo pipefail
 echo "[install-packages]"
 
 # 필수 패키지 목록
-packages=(curl git vim zsh)
+packages=(curl git vim zsh bat)
 
 # 미설치 패키지 확인
 install_needed=()
 for pkg in "${packages[@]}"; do
+    if [ "$pkg" = "bat" ] && (command -v bat &>/dev/null || command -v batcat &>/dev/null); then
+        continue
+    fi
     if ! command -v "$pkg" &>/dev/null; then
         install_needed+=("$pkg")
     fi
