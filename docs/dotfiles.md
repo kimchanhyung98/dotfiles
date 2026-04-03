@@ -593,9 +593,9 @@ SuperGemini는 Gemini CLI의 확장 프레임워크로, 슬래시 명령어와 A
 **설정 (dot_gemini/ → ~/.gemini/)**
 
 - `settings.json` 기본 승인 모드는 `auto_edit`로 설정한다.
-- YOLO 모드는 설정 파일의 기본값으로 지정할 수 없으며, 실행 시 `--approval-mode=yolo`(또는 `--yolo`) 옵션을 사용해야 한다.
+- YOLO 모드는 설정 파일 기본값(`general.defaultApprovalMode`)으로는 지정할 수 없으며, 실행 시 `--approval-mode=yolo`(또는 `--yolo`) 옵션을 사용해야 한다(공식 문서: https://geminicli.com/docs/reference/configuration/).
 - 이 dotfiles는 `gemini-yolo` 별칭(`gemini --approval-mode=yolo`)을 제공한다.
-- YOLO 모드에서는 sandbox가 기본 활성화되어, 파일/명령 실행을 격리 환경에서 수행하도록 유도한다(공식 configuration 문서의 Sandboxing 섹션 기준).
+- YOLO 모드에서는 sandbox가 기본 활성화되며, 별도 `settings.json` 설정 없이 동작한다(공식 configuration 문서의 Sandboxing 섹션 기준).
 
 ### Copilot
 
