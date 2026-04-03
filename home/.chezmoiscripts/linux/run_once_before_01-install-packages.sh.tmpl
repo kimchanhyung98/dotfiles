@@ -14,13 +14,19 @@ echo "[install-packages]"
 # 필수 패키지 목록
 packages=(curl git vim zsh bat)
 
+is_package_installed() {
+    local pkg="$1"
+    if [ "$pkg" = "bat" ]; then
+        command -v bat &>/dev/null || command -v batcat &>/dev/null
+        return
+    fi
+    command -v "$pkg" &>/dev/null
+}
+
 # 미설치 패키지 확인
 install_needed=()
 for pkg in "${packages[@]}"; do
-    if [ "$pkg" = "bat" ] && (command -v bat &>/dev/null || command -v batcat &>/dev/null); then
-        continue
-    fi
-    if ! command -v "$pkg" &>/dev/null; then
+    if ! is_package_installed "$pkg"; then
         install_needed+=("$pkg")
     fi
 done
