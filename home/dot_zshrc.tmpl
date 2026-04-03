@@ -73,7 +73,7 @@ fi
 
 # mise (런타임/도구 버전 매니저)
 if command -v mise &>/dev/null; then
-    eval "$(mise activate zsh)"
+    eval "$(mise activate zsh)" || echo "[zshrc][warning] mise activation failed" >&2
 fi
 
 # fzf (퍼지 파인더 셸 통합)
