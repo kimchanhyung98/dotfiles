@@ -14,6 +14,7 @@ RUN apt-get update -qq && \
         locales \
         shellcheck \
         zoxide \
+        bat \
         nodejs \
         npm \
     && locale-gen en_US.UTF-8 \
