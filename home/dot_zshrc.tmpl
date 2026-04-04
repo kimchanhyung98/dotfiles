@@ -85,3 +85,8 @@ if [ -d "$HOME/.bun" ]; then
     export BUN_INSTALL="$HOME/.bun"
     export PATH="$BUN_INSTALL/bin:$PATH"
 fi
+
+# zoxide (스마트 디렉토리 이동)
+if command -v zoxide &>/dev/null; then
+    eval "$(zoxide init zsh)"
+fi
