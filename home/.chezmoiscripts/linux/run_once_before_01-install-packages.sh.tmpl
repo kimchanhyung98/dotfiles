@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Install essential packages: curl, git, vim, zsh, ghostty
+# Install essential packages: curl, git, vim, zsh, bat, ghostty
 # Runs once on first setup
 
 {{ if ne .chezmoi.os "linux" }}
@@ -12,12 +12,16 @@ set -eufo pipefail
 echo "[install-packages]"
 
 # 필수 패키지 목록
-packages=(curl git vim zsh)
+packages=(curl git vim zsh bat)
 
 # 미설치 패키지 확인
 install_needed=()
 for pkg in "${packages[@]}"; do
     if ! command -v "$pkg" &>/dev/null; then
+        # Debian/Ubuntu: bat 패키지는 batcat으로 설치됨
+        if [ "$pkg" = "bat" ] && command -v batcat &>/dev/null; then
+            continue
+        fi
         install_needed+=("$pkg")
     fi
 done
@@ -52,6 +56,13 @@ else
         echo "Please install manually: ${install_needed[*]}"
         exit 1
     fi
+fi
+
+# bat → batcat 심볼릭 링크 (Debian/Ubuntu에서 bat 패키지는 batcat으로 설치됨)
+if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
+    mkdir -p "$HOME/.local/bin"
+    ln -sf "$(command -v batcat)" "$HOME/.local/bin/bat"
+    echo "Created symlink: bat → batcat"
 fi
 
 # Ghostty

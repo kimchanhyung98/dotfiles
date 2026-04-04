@@ -13,6 +13,7 @@ RUN apt-get update -qq && \
         ca-certificates \
         locales \
         shellcheck \
+        bat \
         nodejs \
         npm \
     && locale-gen en_US.UTF-8 \

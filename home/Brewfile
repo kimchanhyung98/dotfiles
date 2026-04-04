@@ -3,6 +3,7 @@
 
 # 시스템 CLI 도구
 brew "bash"               # Bash 셸
+brew "bat"                # cat 대체 뷰어 (문법 강조)
 brew "curl"               # URL 데이터 전송
 brew "gh"                 # GitHub CLI
 brew "git"                # 버전 관리
