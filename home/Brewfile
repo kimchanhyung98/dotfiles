@@ -43,9 +43,9 @@ brew "rust"         # Rust
 
 # 패키지/가상 환경 관리
 brew "composer"     # PHP 패키지 매니저
+brew "mise"         # 런타임/도구 버전 매니저
 brew "npm"          # Node.js 패키지 매니저
 brew "pipx"         # Python CLI 도구 격리 설치
-brew "rbenv"        # Ruby 버전 매니저
 brew "uv"           # 빠른 Python 패키지 매니저
 brew "xcodes"       # Xcode 버전 매니저
 brew "yarn"         # Node.js 패키지 매니저 (대체)

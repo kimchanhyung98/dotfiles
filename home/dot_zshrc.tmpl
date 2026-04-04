@@ -75,6 +75,11 @@ if command -v direnv &>/dev/null; then
     eval "$(direnv hook zsh)"
 fi
 
+# mise (런타임/도구 버전 매니저)
+if command -v mise &>/dev/null; then
+    eval "$(mise activate zsh)"
+fi
+
 # fzf (퍼지 파인더 셸 통합)
 if command -v fzf &>/dev/null; then
     source <(fzf --zsh) 2>/dev/null || true
