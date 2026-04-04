@@ -141,7 +141,7 @@ dotfiles/
 | `dot_codex/`           | `~/.codex/`           | Codex CLI 설정                    |
 | `dot_agents/skills/`   | `~/.agents/skills/`   | Codex 글로벌 스킬                    |
 | `dot_copilot/`         | `~/.copilot/`         | Copilot MCP 설정, 글로벌 스킬          |
-| `dot_gemini/`          | `~/.gemini/`          | Gemini CLI 설정 (MCP 서버)          |
+| `dot_gemini/`          | `~/.gemini/`          | Gemini CLI 설정 (승인 모드, 알림/UI, 훅, MCP 서버) |
 | `dot_local/bin/`       | `~/.local/bin/`       | 사용자 스크립트 (dotfiles-doctor)      |
 
 ## chezmoi special 파일
@@ -589,6 +589,12 @@ OpenCode는 프로젝트/글로벌 모두에서 `.opencode/skills/` 외에 `.cla
 
 SuperGemini는 Gemini CLI의 확장 프레임워크로, 슬래시 명령어와 AI 에이전트 페르소나를 제공한다. superpowers는 ~/superpowers에서 ~
 /.gemini/skills/superpowers로 복사된다.
+
+**설정 (dot_gemini/ → ~/.gemini/)**
+
+- `settings.json` 기본 승인 모드는 `auto_edit`로 설정한다.
+- YOLO 모드는 설정 파일 기본값(`general.defaultApprovalMode`)으로는 지정할 수 없으며, 실행 시 `--approval-mode=yolo` 옵션을 사용해야 한다.
+- 이 dotfiles는 `gemini-yolo` 별칭(`gemini --approval-mode=yolo`)을 제공한다.
 
 ### Copilot
 

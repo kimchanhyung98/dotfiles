@@ -52,6 +52,10 @@ alias ll='ls -la'
 alias la='ls -A'
 alias l='ls -CF'
 
+# Gemini CLI 단축키
+# - YOLO 모드는 config 기본값으로 지원되지 않아 실행 시 옵션으로 지정
+alias gemini-yolo='gemini --approval-mode=yolo'
+
 # Git 단축키
 alias gs='git status'
 alias ga='git add'
@@ -85,4 +89,9 @@ fi
 if [ -d "$HOME/.bun" ]; then
     export BUN_INSTALL="$HOME/.bun"
     export PATH="$BUN_INSTALL/bin:$PATH"
+fi
+
+# zoxide (스마트 디렉토리 이동)
+if command -v zoxide &>/dev/null; then
+    eval "$(zoxide init zsh)"
 fi

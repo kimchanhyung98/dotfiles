@@ -3,6 +3,7 @@
 
 # 시스템 CLI 도구
 brew "bash"               # Bash 셸
+brew "bat"                # cat 대체 뷰어 (문법 강조)
 brew "curl"               # URL 데이터 전송
 brew "gh"                 # GitHub CLI
 brew "git"                # 버전 관리
@@ -27,6 +28,7 @@ brew "fzf"          # 퍼지 파인더
 brew "ripgrep"      # 빠른 텍스트 검색 (rg)
 brew "tmux"         # 터미널 멀티플렉서
 brew "watchman"     # 파일 변경 감시
+brew "zoxide"       # 스마트 디렉토리 이동
 
 # 프로그래밍 언어
 brew "dotnet"       # .NET
