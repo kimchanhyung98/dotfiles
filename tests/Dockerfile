@@ -13,6 +13,7 @@ RUN apt-get update -qq && \
         ca-certificates \
         locales \
         shellcheck \
+        zoxide \
         bat \
         nodejs \
         npm \

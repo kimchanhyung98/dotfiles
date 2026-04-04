@@ -28,6 +28,7 @@ brew "fzf"          # 퍼지 파인더
 brew "ripgrep"      # 빠른 텍스트 검색 (rg)
 brew "tmux"         # 터미널 멀티플렉서
 brew "watchman"     # 파일 변경 감시
+brew "zoxide"       # 스마트 디렉토리 이동
 
 # 프로그래밍 언어
 brew "dotnet"       # .NET
