@@ -23,6 +23,7 @@ brew "zsh"                # Zsh 셸
 brew "act"          # GitHub Actions 로컬 실행
 brew "awscli"       # AWS CLI
 brew "direnv"       # 디렉토리별 환경 변수
+brew "dopplerhq/cli/doppler"  # 시크릿 관리 CLI
 brew "fswatch"      # 파일시스템 이벤트 모니터
 brew "fzf"          # 퍼지 파인더
 brew "ripgrep"      # 빠른 텍스트 검색 (rg)
