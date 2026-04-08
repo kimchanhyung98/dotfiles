@@ -81,4 +81,3 @@ cask "keka"             # 파일 압축/해제
 cask "rectangle"        # 윈도우 매니저
 cask "slack"            # 팀 메신저
 cask "stats"            # 시스템 모니터
-cask "zoom"             # 화상 회의
