@@ -56,8 +56,7 @@ brew "sqlite"       # 경량 SQL 데이터베이스
 
 # JetBrains: https://www.jetbrains.com/toolbox-app 에서 설치
 # cask "jetbrains-toolbox"
-cask "font-jetbrains-mono"  # JetBrains Mono 개발 폰트
-cask "font-jetbrains-mono-nerd-font"  # JetBrainsMono Nerd Font (아이콘 글리프 포함)
+cask "font-d2coding"  # D2 Coding 개발 폰트 (Naver)
 
 # 터미널 에뮬레이터
 cask "cmux"         # Ghostty 기반 macOS 터미널 (AI 에이전트 워크플로우)
