@@ -33,8 +33,11 @@ KNOWN_HOSTS="$SSH_DIR/known_hosts"
 if command -v ssh-keyscan &>/dev/null; then
     if ! grep -q "github.com" "$KNOWN_HOSTS" 2>/dev/null; then
         echo "Adding GitHub SSH host keys..."
-        ssh-keyscan -t ed25519,ecdsa,rsa github.com >> "$KNOWN_HOSTS" 2>/dev/null
-        chmod 600 "$KNOWN_HOSTS"
+        if ssh-keyscan -t ed25519,ecdsa,rsa github.com >> "$KNOWN_HOSTS" 2>/dev/null; then
+            chmod 600 "$KNOWN_HOSTS"
+        else
+            echo "[git-baseline][warning] Failed to fetch GitHub host keys; continuing."
+        fi
     else
         echo "GitHub SSH host keys: already registered."
     fi
