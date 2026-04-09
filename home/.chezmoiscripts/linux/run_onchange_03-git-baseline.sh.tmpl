@@ -31,7 +31,7 @@ fi
 # - GitHub SSH known_hosts 등록
 KNOWN_HOSTS="$SSH_DIR/known_hosts"
 if command -v ssh-keyscan &>/dev/null; then
-    if ! grep -q "github.com" "$KNOWN_HOSTS" 2>/dev/null; then
+    if ! ssh-keygen -F github.com -f "$KNOWN_HOSTS" >/dev/null 2>&1; then
         echo "Adding GitHub SSH host keys..."
         if ssh-keyscan -t ed25519,ecdsa,rsa github.com >> "$KNOWN_HOSTS" 2>/dev/null; then
             chmod 600 "$KNOWN_HOSTS"
