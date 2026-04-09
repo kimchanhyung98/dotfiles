@@ -28,6 +28,20 @@ if [ ! -d "$SSH_DIR" ]; then
     chmod 700 "$SSH_DIR"
 fi
 
+# - GitHub SSH known_hosts 등록
+KNOWN_HOSTS="$SSH_DIR/known_hosts"
+if command -v ssh-keyscan &>/dev/null; then
+    if ! grep -q "github.com" "$KNOWN_HOSTS" 2>/dev/null; then
+        echo "Adding GitHub SSH host keys..."
+        ssh-keyscan -t ed25519,ecdsa,rsa github.com >> "$KNOWN_HOSTS" 2>/dev/null
+        chmod 600 "$KNOWN_HOSTS"
+    else
+        echo "GitHub SSH host keys: already registered."
+    fi
+else
+    echo "[git-baseline][warning] ssh-keyscan not found. Install openssh-client to auto-register GitHub host keys."
+fi
+
 # - Ed25519 SSH 키 존재 여부 확인
 if [ ! -f "$SSH_DIR/id_ed25519" ]; then
     echo "[git-baseline][info] No SSH key found. Generate one with:"

@@ -84,4 +84,18 @@ else
 fi
 {{ end }}
 
+# 5. GitHub SSH known_hosts
+# - 새 환경에서 SSH 호스트 키 검증 프롬프트 방지
+SSH_DIR="$HOME/.ssh"
+KNOWN_HOSTS="$SSH_DIR/known_hosts"
+mkdir -p "$SSH_DIR"
+chmod 700 "$SSH_DIR"
+if ! grep -q "github.com" "$KNOWN_HOSTS" 2>/dev/null; then
+    echo "Adding GitHub SSH host keys..."
+    ssh-keyscan -t ed25519,ecdsa,rsa github.com >> "$KNOWN_HOSTS" 2>/dev/null
+    chmod 600 "$KNOWN_HOSTS"
+else
+    echo "GitHub SSH host keys: already registered."
+fi
+
 echo "[prerequisites] done"
