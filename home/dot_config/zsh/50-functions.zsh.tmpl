@@ -1,0 +1,8 @@
+# 커스텀 쉘 함수
+
+{{ if eq .chezmoi.os "darwin" }}
+# zerobrew 래퍼 (zerobrew 우선, 실패 시 Homebrew 폴백)
+if command -v zb &>/dev/null; then
+    pkg_install() { zb install "$@" || \brew install "$@"; }
+fi
+{{ end }}
