@@ -9,6 +9,7 @@ typeset -a zsh_modules=(
     "$module_dir/40-aliases.zsh"
     "$module_dir/50-functions.zsh"
     "$module_dir/60-completion.zsh"
+    # (N): no match 시 에러 대신 빈 확장으로 처리
     "$module_dir"/70-tools-*.zsh(N)
     "$module_dir/80-plugins.zsh"
     "$module_dir/90-secrets.zsh"
