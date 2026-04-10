@@ -2,12 +2,15 @@
 
 {{ if eq .chezmoi.os "darwin" }}
 # Homebrew 환경 로드 (macOS 전용, 아키텍처별 경로)
+if [ -z "${HOMEBREW_SHELLENV_LOADED:-}" ]; then
 {{ if .isAppleSilicon }}
-eval "$(/opt/homebrew/bin/brew shellenv)"
+    eval "$(/opt/homebrew/bin/brew shellenv)"
 {{ else }}
-eval "$(/usr/local/bin/brew shellenv)"
+    eval "$(/usr/local/bin/brew shellenv)"
 {{ end }}
+    export HOMEBREW_SHELLENV_LOADED=1
 {{ end }}
+fi
 
 case ":$PATH:" in
     *":$HOME/.local/bin:"*) ;;
