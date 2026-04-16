@@ -68,6 +68,14 @@ else
     fail "$TMPL_FAIL template(s) failed to render"
 fi
 
+# --- 1.5. Zsh 설정 회귀 검증 ---
+section "Zsh config regression"
+if bash "$REPO_DIR/tests/zsh-config.sh"; then
+    pass "Zsh config regression checks"
+else
+    fail "Zsh config regression checks"
+fi
+
 # --- 2. chezmoi diff (소스와 대상 차이 확인) ---
 section "chezmoi diff"
 if cz diff > /dev/null 2>&1; then

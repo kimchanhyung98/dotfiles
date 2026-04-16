@@ -42,8 +42,8 @@ RUN mkdir -p ~/.config/chezmoi && \
 # Copy source directory
 COPY --chown=testuser:testuser home/ /home/testuser/.local/share/chezmoi/
 
-# Test script
-COPY --chown=testuser:testuser tests/linux.sh /home/testuser/linux.sh
-RUN chmod +x /home/testuser/linux.sh
+# Test scripts
+COPY --chown=testuser:testuser tests/ /home/testuser/tests/
+RUN chmod +x /home/testuser/tests/linux.sh /home/testuser/tests/zsh-config.sh
 
-CMD ["/home/testuser/linux.sh"]
+CMD ["/home/testuser/tests/linux.sh"]
