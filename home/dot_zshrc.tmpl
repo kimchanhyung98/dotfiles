@@ -4,15 +4,14 @@
 module_dir="$HOME/.config/zsh"
 typeset -a zsh_modules=(
     "$module_dir/00-core.zsh"
-    "$module_dir/20-env.zsh"
-    "$module_dir/30-path.zsh"
-    "$module_dir/40-aliases.zsh"
-    "$module_dir/50-functions.zsh"
-    "$module_dir/60-completion.zsh"
-    # (N): no match 시 에러 대신 빈 확장으로 처리
-    "$module_dir"/70-tools-*.zsh(N)
-    "$module_dir/80-plugins.zsh"
-    "$module_dir/90-secrets.zsh"
+    "$module_dir/10-env.zsh"
+    "$module_dir/20-path.zsh"
+    "$module_dir/30-functions.zsh"
+    "$module_dir/40-completion.zsh"
+    "$module_dir/50-plugins.zsh"
+    "$module_dir/60-tools.zsh"
+    "$module_dir/70-aliases.zsh"
+    "$module_dir/80-secrets.zsh"
 )
 
 for module in "${zsh_modules[@]}"; do

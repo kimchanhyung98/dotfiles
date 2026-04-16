@@ -1,0 +1,13 @@
+# PATH 설정
+
+{{ if eq .chezmoi.os "darwin" }}
+if [ -z "${HOMEBREW_SHELLENV_LOADED:-}" ] && [ -x "{{ .homebrewPrefix }}/bin/brew" ]; then
+    eval "$({{ .homebrewPrefix }}/bin/brew shellenv)"
+    export HOMEBREW_SHELLENV_LOADED=1
+fi
+{{ end }}
+
+case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) export PATH="$HOME/.local/bin:$PATH" ;;
+esac
