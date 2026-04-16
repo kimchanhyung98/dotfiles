@@ -50,14 +50,14 @@ dotfiles/
     │   │   └── config.tmpl
     │   ├── zsh/
     │   │   ├── 00-core.zsh
-    │   │   ├── 20-env.zsh
-    │   │   ├── 30-path.zsh.tmpl
-    │   │   ├── 40-aliases.zsh
-    │   │   ├── 50-functions.zsh.tmpl
-    │   │   ├── 60-completion.zsh
-    │   │   ├── 70-tools-*.zsh
-    │   │   ├── 80-plugins.zsh
-    │   │   └── 90-secrets.zsh
+    │   │   ├── 10-env.zsh
+    │   │   ├── 20-path.zsh.tmpl
+    │   │   ├── 30-functions.zsh.tmpl
+    │   │   ├── 40-completion.zsh
+    │   │   ├── 50-plugins.zsh
+    │   │   ├── 60-tools.zsh
+    │   │   ├── 70-aliases.zsh
+    │   │   └── 80-secrets.zsh
     │   └── opencode/
     │       ├── opencode.json.tmpl
     │       ├── oh-my-opencode.jsonc.tmpl
@@ -94,7 +94,7 @@ dotfiles/
 | `AGENTS.md.tmpl`       | `~/AGENTS.md`         | 공통 에이전트 지침 (홈 루트)                       |
 | `dot_config/bat/`      | `~/.config/bat/`      | bat(cat 대체 뷰어) 설정                       |
 | `dot_config/ghostty/`  | `~/.config/ghostty/`  | Ghostty 터미널 설정                          |
-| `dot_config/zsh/`      | `~/.config/zsh/`      | `.zshrc`에서 순차 로드하는 모듈형 Zsh 설정          |
+| `dot_config/zsh/`      | `~/.config/zsh/`      | `.zshrc`에서 순차 로드하는 모듈형 Zsh 설정           |
 | `dot_config/opencode/` | `~/.config/opencode/` | OpenCode + oh-my-opencode 설정            |
 | `dot_claude/`          | `~/.claude/`          | Claude Code 설정, 훅                       |
 | `dot_codex/`           | `~/.codex/`           | Codex CLI 설정                            |

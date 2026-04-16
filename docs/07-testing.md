@@ -24,14 +24,15 @@ make check
 
 로컬 유저 설정에 **절대 영향을 주지 않는** 읽기 전용 명령어만 사용한다.
 
-| 단계         | 명령어                                 | 설명                            |
-|------------|-------------------------------------|-------------------------------|
-| 템플릿 검증     | `chezmoi execute-template`          | 모든 `.tmpl` 파일을 순회하며 렌더링 확인    |
-| Diff 확인    | `chezmoi diff`                      | 현재 상태와 source의 차이를 출력 (변경 없음) |
-| Dry-run    | `chezmoi apply --dry-run --verbose` | 적용 시뮬레이션만 수행 (실제 변경 없음)       |
-| 상태 검증      | `chezmoi verify`                    | 배포된 파일이 source와 일치하는지 확인      |
-| 진단         | `chezmoi doctor`                    | 환경 진단                         |
-| ShellCheck | `shellcheck`                        | darwin 스크립트 정적 분석             |
+| 단계           | 명령어                                 | 설명                            |
+|--------------|-------------------------------------|-------------------------------|
+| 템플릿 검증       | `chezmoi execute-template`          | 모든 `.tmpl` 파일을 순회하며 렌더링 확인    |
+| Zsh 설정 회귀 검증 | `tests/zsh-config.sh`               | LANG 폴백, fzf 바인딩 순서 등 회귀 테스트  |
+| Diff 확인      | `chezmoi diff`                      | 현재 상태와 source의 차이를 출력 (변경 없음) |
+| Dry-run      | `chezmoi apply --dry-run --verbose` | 적용 시뮬레이션만 수행 (실제 변경 없음)       |
+| 상태 검증        | `chezmoi verify`                    | 배포된 파일이 source와 일치하는지 확인      |
+| 진단           | `chezmoi doctor`                    | 환경 진단                         |
+| ShellCheck   | `shellcheck`                        | darwin 스크립트 정적 분석             |
 
 > 템플릿 검증은 `find home -name '*.tmpl' | while read f; do chezmoi execute-template < "$f"; done` 등의 방식으로 전체 파일을 순회해야 한다. (
 `-exec`에서는 쉘 리다이렉션(`<`)을 직접 사용할 수 없으므로 파이프라인 또는 `sh -c` 래퍼를 사용한다.)
@@ -67,8 +68,9 @@ make check
 | 3. chezmoi 설치          | `get.chezmoi.io` 스크립트                                                |
 | 4. 버전 확인               | `chezmoi --version` (디버깅용 기록)                                        |
 | 5. 비대화형 설정 주입          | chezmoi config에 테스트용 데이터 사전 생성 (아래 참고)                               |
-| 6. source directory 복사 | `home/` → chezmoi source path                                        |
+| 6. source directory 복사 | `home/` → chezmoi source path, `tests/` → 테스트 스크립트 디렉토리              |
 | 7. 템플릿 검증              | `chezmoi execute-template` (전체 순회)                                   |
+| 7.5. Zsh 설정 회귀 검증      | `tests/zsh-config.sh` (LANG 폴백, fzf 바인딩 순서)                          |
 | 8. 진단                  | `chezmoi doctor --no-network`                                        |
 | 9. Dry-run 적용          | `chezmoi apply --dry-run --verbose`                                  |
 | 10. 실제 적용              | `chezmoi apply --force --verbose 2>&1 \| tee /tmp/chezmoi-apply.log` |
@@ -119,6 +121,7 @@ Makefile의 `check` 타겟은 macOS에서 실행 시 로컬 macOS 테스트(`tes
 ```
 make check
 ├── [macOS] 템플릿 렌더링 검증 (모든 .tmpl 순회)
+├── [macOS] Zsh 설정 회귀 검증 (LANG 폴백, fzf 바인딩 순서)
 ├── [macOS] chezmoi diff
 ├── [macOS] chezmoi apply --dry-run --verbose
 ├── [macOS] chezmoi verify
@@ -126,6 +129,7 @@ make check
 ├── [macOS] ShellCheck (darwin 스크립트, 렌더링 후 실행)
 ├── [Linux] Docker Ubuntu 컨테이너 빌드 & 실행
 │   ├── 템플릿 검증
+│   ├── Zsh 설정 회귀 검증
 │   ├── chezmoi doctor
 │   ├── chezmoi apply (실제 적용, 로그 기록)
 │   ├── chezmoi managed + chezmoi verify (전체 파일 검증)
