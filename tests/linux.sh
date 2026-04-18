@@ -46,6 +46,14 @@ else
     fail "$TMPL_FAIL template(s) failed to render"
 fi
 
+# --- 2.5. Zsh 설정 회귀 검증 ---
+section "Zsh config regression"
+if bash "$HOME/tests/zsh-config.sh"; then
+    pass "Zsh config regression checks"
+else
+    fail "Zsh config regression checks"
+fi
+
 # --- 3. chezmoi doctor (환경 진단) ---
 section "chezmoi doctor"
 set +e
