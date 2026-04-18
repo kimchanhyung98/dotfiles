@@ -123,9 +123,17 @@ EOF
     chmod +x "${fakebin}/locale" "${fakebin}/fzf" "${homebrew_prefix}/bin/brew"
 }
 
+cleanup_temp_homes() {
+    rm -rf \
+        "${lang_home:-}" \
+        "${bind_home:-}" \
+        "${guard_home:-}" \
+        "${missing_home:-}"
+}
+trap cleanup_temp_homes EXIT
+
 section "LANG fallback"
 lang_home="$(mktemp -d)"
-trap 'rm -rf "${lang_home:-}" "${bind_home:-}"' EXIT
 lang_homebrew_prefix="${lang_home}/fake-homebrew"
 setup_rendered_zsh_home "${lang_home}" "${lang_homebrew_prefix}"
 setup_fake_commands "${lang_home}/fakebin" "${lang_home}" "${lang_homebrew_prefix}"

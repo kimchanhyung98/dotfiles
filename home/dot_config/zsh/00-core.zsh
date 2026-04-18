@@ -8,7 +8,5 @@ setopt SHARE_HISTORY
 setopt HIST_IGNORE_DUPS
 setopt HIST_IGNORE_SPACE
 
-# 키 바인딩
+# 기본 편집 모드 (화살표 등 히스토리 탐색은 Oh My Zsh의 기본 바인딩 사용)
 bindkey -e
-bindkey '^[[A' history-search-backward
-bindkey '^[[B' history-search-forward
