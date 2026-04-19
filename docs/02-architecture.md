@@ -20,7 +20,8 @@ dotfiles/
     │   │   ├── run_once_before_01-prerequisites.sh.tmpl
     │   │   ├── run_onchange_after_02-macos-settings.sh.tmpl
     │   │   ├── run_onchange_03-brew-packages.sh.tmpl
-    │   │   ├── run_once_04-runtime.sh.tmpl
+    │   │   ├── run_onchange_after_04-cmux-settings.sh.tmpl
+    │   │   ├── run_once_05-runtime.sh.tmpl
     │   │   ├── run_once_10-ai-core.sh.tmpl
     │   │   ├── run_once_11-ai-claude.sh.tmpl
     │   │   ├── run_once_12-ai-codex.sh.tmpl
@@ -46,6 +47,8 @@ dotfiles/
     ├── dot_config/
     │   ├── bat/
     │   │   └── config
+    │   ├── cmux/
+    │   │   └── settings.json.tmpl
     │   ├── ghostty/
     │   │   └── config.tmpl
     │   ├── zsh/
@@ -93,6 +96,7 @@ dotfiles/
 |------------------------|-----------------------|-----------------------------------------|
 | `AGENTS.md.tmpl`       | `~/AGENTS.md`         | 공통 에이전트 지침 (홈 루트)                       |
 | `dot_config/bat/`      | `~/.config/bat/`      | bat(cat 대체 뷰어) 설정                       |
+| `dot_config/cmux/`     | `~/.config/cmux/`     | cmux 설정 (`socketControlMode` 등 자동화 기본값) |
 | `dot_config/ghostty/`  | `~/.config/ghostty/`  | Ghostty 터미널 설정                          |
 | `dot_config/zsh/`      | `~/.config/zsh/`      | `.zshrc`에서 순차 로드하는 모듈형 Zsh 설정           |
 | `dot_config/opencode/` | `~/.config/opencode/` | OpenCode + oh-my-opencode 설정            |

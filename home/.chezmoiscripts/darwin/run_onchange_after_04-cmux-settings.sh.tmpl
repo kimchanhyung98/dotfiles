@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+# cmux baseline settings: enable external automation control on macOS
+# Re-applies when this script changes
+
+{{ if ne .chezmoi.os "darwin" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "[cmux-settings]"
+
+defaults write com.cmuxterm.app socketControlMode -string automation
+
+echo "[cmux-settings] done"

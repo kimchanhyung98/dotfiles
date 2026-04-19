@@ -68,6 +68,30 @@ else
     fail "$TMPL_FAIL template(s) failed to render"
 fi
 
+# --- 1.2. cmux 기본 자동화 설정 검증 ---
+section "cmux automation defaults"
+CMUX_SETTINGS_SOURCE="$REPO_DIR/home/dot_config/cmux/settings.json.tmpl"
+rendered_cmux_settings="$(mktemp -p "$TMPHOME")"
+cmux_settings_err="$(mktemp -p "$TMPHOME")"
+if cz execute-template < "$CMUX_SETTINGS_SOURCE" > "$rendered_cmux_settings" 2>"$cmux_settings_err" \
+   && grep -q '"socketControlMode": "automation"' "$rendered_cmux_settings"; then
+    pass "cmux settings.json enables automation mode"
+else
+    fail "cmux settings.json did not render socketControlMode=automation (stderr: $(cat "$cmux_settings_err"))"
+fi
+rm -f "$rendered_cmux_settings" "$cmux_settings_err"
+
+CMUX_SCRIPT_SOURCE="$REPO_DIR/home/.chezmoiscripts/darwin/run_onchange_after_04-cmux-settings.sh.tmpl"
+rendered_cmux_script="$(mktemp -p "$TMPHOME")"
+cmux_script_err="$(mktemp -p "$TMPHOME")"
+if cz execute-template < "$CMUX_SCRIPT_SOURCE" > "$rendered_cmux_script" 2>"$cmux_script_err" \
+   && grep -q 'defaults write com.cmuxterm.app socketControlMode -string automation' "$rendered_cmux_script"; then
+    pass "cmux darwin script sets automation mode in defaults"
+else
+    fail "cmux darwin script missing defaults-write for socketControlMode (stderr: $(cat "$cmux_script_err"))"
+fi
+rm -f "$rendered_cmux_script" "$cmux_script_err"
+
 # --- 1.5. Zsh 설정 회귀 검증 ---
 section "Zsh config regression"
 if bash "$REPO_DIR/tests/zsh-config.sh"; then
