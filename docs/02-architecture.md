@@ -27,6 +27,7 @@ dotfiles/
     │   │   ├── run_once_12-ai-codex.sh.tmpl
     │   │   ├── run_once_13-ai-gemini.sh.tmpl
     │   │   ├── run_once_14-ai-copilot.sh.tmpl
+    │   │   ├── run_onchange_15-ai-humanizer-ko.sh.tmpl
     │   │   ├── run_once_20-ai-opencode.sh.tmpl
     │   │   └── run_once_after_99-manual-install.sh.tmpl
     │   │
@@ -35,7 +36,8 @@ dotfiles/
     │       ├── run_onchange_02-shell-baseline.sh.tmpl
     │       ├── run_onchange_03-git-baseline.sh.tmpl
     │       ├── run_once_04-ai-tools.sh.tmpl
-    │       └── run_onchange_05-system-baseline.sh.tmpl
+    │       ├── run_onchange_05-system-baseline.sh.tmpl
+    │       └── run_onchange_15-ai-humanizer-ko.sh.tmpl
     │
     ├── Brewfile
     ├── dot_zshrc.tmpl
@@ -78,7 +80,6 @@ dotfiles/
     │
     ├── dot_agents/
     │   └── skills/
-    │       └── humanizer-ko/
     │
     ├── dot_copilot/
     │   ├── mcp-config.json.tmpl

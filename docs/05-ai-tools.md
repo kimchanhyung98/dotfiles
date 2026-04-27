@@ -85,6 +85,17 @@
 | `~/.claude/commands/` | 글로벌 커스텀 슬래시 커맨드 | 마크다운 파일로 정의하는 사용자 커스텀 슬래시 커맨드. `/help`에서 목록 확인 가능          |
 | `~/.claude/agents/`   | 글로벌 커스텀 서브에이전트  | YAML frontmatter가 포함된 마크다운 파일로 정의하는 서브에이전트. 오케스트레이터가 자동 생성 |
 
+**im-not-ai 동기화**
+
+`run_onchange_15-ai-humanizer-ko.sh.tmpl`은 epoko77-ai/im-not-ai의 `.claude/` 자산을 Claude Code 사용자 경로로 동기화한다. macOS와 Linux에 같은
+스크립트를 두고 OS별 chezmoi 분기로 실행한다.
+
+| upstream 경로         | 배포 경로                | 역할                 |
+|---------------------|----------------------|--------------------|
+| `.claude/agents/`   | `~/.claude/agents/`   | im-not-ai 서브에이전트  |
+| `.claude/commands/` | `~/.claude/commands/` | im-not-ai 슬래시 커맨드 |
+| `.claude/skills/`   | `~/.claude/skills/`   | im-not-ai 스킬        |
+
 **MCP 설정 위치**: 사용자 범위는 `~/.claude.json`, 프로젝트 범위는 `.mcp.json`을 사용한다. `~/.claude/` 디렉토리 내부가 아닌 **홈 디렉토리 루트**에 위치하는 점에
 주의. `~/.claude.json`은 Claude Code가 런타임에 직접 관리하며(`.chezmoiignore`로 chezmoi 배포 제외), `.mcp.json`은 프로젝트별 MCP 서버를 선언한다.
 

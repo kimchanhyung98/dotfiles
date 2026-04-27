@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+# AI humanizer-ko: epoko77-ai/im-not-ai 동기화
+
+{{ if ne .chezmoi.os "linux" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "[ai-humanizer-ko]"
+
+REPO="https://github.com/epoko77-ai/im-not-ai.git"
+if ! command -v git >/dev/null 2>&1; then
+    echo "[ai-humanizer-ko][error] git not found"
+    exit 1
+fi
+
+# upstream clone
+# - im-not-ai main을 임시 디렉토리에 shallow clone, 종료 시 자동 정리
+echo "Cloning im-not-ai..."
+WORK=$(mktemp -d)
+trap 'rm -rf "$WORK"' EXIT
+git clone --depth 1 --quiet --branch main "$REPO" "$WORK"
+
+# .claude 동기화
+# - upstream agents/commands/skills 구조를 그대로 ~/.claude 로 복사
+echo "Syncing im-not-ai Claude Code assets..."
+mkdir -p "$HOME/.claude"
+cp -R "$WORK/.claude/." "$HOME/.claude/"
+
+echo "[ai-humanizer-ko] done"
