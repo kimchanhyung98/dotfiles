@@ -15,7 +15,7 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 |----------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
 | System   | lucasgelfond/zerobrew, ghostty-org/ghostty                                                                                                          |
 | Claude   | PeonPing/peon-ping, obra/superpowers, jarrodwatts/claude-hud, blader/humanizer, VoltAgent/awesome-agent-skills, forrestchang/andrej-karpathy-skills |
-| Codex    | Yeachan-Heo/oh-my-codex                                                                                                                             |
+| Codex    | Yeachan-Heo/oh-my-codex, epoko77-ai/im-not-ai                                                                                                      |
 | Gemini   | (SuperGemini — pipx 패키지)                                                                                                                            |
 | OpenCode | anomalyco/opencode, code-yeongyu/oh-my-opencode                                                                                                     |
 
@@ -34,6 +34,7 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 | blader/humanizer                    | `c78047b` |
 | VoltAgent/awesome-agent-skills      | `feb81d6` |
 | forrestchang/andrej-karpathy-skills | `aa4467f` |
+| epoko77-ai/im-not-ai                | `f6f2082` |
 | anomalyco/opencode                  | `ef979cc` |
 | code-yeongyu/oh-my-opencode         | `7d2c798` |
 | Yeachan-Heo/oh-my-codex             | `c25edb0` |
@@ -51,6 +52,6 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 - **설치와 설정 분리**: 도구의 바이너리 설치는 스크립트가 담당하고, 사용자 설정은 chezmoi가 배포하는 설정 파일(`.tmpl`)이 담당한다. 설치 방식이 바뀌어도 설정은 그대로 유지되고, 설정을 변경해도
   재설치가 필요 없다.
 - **실패 격리**: 각 AI 도구의 설치를 독립 스크립트로 분리하여, 한 도구의 설치 실패가 다른 도구에 영향을 주지 않는다. Claude 설치가 실패해도 Codex, OpenCode는 정상적으로 설치된다.
-- **스킬 공유**: AI 도구 공통 스킬(humanizer, karpathy 지침 등)을 도구별 글로벌 스킬 경로에 각각 배포하여, 어떤 도구를 사용하든 동일한 개발 지침이 적용된다.
+- **스킬 공유**: AI 도구 공통 스킬(humanizer, karpathy 지침 등)을 도구별 글로벌 스킬 경로에 각각 배포한다. Codex에는 im-not-ai 기반 `humanizer-ko` 스킬을 별도로 변환해 배포한다.
 - **사용자 설정 우선**: 도구의 기본 동작보다 사용자가 선언한 설정을 우선 적용한다. 도구 업데이트로 기본값이 변경되어도 사용자 설정은 유지된다.
 - **검증 가능한 근거 유지**: 모든 경로, 설정 파일명, 도구 동작은 공식 문서 또는 실제 저장소 기준으로 검증한다. 문서에 기재된 정보는 검증 스냅샷의 커밋 해시로 추적할 수 있어야 한다.

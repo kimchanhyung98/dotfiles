@@ -38,7 +38,7 @@
 | Gemini         | SuperGemini, superpowers (copy), MCP 3종                                                             |
 | Copilot        | superpowers (copy), MCP 2종                                                                          |
 | OpenCode       | OpenCode, oh-my-opencode, superpowers (copy)                                                        |
-| Skills         | humanizer (Claude, Codex), superpowers (Claude 플러그인 + Codex/Gemini/Copilot/OpenCode copy)           |
+| Skills         | humanizer (Claude, Codex), humanizer-ko (Codex), superpowers (Claude 플러그인 + Codex/Gemini/Copilot/OpenCode copy) |
 | Apps           | ghostty, docker, iterm2, chrome, rectangle, slack, figma 등                                          |
 | Shell          | Oh My Zsh + autosuggestions + syntax-highlighting                                                   |
 | Linux          | curl, git, vim, zsh, ghostty, 셸/Git baseline, claude, codex, opencode, gemini                       |
@@ -49,9 +49,9 @@
 |---------------------|----------------------------------------------------------------------------------|
 | 템플릿 데이터 키 일관성       | `.chezmoi.toml.tmpl`에 정의된 변수가 모든 `.tmpl` 파일에서 동일한 이름으로 참조되는지 확인                  |
 | 스크립트 번호 체계 일관성      | darwin/(01~04, 10~14, 20, 99), linux/(01~05) 번호가 중복 없이 순서대로 유지되는지 확인             |
-| 외부 리소스 선언 파일 최신화    | `.chezmoiexternal.toml`의 URL, 브랜치, 해시가 최신 원격 저장소와 일치하는지 확인                       |
+| 외부 리소스 선언 파일 최신화    | `.chezmoiexternal.toml`의 URL, 브랜치, 해시가 최신 원격 저장소와 일치하는지 확인. im-not-ai는 `make im-not-ai` 실행 결과와 upstream commit 확인 |
 | AI 모듈 경계 준수         | 설치 스크립트는 바이너리 설치만, 설정 파일은 사용자 설정만 담당하는 분리 원칙이 유지되는지 확인                           |
-| 스킬 디렉토리 동기화 상태      | Claude, Codex, Gemini, Copilot, OpenCode 5개 글로벌 스킬 경로에 humanizer 스킬이 배포되어 있는지 확인 |
+| 스킬 디렉토리 동기화 상태      | Claude, Codex, Gemini, Copilot, OpenCode 글로벌 스킬 경로에 humanizer/superpowers가 배포되어 있는지 확인. Codex는 `humanizer-ko` 갱신 여부도 확인 |
 | AGENTS.md 공통 지침 최신화 | `~/AGENTS.md`와 `~/.codex/AGENTS.md`의 4대 원칙과 공통 규칙이 최신 상태인지 확인                    |
 | peon-ping 어댑터 등록 상태 | 사용 중인 AI 도구의 peon-ping 어댑터가 올바르게 연결되어 이벤트 알림이 동작하는지 확인                           |
 | 플러그인 버전 호환성         | Claude Code, Codex, OpenCode의 플러그인이 현재 도구 버전과 호환되는지 확인                           |

@@ -78,6 +78,7 @@ dotfiles/
     │
     ├── dot_agents/
     │   └── skills/
+    │       └── humanizer-ko/
     │
     ├── dot_copilot/
     │   ├── mcp-config.json.tmpl
