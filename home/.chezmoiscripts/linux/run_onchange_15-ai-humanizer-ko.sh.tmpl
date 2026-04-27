@@ -23,10 +23,10 @@ WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
 git clone --depth 1 --quiet --branch main "$REPO" "$WORK"
 
-# .claude 동기화
-# - upstream agents/commands/skills 구조를 그대로 ~/.claude 로 복사
-echo "Syncing im-not-ai Claude Code assets..."
-mkdir -p "$HOME/.claude"
-cp -R "$WORK/.claude/." "$HOME/.claude/"
+# Codex skill 동기화
+echo "Syncing im-not-ai Codex skill..."
+mkdir -p "$HOME/.agents/skills"
+rm -rf "$HOME/.agents/skills/humanize-korean"
+cp -R "$WORK/.claude/skills/humanize-korean" "$HOME/.agents/skills/humanize-korean"
 
 echo "[ai-humanizer-ko] done"
