@@ -11,22 +11,62 @@ set -eufo pipefail
 echo "[ai-humanizer-ko]"
 
 REPO="https://github.com/epoko77-ai/im-not-ai.git"
+REPO_DIR="$HOME/im-not-ai"
+CODEX_SKILL_DIR="$HOME/.agents/skills/humanize-korean"
+
 if ! command -v git >/dev/null 2>&1; then
     echo "[ai-humanizer-ko][error] git not found"
     exit 1
 fi
 
-# upstream clone
-# - im-not-ai main을 임시 디렉토리에 shallow clone, 종료 시 자동 정리
-echo "Cloning im-not-ai..."
-WORK=$(mktemp -d)
-trap 'rm -rf "$WORK"' EXIT
-git clone --depth 1 --quiet --branch main "$REPO" "$WORK"
+if [ -d "$REPO_DIR/.git" ]; then
+    echo "Updating im-not-ai..."
+    git -C "$REPO_DIR" pull
+elif [ -d "$REPO_DIR" ]; then
+    echo "[ai-humanizer-ko][error] $REPO_DIR exists but is not a git repository"
+    exit 1
+else
+    echo "Cloning im-not-ai..."
+    git clone "$REPO" "$REPO_DIR"
+fi
 
-# Codex skill 동기화
+echo "Syncing im-not-ai Claude assets..."
+mkdir -p "$HOME/.claude/agents" "$HOME/.claude/commands" "$HOME/.claude/skills"
+
+find "$REPO_DIR/.claude/agents" -type f -name '*.md' | while IFS= read -r file; do
+    dst="$HOME/.claude/agents/$(basename "$file")"
+    rm -f "$dst"
+    cp "$file" "$dst"
+done
+
+find "$REPO_DIR/.claude/commands" -type f -name '*.md' | while IFS= read -r file; do
+    dst="$HOME/.claude/commands/$(basename "$file")"
+    rm -f "$dst"
+    cp "$file" "$dst"
+done
+
+rm -rf "$HOME/.claude/skills/humanize-korean"
+cp -R "$REPO_DIR/.claude/skills/humanize-korean" "$HOME/.claude/skills/humanize-korean"
+
 echo "Syncing im-not-ai Codex skill..."
-mkdir -p "$HOME/.agents/skills"
-rm -rf "$HOME/.agents/skills/humanize-korean"
-cp -R "$WORK/.claude/skills/humanize-korean" "$HOME/.agents/skills/humanize-korean"
+src_skill="$REPO_DIR/.claude/skills/humanize-korean/SKILL.md"
+rm -rf "$CODEX_SKILL_DIR"
+mkdir -p "$CODEX_SKILL_DIR"
+cp -R "$REPO_DIR/.claude/skills/humanize-korean/references" "$CODEX_SKILL_DIR/references"
+
+{
+    cat <<'HEADER'
+---
+name: humanize-korean
+version: "1.5.0-codex"
+description: |
+---
+HEADER
+    awk '
+        NR == 1 && $0 == "---" { in_header = 1; next }
+        in_header && $0 == "---" { in_header = 0; next }
+        !in_header { print }
+    ' "$src_skill"
+} >"$CODEX_SKILL_DIR/SKILL.md"
 
 echo "[ai-humanizer-ko] done"

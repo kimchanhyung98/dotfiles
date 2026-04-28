@@ -118,7 +118,11 @@ check "oh-my-opencode" "command -v oh-my-opencode"
 # Skill Directories
 section "Skill Directories"
 check_path "Claude skills" "$HOME/.claude/skills"
+check_path "Claude humanize-korean skill" "$HOME/.claude/skills/humanize-korean"
+check_path "Claude humanize command" "$HOME/.claude/commands/humanize.md"
+check_path "Claude humanize agent" "$HOME/.claude/agents/humanize-monolith.md"
 check_path "Codex skills" "$HOME/.agents/skills"
+check_path "Codex humanize-korean" "$HOME/.agents/skills/humanize-korean"
 check_path "Copilot skills" "$HOME/.copilot/skills"
 check_path "OpenCode skills" "$HOME/.config/opencode/skills"
 
