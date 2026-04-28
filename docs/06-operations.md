@@ -13,7 +13,7 @@
 | Package Managers | brew, zb, pipx, bun                                                                                 | 패키지 관리자의 설치 여부 확인. zb는 zerobrew |
 | AI CLI           | claude, codex, opencode, ollama, gemini                                                             | AI 도구 CLI의 설치 여부 확인             |
 | AI 플러그인          | superpowers, everything-claude-code, claude-hud, peon-ping, claude-mem, oh-my-codex, oh-my-opencode | 각 AI 도구의 확장 기능 설치 상태 확인         |
-| 스킬 디렉토리          | Claude, Codex, Copilot, OpenCode 4개 경로                                                              | 글로벌 스킬 디렉토리 존재 여부와 내용물 확인       |
+| 스킬 디렉토리          | Claude, Codex, Copilot, OpenCode 글로벌 경로, Claude/Codex humanize-korean                                      | 글로벌 스킬 디렉토리와 핵심 스킬 경로 존재 여부 확인 |
 | AGENTS.md        | `~/AGENTS.md` 존재 여부                                                                                 | 공통 에이전트 지침 파일 배포 상태 확인          |
 | claude-mem       | `~/.claude-mem/`, `settings.json`                                                                   | claude-mem 디렉토리와 설정 파일 존재 여부 확인 |
 | Dotfiles         | ~/.zshrc, ~/.gitconfig, ~/.vimrc, ~/.oh-my-zsh                                                      | 핵심 dotfiles의 배포 상태 확인           |
@@ -38,7 +38,7 @@
 | Gemini         | SuperGemini, superpowers (copy), MCP 3종                                                             |
 | Copilot        | superpowers (copy), MCP 2종                                                                          |
 | OpenCode       | OpenCode, oh-my-opencode, superpowers (copy)                                                        |
-| Skills         | humanizer (Claude, Codex), im-not-ai (Claude), superpowers (Claude 플러그인 + Codex/Gemini/Copilot/OpenCode copy) |
+| Skills         | humanizer (Claude, Codex), im-not-ai (Claude global copy + Codex skill wrapper), superpowers (Claude 플러그인 + Codex/Gemini/Copilot/OpenCode copy) |
 | Apps           | ghostty, docker, iterm2, chrome, rectangle, slack, figma 등                                          |
 | Shell          | Oh My Zsh + autosuggestions + syntax-highlighting                                                   |
 | Linux          | curl, git, vim, zsh, ghostty, 셸/Git baseline, claude, codex, opencode, gemini                       |
@@ -48,10 +48,10 @@
 | 항목                  | 확인 포인트                                                                           |
 |---------------------|----------------------------------------------------------------------------------|
 | 템플릿 데이터 키 일관성       | `.chezmoi.toml.tmpl`에 정의된 변수가 모든 `.tmpl` 파일에서 동일한 이름으로 참조되는지 확인                  |
-| 스크립트 번호 체계 일관성      | darwin/(01~04, 10~14, 20, 99), linux/(01~05) 번호가 중복 없이 순서대로 유지되는지 확인             |
-| 외부 리소스 선언 파일 최신화    | `.chezmoiexternal.toml`의 URL, 브랜치, 해시가 최신 원격 저장소와 일치하는지 확인. im-not-ai는 `run_onchange_15-ai-humanizer-ko` 스크립트 실행 시 upstream main을 동기화하는지 확인 |
+| 스크립트 번호 체계 일관성      | darwin/(01~04, 10~15, 20, 99), linux/(01~05, 15) 번호가 중복 없이 순서대로 유지되는지 확인          |
+| 외부 리소스 선언 파일 최신화    | `.chezmoiexternal.toml`의 URL, 브랜치, 해시가 최신 원격 저장소와 일치하는지 확인. im-not-ai는 `run_onchange_15-ai-humanizer-ko` 스크립트 변경 또는 강제 재실행 시 upstream main을 동기화하는지 확인 |
 | AI 모듈 경계 준수         | 설치 스크립트는 바이너리 설치만, 설정 파일은 사용자 설정만 담당하는 분리 원칙이 유지되는지 확인                           |
-| 스킬 디렉토리 동기화 상태      | Claude, Codex, Gemini, Copilot, OpenCode 글로벌 스킬 경로에 humanizer/superpowers가 배포되어 있는지 확인. Claude는 im-not-ai `.claude` 자산 갱신 여부도 확인 |
+| 스킬 디렉토리 동기화 상태      | Claude, Codex, Gemini, Copilot, OpenCode 글로벌 스킬 경로에 humanizer/superpowers가 배포되어 있는지 확인. im-not-ai는 `~/im-not-ai` checkout, Claude 글로벌 복사본, Codex `humanize-korean` 스킬 래퍼를 각각 확인 |
 | AGENTS.md 공통 지침 최신화 | `~/AGENTS.md`와 `~/.codex/AGENTS.md`의 4대 원칙과 공통 규칙이 최신 상태인지 확인                    |
 | peon-ping 어댑터 등록 상태 | 사용 중인 AI 도구의 peon-ping 어댑터가 올바르게 연결되어 이벤트 알림이 동작하는지 확인                           |
 | 플러그인 버전 호환성         | Claude Code, Codex, OpenCode의 플러그인이 현재 도구 버전과 호환되는지 확인                           |
@@ -106,6 +106,7 @@
 - [humanizer](https://github.com/blader/humanizer)
 - [awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills)
 - [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)
+- [im-not-ai](https://github.com/epoko77-ai/im-not-ai)
 - [OpenCode](https://github.com/anomalyco/opencode)
 - [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode)
 - [oh-my-codex](https://github.com/Yeachan-Heo/oh-my-codex)
