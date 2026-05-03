@@ -14,7 +14,7 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 | 카테고리     | 저장소                                                                                                                                                 |
 |----------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
 | System   | lucasgelfond/zerobrew, ghostty-org/ghostty                                                                                                          |
-| Claude   | PeonPing/peon-ping, obra/superpowers, jarrodwatts/claude-hud, blader/humanizer, VoltAgent/awesome-agent-skills, forrestchang/andrej-karpathy-skills |
+| Claude   | obra/superpowers, jarrodwatts/claude-hud, blader/humanizer, VoltAgent/awesome-agent-skills, forrestchang/andrej-karpathy-skills                     |
 | Codex    | Yeachan-Heo/oh-my-codex                                                                                                                             |
 | Gemini   | (SuperGemini — pipx 패키지)                                                                                                                            |
 | OpenCode | anomalyco/opencode, code-yeongyu/oh-my-opencode                                                                                                     |
@@ -28,7 +28,6 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 |-------------------------------------|-----------|
 | lucasgelfond/zerobrew               | `a15119f` |
 | ghostty-org/ghostty                 | `e94c905` |
-| PeonPing/peon-ping                  | `e8d9502` |
 | obra/superpowers                    | `e16d611` |
 | jarrodwatts/claude-hud              | `10193cc` |
 | blader/humanizer                    | `c78047b` |

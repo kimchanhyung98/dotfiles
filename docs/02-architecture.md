@@ -68,10 +68,7 @@ dotfiles/
     │       └── skills/
     │
     ├── dot_claude/
-    │   ├── settings.json.tmpl
-    │   └── hooks/
-    │       └── peon-ping/
-    │           └── config.json.tmpl
+    │   └── settings.json.tmpl
     │
     ├── dot_codex/
     │   └── config.toml.tmpl
@@ -100,11 +97,11 @@ dotfiles/
 | `dot_config/ghostty/`  | `~/.config/ghostty/`  | Ghostty 터미널 설정                          |
 | `dot_config/zsh/`      | `~/.config/zsh/`      | `.zshrc`에서 순차 로드하는 모듈형 Zsh 설정           |
 | `dot_config/opencode/` | `~/.config/opencode/` | OpenCode + oh-my-opencode 설정            |
-| `dot_claude/`          | `~/.claude/`          | Claude Code 설정, 훅                       |
+| `dot_claude/`          | `~/.claude/`          | Claude Code 설정                          |
 | `dot_codex/`           | `~/.codex/`           | Codex CLI 설정                            |
 | `dot_agents/skills/`   | `~/.agents/skills/`   | Codex 글로벌 스킬                            |
 | `dot_copilot/`         | `~/.copilot/`         | Copilot MCP 설정, 글로벌 스킬                  |
-| `dot_gemini/`          | `~/.gemini/`          | Gemini CLI 설정 (승인 모드, 알림/UI, 훅, MCP 서버) |
+| `dot_gemini/`          | `~/.gemini/`          | Gemini CLI 설정 (승인 모드, 알림/UI, MCP 서버)   |
 | `dot_local/bin/`       | `~/.local/bin/`       | 사용자 스크립트 (dotfiles-doctor)              |
 
 ## chezmoi special 파일
