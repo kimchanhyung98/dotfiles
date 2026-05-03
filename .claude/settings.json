@@ -23,6 +23,11 @@
       "Read(**/.ssh/*)",
       "Read(**/.aws/*)",
       "Read(**/credentials.json)",
+      "Read(**/.netrc)",
+      "Read(**/.npmrc)",
+      "Read(**/.git-credentials)",
+      "Read(**/.kube/config)",
+      "Read(**/.gnupg/**)",
       "Edit(../**)",
       "Write(../**)"
     ],
