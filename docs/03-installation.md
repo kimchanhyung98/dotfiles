@@ -15,7 +15,7 @@
 | 순서 | 스크립트        | 역할                                                           | 실행 조건 | 상세                                                                                                                                |
 |:--:|-------------|--------------------------------------------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------|
 | 10 | ai-core     | Claude Code, Codex CLI, Gemini CLI, Copilot CLI, superpowers | 최초 1회 | 공식 AI CLI 도구 4종 설치 + superpowers를 ~/superpowers에 clone. Claude Code는 공식 설치 스크립트(curl), 나머지 3종은 npm. 확장 환경 구성은 개별 스크립트(11~14)에서 처리 |
-| 11 | ai-claude   | SuperClaude, peon-ping                                       | 최초 1회 | SuperClaude 프레임워크(pipx), peon-ping 알림 사운드. 플러그인·MCP는 settings.json·claude.json에서 선언적 관리                                           |
+| 11 | ai-claude   | SuperClaude                                                  | 최초 1회 | SuperClaude 프레임워크(pipx). 플러그인·MCP는 settings.json·claude.json에서 선언적 관리                                                              |
 | 12 | ai-codex    | oh-my-codex, superpowers (copy), 프로필 초기화                     | 최초 1회 | oh-my-codex(npm), ~/superpowers에서 ~/.agents/skills/superpowers로 복사, 프로필 초기화                                                       |
 | 13 | ai-gemini   | SuperGemini, superpowers (copy)                              | 최초 1회 | SuperGemini 확장 프레임워크(pipx), ~/superpowers에서 ~/.gemini/skills/superpowers로 복사. MCP는 settings.json에서 선언적 관리                         |
 | 14 | ai-copilot  | superpowers (copy)                                           | 최초 1회 | ~/superpowers에서 ~/.copilot/skills/superpowers로 복사. MCP는 mcp-config.json에서 선언적 관리                                                  |
@@ -78,7 +78,7 @@ chezmoi init --apply
 │   Claude Code(curl 스크립트), Codex·Gemini·Copilot(npm) 설치, superpowers를 ~/superpowers에 clone
 │
 ├─ 11 ai-claude
-│   SuperClaude, peon-ping (플러그인·MCP는 설정 파일로 관리)
+│   SuperClaude (플러그인·MCP는 설정 파일로 관리)
 │
 ├─ 12 ai-codex
 │   oh-my-codex → superpowers (copy) → 프로필 초기화
@@ -96,7 +96,7 @@ chezmoi init --apply
 │   ~/.zshrc, ~/.gitconfig, ~/.gitignore_global, ~/.vimrc
 │   ~/AGENTS.md (공통 에이전트 지침)
 │   ~/.config/cmux/settings.json, ~/.config/ghostty/config, ~/.config/opencode/*
-│   ~/.claude/settings.json, ~/.claude/hooks/peon-ping/*
+│   ~/.claude/settings.json
 │   ~/.codex/config.toml
 │   ~/.agents/skills/*, ~/.copilot/mcp-config.json, ~/.copilot/skills/*
 │   ~/.gemini/settings.json

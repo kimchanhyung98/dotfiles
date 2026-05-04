@@ -1,4 +1,4 @@
-{{- /* ~/.gemini/settings.json — Gemini CLI 설정 (승인 모드, 알림/UI, 훅, MCP 서버) */ -}}
+{{- /* ~/.gemini/settings.json — Gemini CLI 설정 (승인 모드, 알림/UI, MCP 서버) */ -}}
 {
   "general": {
     "defaultApprovalMode": "auto_edit",
@@ -7,56 +7,6 @@
   },
   "ui": {
     "escapePastedAtSymbols": true
-  },
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "startup",
-        "hooks": [
-          {
-            "name": "peon-start",
-            "type": "command",
-            "command": "bash ~/.claude/hooks/peon-ping/adapters/gemini.sh SessionStart"
-          }
-        ]
-      }
-    ],
-    "AfterAgent": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "name": "peon-after-agent",
-            "type": "command",
-            "command": "bash ~/.claude/hooks/peon-ping/adapters/gemini.sh AfterAgent"
-          }
-        ]
-      }
-    ],
-    "AfterTool": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "name": "peon-after-tool",
-            "type": "command",
-            "command": "bash ~/.claude/hooks/peon-ping/adapters/gemini.sh AfterTool"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "name": "peon-notification",
-            "type": "command",
-            "command": "bash ~/.claude/hooks/peon-ping/adapters/gemini.sh Notification"
-          }
-        ]
-      }
-    ]
   },
   "mcpServers": {
     "context7": {

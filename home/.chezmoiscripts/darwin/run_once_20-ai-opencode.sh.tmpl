@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# AI OpenCode: OpenCode, oh-my-opencode, superpowers (copy), peon-ping adapter
+# AI OpenCode: OpenCode, oh-my-opencode, superpowers (copy)
 
 {{ if ne .chezmoi.os "darwin" }}
 exit 0
@@ -46,22 +46,6 @@ if [ -d "$HOME/superpowers" ]; then
         echo "Copying superpowers skills to OpenCode..."
         cp -r "$HOME/superpowers/skills" "$OPENCODE_DIR/skills/superpowers"
     fi
-fi
-
-# peon-ping adapter for OpenCode
-# - OpenCode용 작업 알림 사운드 어댑터 (임시파일 다운로드 후 실행)
-if [ ! -d "$HOME/.config/opencode/hooks/peon-ping" ]; then
-    echo "Installing peon-ping adapter for OpenCode..."
-    installer=$(mktemp)
-    if curl -fsSL https://raw.githubusercontent.com/PeonPing/peon-ping/main/adapters/opencode.sh -o "$installer" 2>/dev/null; then
-        bash "$installer" || echo "[ai-opencode][warning] peon-ping adapter installation failed"
-        rm -f "$installer"
-    else
-        rm -f "$installer"
-        echo "[ai-opencode][warning] peon-ping adapter download failed"
-    fi
-else
-    echo "peon-ping adapter: already installed"
 fi
 
 echo "[ai-opencode] done"

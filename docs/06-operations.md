@@ -12,7 +12,7 @@
 | Languages        | node, python3, go, rustc, php, ruby                                                                 | 프로그래밍 언어 런타임의 설치 여부와 버전 확인      |
 | Package Managers | brew, zb, pipx, bun                                                                                 | 패키지 관리자의 설치 여부 확인. zb는 zerobrew |
 | AI CLI           | claude, codex, opencode, ollama, gemini                                                             | AI 도구 CLI의 설치 여부 확인             |
-| AI 플러그인          | superpowers, everything-claude-code, claude-hud, peon-ping, claude-mem, oh-my-codex, oh-my-opencode | 각 AI 도구의 확장 기능 설치 상태 확인         |
+| AI 플러그인          | superpowers, everything-claude-code, claude-hud, claude-mem, oh-my-codex, oh-my-opencode            | 각 AI 도구의 확장 기능 설치 상태 확인         |
 | 스킬 디렉토리          | Claude, Codex, Copilot, OpenCode 4개 경로                                                              | 글로벌 스킬 디렉토리 존재 여부와 내용물 확인       |
 | AGENTS.md        | `~/AGENTS.md` 존재 여부                                                                                 | 공통 에이전트 지침 파일 배포 상태 확인          |
 | claude-mem       | `~/.claude-mem/`, `settings.json`                                                                   | claude-mem 디렉토리와 설정 파일 존재 여부 확인 |
@@ -33,7 +33,7 @@
 | Pkg Managers   | composer, mise, npm, pipx, uv, xcodes, yarn                                                         |
 | Runtime        | Bun                                                                                                 |
 | AI Core        | Claude Code, Codex CLI, Gemini CLI, Copilot CLI                                                     |
-| Claude         | SuperClaude, superpowers, claude-hud, peon-ping, karpathy-skills, MCP 4종                            |
+| Claude         | SuperClaude, superpowers, claude-hud, karpathy-skills, MCP 4종                                       |
 | Codex          | oh-my-codex, superpowers (copy)                                                                     |
 | Gemini         | SuperGemini, superpowers (copy), MCP 3종                                                             |
 | Copilot        | superpowers (copy), MCP 2종                                                                          |
@@ -53,7 +53,6 @@
 | AI 모듈 경계 준수         | 설치 스크립트는 바이너리 설치만, 설정 파일은 사용자 설정만 담당하는 분리 원칙이 유지되는지 확인                           |
 | 스킬 디렉토리 동기화 상태      | Claude, Codex, Gemini, Copilot, OpenCode 5개 글로벌 스킬 경로에 humanizer 스킬이 배포되어 있는지 확인 |
 | AGENTS.md 공통 지침 최신화 | `~/AGENTS.md`와 `~/.codex/AGENTS.md`의 4대 원칙과 공통 규칙이 최신 상태인지 확인                    |
-| peon-ping 어댑터 등록 상태 | 사용 중인 AI 도구의 peon-ping 어댑터가 올바르게 연결되어 이벤트 알림이 동작하는지 확인                           |
 | 플러그인 버전 호환성         | Claude Code, Codex, OpenCode의 플러그인이 현재 도구 버전과 호환되는지 확인                           |
 | Linux 기초 설정 누락 여부   | macOS에 추가된 AI 도구가 Linux ai-tools 스크립트에도 반영되어 있는지 확인                              |
 | 진단 스크립트 검사 대상 최신화   | dotfiles-doctor가 새로 추가된 도구, 설정 파일, 스킬 경로를 검사 대상에 포함하는지 확인                        |
@@ -100,7 +99,6 @@
 
 - [zerobrew](https://github.com/lucasgelfond/zerobrew)
 - [Ghostty](https://github.com/ghostty-org/ghostty)
-- [peon-ping](https://github.com/PeonPing/peon-ping)
 - [superpowers](https://github.com/obra/superpowers)
 - [claude-hud](https://github.com/jarrodwatts/claude-hud)
 - [humanizer](https://github.com/blader/humanizer)
