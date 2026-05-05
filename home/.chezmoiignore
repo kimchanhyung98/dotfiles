@@ -5,6 +5,7 @@
 Brewfile
 .config/cmux/**
 .config/rectangle/**
+.config/stats/**
 {{ end }}
 
 {{ if ne .chezmoi.os "linux" }}

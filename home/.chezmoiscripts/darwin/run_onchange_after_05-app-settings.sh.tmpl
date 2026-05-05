@@ -1,8 +1,9 @@
 #!/bin/bash
 #
-# App settings: Rectangle
+# App settings: Rectangle, Stats
 #
 # Rectangle config hash: {{ include "dot_config/rectangle/RectangleConfig.json" | sha256sum }}
+# Stats config hash: {{ include "dot_config/stats/Stats.plist" | sha256sum }}
 
 {{ if ne .chezmoi.os "darwin" }}
 exit 0
@@ -14,6 +15,7 @@ echo "[app-settings][start]"
 
 RECTANGLE_CONFIG="{{ .chezmoi.sourceDir }}/dot_config/rectangle/RectangleConfig.json"
 RECTANGLE_IMPORT="$HOME/Library/Application Support/Rectangle/RectangleConfig.json"
+STATS_CONFIG="{{ .chezmoi.sourceDir }}/dot_config/stats/Stats.plist"
 
 # Rectangle
 # - Rectangle reads this file on next launch, then renames/removes it.
@@ -23,6 +25,29 @@ if [ -f "$RECTANGLE_CONFIG" ]; then
     install -m 0644 "$RECTANGLE_CONFIG" "$RECTANGLE_IMPORT"
 else
     echo "[app-settings][warning] Rectangle config not found"
+fi
+
+# Stats
+# - Preserve remote credentials managed by the app, then import baseline settings.
+if [ -f "$STATS_CONFIG" ]; then
+    echo "[app-settings][stats] import defaults"
+    STATS_REMOTE_ID="$(defaults read eu.exelban.Stats remote_id 2>/dev/null || true)"
+    STATS_ACCESS_TOKEN="$(defaults read eu.exelban.Stats access_token 2>/dev/null || true)"
+    STATS_REFRESH_TOKEN="$(defaults read eu.exelban.Stats refresh_token 2>/dev/null || true)"
+
+    defaults import eu.exelban.Stats "$STATS_CONFIG"
+
+    if [ -n "$STATS_REMOTE_ID" ]; then
+        defaults write eu.exelban.Stats remote_id -string "$STATS_REMOTE_ID"
+    fi
+    if [ -n "$STATS_ACCESS_TOKEN" ]; then
+        defaults write eu.exelban.Stats access_token -string "$STATS_ACCESS_TOKEN"
+    fi
+    if [ -n "$STATS_REFRESH_TOKEN" ]; then
+        defaults write eu.exelban.Stats refresh_token -string "$STATS_REFRESH_TOKEN"
+    fi
+else
+    echo "[app-settings][warning] Stats config not found"
 fi
 
 echo "[app-settings][done]"
