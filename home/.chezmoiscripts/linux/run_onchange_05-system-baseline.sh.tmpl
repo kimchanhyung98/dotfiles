@@ -9,7 +9,7 @@ exit 0
 
 set -eufo pipefail
 
-echo "[system-baseline]"
+echo "[system-baseline][start]"
 
 PROFILE_FILE="$HOME/.profile"
 touch "$PROFILE_FILE"
@@ -26,7 +26,7 @@ append_if_missing() {
 # - vim을 EDITOR/VISUAL 환경 변수로 설정
 if command -v vim &>/dev/null; then
     if ! grep -Fq 'export EDITOR="vim"' "$PROFILE_FILE" 2>/dev/null; then
-        echo "Setting vim as default editor..."
+        echo "[system-baseline][editor] setting vim"
         append_if_missing 'export EDITOR="vim"'
         append_if_missing 'export VISUAL="vim"'
     fi
@@ -39,4 +39,4 @@ if ! grep -Fq 'export PATH="$HOME/.local/bin:$PATH"' "$PROFILE_FILE" 2>/dev/null
     append_if_missing 'export PATH="$HOME/.local/bin:$PATH"'
 fi
 
-echo "[system-baseline] done"
+echo "[system-baseline][done]"

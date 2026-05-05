@@ -9,7 +9,7 @@ exit 0
 
 set -eufo pipefail
 
-echo "[macos-settings]"
+echo "[macos-settings][start]"
 
 # - Dock
 # Dock 자동 숨기기 활성화
@@ -89,4 +89,4 @@ killall Dock 2>/dev/null || true
 killall Finder 2>/dev/null || true
 killall SystemUIServer 2>/dev/null || true
 
-echo "[macos-settings] done"
+echo "[macos-settings][done]"

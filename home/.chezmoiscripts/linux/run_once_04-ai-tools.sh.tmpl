@@ -9,7 +9,7 @@ exit 0
 
 set -eufo pipefail
 
-echo "[ai-tools]"
+echo "[ai-tools][start]"
 
 # npm 사전 확인
 if ! command -v npm &>/dev/null; then
@@ -20,7 +20,7 @@ fi
 # Claude Code
 # - Anthropic Claude 터미널 AI 코딩 도우미
 if ! command -v claude &>/dev/null; then
-    echo "Installing Claude Code..."
+    echo "[ai-tools][claude] installing"
     installer=$(mktemp)
     if curl -fsSL https://claude.ai/install.sh -o "$installer"; then
         bash "$installer" || echo "[ai-tools][warning] Claude Code installation failed"
@@ -29,52 +29,52 @@ if ! command -v claude &>/dev/null; then
     fi
     rm -f "$installer"
 else
-    echo "Claude Code: already installed ($(claude --version 2>/dev/null || echo 'unknown'))"
+    echo "[ai-tools][claude] already installed ($(claude --version 2>/dev/null || echo 'unknown'))"
 fi
 
 # Codex CLI
 # - OpenAI Codex 터미널 AI 코딩 도우미
 if ! command -v codex &>/dev/null; then
-    echo "Installing Codex CLI..."
+    echo "[ai-tools][codex] installing"
     npm install -g @openai/codex || echo "[ai-tools][warning] Codex install failed"
 else
-    echo "Codex CLI: already installed"
+    echo "[ai-tools][codex] already installed"
 fi
 
 # oh-my-codex
 # - Codex CLI 확장 프레임워크
 if ! command -v oh-my-codex &>/dev/null; then
-    echo "Installing oh-my-codex..."
+    echo "[ai-tools][oh-my-codex] installing"
     npm install -g oh-my-codex || echo "[ai-tools][warning] oh-my-codex install failed"
 else
-    echo "oh-my-codex: already installed"
+    echo "[ai-tools][oh-my-codex] already installed"
 fi
 
 # OpenCode
 # - 오픈소스 터미널 AI 코딩 도우미
 if ! command -v opencode &>/dev/null; then
-    echo "Installing OpenCode..."
+    echo "[ai-tools][opencode] installing"
     npm install -g opencode-ai || echo "[ai-tools][warning] OpenCode install failed"
 else
-    echo "OpenCode: already installed"
+    echo "[ai-tools][opencode] already installed"
 fi
 
 # oh-my-opencode
 # - OpenCode 확장 프레임워크
 if ! command -v oh-my-opencode &>/dev/null; then
-    echo "Installing oh-my-opencode..."
+    echo "[ai-tools][oh-my-opencode] installing"
     npm install -g oh-my-opencode || echo "[ai-tools][warning] oh-my-opencode install failed"
 else
-    echo "oh-my-opencode: already installed"
+    echo "[ai-tools][oh-my-opencode] already installed"
 fi
 
 # Gemini CLI
 # - Google Gemini 터미널 AI 도우미
 if ! command -v gemini &>/dev/null; then
-    echo "Installing Gemini CLI..."
+    echo "[ai-tools][gemini] installing"
     npm install -g @google/gemini-cli || echo "[ai-tools][warning] Gemini CLI install failed"
 else
-    echo "Gemini CLI: already installed"
+    echo "[ai-tools][gemini] already installed"
 fi
 
-echo "[ai-tools] done"
+echo "[ai-tools][done]"

@@ -8,25 +8,25 @@ exit 0
 
 set -eufo pipefail
 
-echo "[prerequisites]"
+echo "[prerequisites][start]"
 
 # 1. Xcode Command Line Tools
 # - macOS 개발 도구 (git, make 등) 설치
 if ! xcode-select -p &>/dev/null; then
-    echo "Installing Xcode Command Line Tools..."
+    echo "[prerequisites][xcode-cli] installing"
     xcode-select --install
-    echo "Waiting for Xcode CLI Tools installation..."
+    echo "[prerequisites][xcode-cli] waiting"
     until xcode-select -p &>/dev/null; do
         sleep 5
     done
 else
-    echo "Xcode CLI Tools: already installed."
+    echo "[prerequisites][xcode-cli] already installed"
 fi
 
 # 2. Homebrew
 # - macOS 패키지 매니저 설치
 if ! command -v brew &>/dev/null; then
-    echo "Installing Homebrew..."
+    echo "[prerequisites][homebrew] installing"
     # Homebrew 공식 부트스트랩 명령으로 설치 (의도적으로 curl | bash 사용)
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     {{ if .isAppleSilicon }}
@@ -35,7 +35,7 @@ if ! command -v brew &>/dev/null; then
     eval "$(/usr/local/bin/brew shellenv)"
     {{ end }}
 else
-    echo "Homebrew: already installed."
+    echo "[prerequisites][homebrew] already installed"
 fi
 
 # 3. zerobrew
@@ -57,7 +57,7 @@ ensure_zb_available() {
 }
 
 if ! ensure_zb_available; then
-    echo "Installing zerobrew..."
+    echo "[prerequisites][zerobrew] installing"
     installer=$(mktemp)
     if curl -fsSL https://zerobrew.rs/install -o "$installer"; then
         bash "$installer" || echo "[prerequisites][warning] zerobrew installation failed"
@@ -68,7 +68,7 @@ if ! ensure_zb_available; then
 fi
 
 if ensure_zb_available; then
-    echo "zerobrew: ready ($(command -v zb))"
+    echo "[prerequisites][zerobrew] ready ($(command -v zb))"
 else
     echo "[prerequisites][warning] zerobrew not available. Homebrew will be used as fallback."
 fi
@@ -77,10 +77,10 @@ fi
 # 4. Rosetta 2 (Apple Silicon 전용)
 # - x86_64 바이너리를 ARM에서 실행하기 위한 호환 레이어
 if ! pkgutil --pkgs 2>/dev/null | grep -q "com.apple.pkg.RosettaUpdateAuto"; then
-    echo "Installing Rosetta 2..."
+    echo "[prerequisites][rosetta] installing"
     /usr/sbin/softwareupdate --install-rosetta --agree-to-license
 else
-    echo "Rosetta 2: already installed."
+    echo "[prerequisites][rosetta] already installed"
 fi
 {{ end }}
 
@@ -92,17 +92,17 @@ mkdir -p "$SSH_DIR"
 chmod 700 "$SSH_DIR"
 if command -v ssh-keyscan &>/dev/null; then
     if ! ssh-keygen -F github.com -f "$KNOWN_HOSTS" >/dev/null 2>&1; then
-        echo "Adding GitHub SSH host keys..."
+        echo "[prerequisites][github-ssh] adding host keys"
         if ssh-keyscan -t ed25519,ecdsa,rsa github.com >> "$KNOWN_HOSTS" 2>/dev/null; then
             chmod 600 "$KNOWN_HOSTS"
         else
             echo "[prerequisites][warning] Failed to fetch GitHub host keys; continuing."
         fi
     else
-        echo "GitHub SSH host keys: already registered."
+        echo "[prerequisites][github-ssh] already registered"
     fi
 else
     echo "[prerequisites][warning] ssh-keyscan not found."
 fi
 
-echo "[prerequisites] done"
+echo "[prerequisites][done]"

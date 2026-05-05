@@ -8,16 +8,16 @@ exit 0
 
 set -eufo pipefail
 
-echo "[ai-copilot]"
+echo "[ai-copilot][start]"
 
 # superpowers for Copilot
 # - ~/superpowers에서 Copilot 스킬 경로로 복사 (개별 커스텀 가능)
 COPILOT_SKILLS_DIR="$HOME/.copilot/skills/superpowers"
 
 if [ -d "$HOME/superpowers/skills" ] && [ ! -d "$COPILOT_SKILLS_DIR" ]; then
-    echo "Copying superpowers to Copilot skills..."
+    echo "[ai-copilot][superpowers] copying skills"
     mkdir -p "$(dirname "$COPILOT_SKILLS_DIR")"
     cp -r "$HOME/superpowers/skills" "$COPILOT_SKILLS_DIR"
 fi
 
-echo "[ai-copilot] done"
+echo "[ai-copilot][done]"

@@ -11,7 +11,7 @@ exit 0
 
 set -eufo pipefail
 
-echo "[brew-packages]"
+echo "[brew-packages][start]"
 
 # Homebrew 환경 변수 로드
 {{ $homebrewPrefix := .homebrewPrefix }}
@@ -31,4 +31,4 @@ for cmd in git node npm; do
     fi
 done
 
-echo "[brew-packages] done"
+echo "[brew-packages][done]"

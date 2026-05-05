@@ -8,19 +8,19 @@ exit 0
 
 set -eufo pipefail
 
-echo "[ai-claude]"
+echo "[ai-claude][start]"
 
 # SuperClaude
 # - Claude Code 확장 프레임워크 (페르소나, 명령어, 플래그 시스템)
 if ! command -v superclaude &>/dev/null; then
-    echo "Installing SuperClaude..."
+    echo "[ai-claude][superclaude] installing"
     if pipx install superclaude; then
         SuperClaude install --force --yes || echo "[ai-claude][warning] SuperClaude post-install setup failed"
     else
         echo "[ai-claude][warning] SuperClaude installation failed (requires pipx)"
     fi
 else
-    echo "SuperClaude: already installed"
+    echo "[ai-claude][superclaude] already installed"
 fi
 
 # Augment Context Engine MCP
@@ -32,7 +32,7 @@ if ! claude mcp list 2>/dev/null | grep -q "auggie"; then
         AUG_URL=$(jq -r '.tenantURL // empty' "$AUGMENT_CRED" 2>/dev/null)
     fi
     if [ -n "${AUG_TOKEN:-}" ] && [ -n "${AUG_URL:-}" ]; then
-        echo "Adding Augment MCP to Claude Code..."
+        echo "[ai-claude][augment-mcp] adding"
         MCP_JSON=$(jq -n \
             --arg token "$AUG_TOKEN" \
             --arg url "$AUG_URL" \
@@ -42,7 +42,7 @@ if ! claude mcp list 2>/dev/null | grep -q "auggie"; then
         echo "[ai-claude][warning] Augment token not found, skipping MCP registration (run 'auggie login' first)"
     fi
 else
-    echo "Augment MCP: already configured"
+    echo "[ai-claude][augment-mcp] already configured"
 fi
 
-echo "[ai-claude] done"
+echo "[ai-claude][done]"

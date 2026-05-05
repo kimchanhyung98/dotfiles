@@ -9,12 +9,12 @@ exit 0
 
 set -eufo pipefail
 
-echo "[git-baseline]"
+echo "[git-baseline][start]"
 
 # Git 사용자 설정 확인
 # - dot_gitconfig.tmpl에서 설정됨, 여기서는 확인만
 if git config --global user.name &>/dev/null; then
-    echo "Git user: $(git config --global user.name) <$(git config --global user.email)>"
+    echo "[git-baseline][user] $(git config --global user.name) <$(git config --global user.email)>"
 else
     echo "[git-baseline][warning] Git user not configured. Check ~/.gitconfig"
 fi
@@ -23,7 +23,7 @@ fi
 # - ~/.ssh 디렉토리 생성 및 권한 설정
 SSH_DIR="$HOME/.ssh"
 if [ ! -d "$SSH_DIR" ]; then
-    echo "Creating SSH directory..."
+    echo "[git-baseline][ssh] creating directory"
     mkdir -p "$SSH_DIR"
     chmod 700 "$SSH_DIR"
 fi
@@ -32,14 +32,14 @@ fi
 KNOWN_HOSTS="$SSH_DIR/known_hosts"
 if command -v ssh-keyscan &>/dev/null; then
     if ! ssh-keygen -F github.com -f "$KNOWN_HOSTS" >/dev/null 2>&1; then
-        echo "Adding GitHub SSH host keys..."
+        echo "[git-baseline][github-ssh] adding host keys"
         if ssh-keyscan -t ed25519,ecdsa,rsa github.com >> "$KNOWN_HOSTS" 2>/dev/null; then
             chmod 600 "$KNOWN_HOSTS"
         else
             echo "[git-baseline][warning] Failed to fetch GitHub host keys; continuing."
         fi
     else
-        echo "GitHub SSH host keys: already registered."
+        echo "[git-baseline][github-ssh] already registered"
     fi
 else
     echo "[git-baseline][warning] ssh-keyscan not found. Install openssh-client to auto-register GitHub host keys."
@@ -48,7 +48,7 @@ fi
 # - Ed25519 SSH 키 존재 여부 확인
 if [ ! -f "$SSH_DIR/id_ed25519" ]; then
     echo "[git-baseline][info] No SSH key found. Generate one with:"
-    echo '  ssh-keygen -t ed25519 -C {{ .email | quote }}'
+    echo '[git-baseline][manual] ssh-keygen -t ed25519 -C {{ .email | quote }}'
 fi
 
-echo "[git-baseline] done"
+echo "[git-baseline][done]"

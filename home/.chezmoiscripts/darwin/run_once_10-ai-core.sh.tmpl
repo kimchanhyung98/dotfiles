@@ -8,7 +8,7 @@ exit 0
 
 set -eufo pipefail
 
-echo "[ai-core]"
+echo "[ai-core][start]"
 
 if ! command -v npm &>/dev/null; then
     echo "[ai-core][error] npm not found. Ensure Node.js was installed via Brewfile."
@@ -17,7 +17,7 @@ fi
 
 # Claude Code
 if ! command -v claude &>/dev/null; then
-    echo "Installing Claude Code..."
+    echo "[ai-core][claude] installing"
     installer=$(mktemp)
     if curl -fsSL https://claude.ai/install.sh -o "$installer"; then
         bash "$installer" || echo "[ai-core][warning] Claude Code installation failed"
@@ -26,42 +26,42 @@ if ! command -v claude &>/dev/null; then
     fi
     rm -f "$installer"
 else
-    echo "Claude Code: already installed ($(claude --version 2>/dev/null || echo 'unknown'))"
+    echo "[ai-core][claude] already installed ($(claude --version 2>/dev/null || echo 'unknown'))"
 fi
 
 # Codex CLI
 if ! command -v codex &>/dev/null; then
-    echo "Installing Codex CLI..."
+    echo "[ai-core][codex] installing"
     npm install -g @openai/codex || echo "[ai-core][warning] Codex CLI installation failed"
 else
-    echo "Codex CLI: already installed ($(codex --version 2>/dev/null || echo 'unknown'))"
+    echo "[ai-core][codex] already installed ($(codex --version 2>/dev/null || echo 'unknown'))"
 fi
 
 # Gemini CLI
 if ! command -v gemini &>/dev/null; then
-    echo "Installing Gemini CLI..."
+    echo "[ai-core][gemini] installing"
     npm install -g @google/gemini-cli || echo "[ai-core][warning] Gemini CLI installation failed"
 else
-    echo "Gemini CLI: already installed ($(gemini --version 2>/dev/null || echo 'unknown'))"
+    echo "[ai-core][gemini] already installed ($(gemini --version 2>/dev/null || echo 'unknown'))"
 fi
 
 # Copilot CLI
 if ! command -v copilot &>/dev/null; then
-    echo "Installing Copilot CLI..."
+    echo "[ai-core][copilot] installing"
     npm install -g @github/copilot || echo "[ai-core][warning] Copilot CLI installation failed"
 else
-    echo "Copilot CLI: already installed ($(copilot --version 2>/dev/null || echo 'unknown'))"
+    echo "[ai-core][copilot] already installed ($(copilot --version 2>/dev/null || echo 'unknown'))"
 fi
 
 # Augment Context Engine (auggie)
 # - 설치 → 로그인 → 토큰 저장 (각 AI 서비스 MCP 설정에서 참조)
 if ! command -v auggie &>/dev/null; then
-    echo "Installing auggie..."
+    echo "[ai-core][auggie] installing"
     npm install -g @augmentcode/auggie@latest || echo "[ai-core][warning] auggie installation failed"
 fi
 if command -v auggie &>/dev/null; then
     if ! auggie token print &>/dev/null; then
-        echo "Authenticating auggie..."
+        echo "[ai-core][auggie] authenticating"
         auggie login || echo "[ai-core][warning] auggie login failed (run 'auggie login' manually)"
     fi
     # 토큰 저장 (TOKEN={"accessToken":"...","tenantURL":"..."} 형식)
@@ -70,21 +70,21 @@ if command -v auggie &>/dev/null; then
         TOKEN_JSON="${TOKEN_RAW#TOKEN=}"
         mkdir -p "$HOME/.config/augment"
         echo "$TOKEN_JSON" > "$HOME/.config/augment/credentials.json"
-        echo "auggie: credentials saved"
+        echo "[ai-core][auggie] credentials saved"
     else
         echo "[ai-core][warning] auggie token not available (run 'auggie login' manually)"
     fi
 else
-    echo "auggie: not installed, skipping login"
+    echo "[ai-core][auggie] not installed, skipping login"
 fi
 
 # superpowers
 # - 공유 스킬 저장소 (각 AI 도구에서 개별 복사하여 사용)
 if [ ! -d "$HOME/superpowers" ]; then
-    echo "Cloning superpowers..."
+    echo "[ai-core][superpowers] cloning"
     git clone https://github.com/obra/superpowers.git "$HOME/superpowers" || echo "[ai-core][warning] superpowers clone failed"
 else
-    echo "superpowers: already cloned"
+    echo "[ai-core][superpowers] already cloned"
 fi
 
-echo "[ai-core] done"
+echo "[ai-core][done]"

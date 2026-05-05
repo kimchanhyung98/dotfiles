@@ -9,7 +9,7 @@ exit 0
 
 set -eufo pipefail
 
-echo "[install-packages]"
+echo "[install-packages][start]"
 
 # 필수 패키지 목록
 packages=(curl git vim zsh bat zoxide)
@@ -27,9 +27,9 @@ for pkg in "${packages[@]}"; do
 done
 
 if [ ${#install_needed[@]} -eq 0 ]; then
-    echo "All essential packages are already installed."
+    echo "[install-packages][packages] already installed"
 else
-    echo "Installing packages: ${install_needed[*]}"
+    echo "[install-packages][packages] installing: ${install_needed[*]}"
 
     # root가 아닌 경우 sudo 사용
     sudo_cmd=""
@@ -37,8 +37,8 @@ else
         if command -v sudo &>/dev/null; then
             sudo_cmd="sudo"
         else
-            echo "Error: Not running as root and 'sudo' is not available."
-            echo "Please install manually: ${install_needed[*]}"
+            echo "[install-packages][error] not running as root and sudo is not available"
+            echo "[install-packages][manual] install manually: ${install_needed[*]}"
             exit 1
         fi
     fi
@@ -52,8 +52,8 @@ else
     elif command -v yum &>/dev/null; then
         $sudo_cmd yum install -y -q "${install_needed[@]}"
     else
-        echo "Error: No supported package manager found (apt-get, dnf, yum)."
-        echo "Please install manually: ${install_needed[*]}"
+        echo "[install-packages][error] no supported package manager found (apt-get, dnf, yum)"
+        echo "[install-packages][manual] install manually: ${install_needed[*]}"
         exit 1
     fi
 fi
@@ -62,14 +62,14 @@ fi
 if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
     mkdir -p "$HOME/.local/bin"
     ln -sf "$(command -v batcat)" "$HOME/.local/bin/bat"
-    echo "Created symlink: bat → batcat"
+    echo "[install-packages][bat] created symlink: bat -> batcat"
 fi
 
 # Ghostty
 # - GPU 가속 터미널 에뮬레이터 (표준 저장소 미포함, 수동 설치 필요)
 if ! command -v ghostty &>/dev/null; then
-    echo "Note: Ghostty requires manual installation on Linux."
-    echo "  See: https://ghostty.org/docs/install/linux"
+    echo "[install-packages][ghostty] manual installation required"
+    echo "[install-packages][ghostty] https://ghostty.org/docs/install/linux"
 fi
 
-echo "[install-packages] done"
+echo "[install-packages][done]"

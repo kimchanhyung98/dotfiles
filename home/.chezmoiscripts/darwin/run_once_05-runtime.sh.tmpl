@@ -8,12 +8,12 @@ exit 0
 
 set -eufo pipefail
 
-echo "[runtime]"
+echo "[runtime][start]"
 
 # Bun
 # - JavaScript/TypeScript 런타임 설치 (임시파일 다운로드 후 실행)
 if ! command -v bun &>/dev/null; then
-    echo "Installing Bun..."
+    echo "[runtime][bun] installing"
     installer=$(mktemp)
     if curl -fsSL https://bun.sh/install -o "$installer"; then
         bash "$installer" || echo "[runtime][warning] Bun installation failed"
@@ -23,7 +23,7 @@ if ! command -v bun &>/dev/null; then
         echo "[runtime][warning] Bun download failed"
     fi
 else
-    echo "Bun: already installed ($(bun --version))"
+    echo "[runtime][bun] already installed ($(bun --version))"
 fi
 
-echo "[runtime] done"
+echo "[runtime][done]"

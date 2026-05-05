@@ -9,28 +9,28 @@ exit 0
 
 set -eufo pipefail
 
-echo "[shell-baseline]"
+echo "[shell-baseline][start]"
 
 # 기본 셸 설정
 # - zsh를 기본 로그인 셸로 변경
 ZSH_PATH=$(command -v zsh 2>/dev/null)
 if [ -n "$ZSH_PATH" ] && [ "$SHELL" != "$ZSH_PATH" ]; then
-    echo "Setting zsh as default shell..."
+    echo "[shell-baseline][zsh] setting default shell"
     if grep -q "$ZSH_PATH" /etc/shells; then
         chsh -s "$ZSH_PATH" 2>/dev/null || echo "[shell-baseline][warning] chsh failed. Run manually: chsh -s $ZSH_PATH"
     else
-        echo "[shell-baseline][warning] $ZSH_PATH not in /etc/shells. Add it first:"
-        echo "  echo '$ZSH_PATH' | sudo tee -a /etc/shells"
+        echo "[shell-baseline][warning] $ZSH_PATH not in /etc/shells"
+        echo "[shell-baseline][manual] echo '$ZSH_PATH' | sudo tee -a /etc/shells"
     fi
 else
-    echo "zsh: already default shell."
+    echo "[shell-baseline][zsh] already default shell"
 fi
 
 # 로케일
 # - en_US.UTF-8 로케일 활성화
 if [ -f /etc/locale.gen ]; then
     if ! locale -a 2>/dev/null | grep -q "en_US.utf8"; then
-        echo "Setting locale to en_US.UTF-8..."
+        echo "[shell-baseline][locale] setting en_US.UTF-8"
         sudo sed -i 's/# en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen 2>/dev/null
         sudo locale-gen 2>/dev/null || echo "[shell-baseline][warning] locale-gen failed — Korean text handling may be affected"
     fi
@@ -41,11 +41,11 @@ fi
 if [ -f /etc/timezone ]; then
     CURRENT_TZ=$(cat /etc/timezone 2>/dev/null || echo "")
     if [ "$CURRENT_TZ" != "Asia/Seoul" ]; then
-        echo "Setting timezone to Asia/Seoul..."
+        echo "[shell-baseline][timezone] setting Asia/Seoul"
         sudo timedatectl set-timezone Asia/Seoul 2>/dev/null || \
             sudo ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime 2>/dev/null || \
             echo "[shell-baseline][warning] timezone setting failed"
     fi
 fi
 
-echo "[shell-baseline] done"
+echo "[shell-baseline][done]"

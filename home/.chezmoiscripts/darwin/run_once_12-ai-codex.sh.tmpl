@@ -8,15 +8,15 @@ exit 0
 
 set -eufo pipefail
 
-echo "[ai-codex]"
+echo "[ai-codex][start]"
 
 # oh-my-codex
 # - Codex CLI 멀티 에이전트 오케스트레이션 (프롬프트, 스킬, 팀 실행)
 if ! command -v omx &>/dev/null; then
-    echo "Installing oh-my-codex..."
+    echo "[ai-codex][oh-my-codex] installing"
     npm install -g oh-my-codex || echo "[ai-codex][warning] oh-my-codex installation failed"
 else
-    echo "oh-my-codex: already installed"
+    echo "[ai-codex][oh-my-codex] already installed"
 fi
 
 # superpowers for Codex
@@ -24,7 +24,7 @@ fi
 CODEX_SKILLS_DIR="$HOME/.agents/skills/superpowers"
 
 if [ -d "$HOME/superpowers/skills" ] && [ ! -d "$CODEX_SKILLS_DIR" ]; then
-    echo "Copying superpowers to Codex skills..."
+    echo "[ai-codex][superpowers] copying skills"
     mkdir -p "$(dirname "$CODEX_SKILLS_DIR")"
     cp -r "$HOME/superpowers/skills" "$CODEX_SKILLS_DIR"
 fi
@@ -38,19 +38,19 @@ if ! codex mcp list 2>/dev/null | grep -q "codebase-retrieval"; then
         AUG_URL=$(jq -r '.tenantURL // empty' "$AUGMENT_CRED" 2>/dev/null)
     fi
     if [ -n "${AUG_TOKEN:-}" ] && [ -n "${AUG_URL:-}" ]; then
-        echo "Adding Augment MCP to Codex..."
+        echo "[ai-codex][augment-mcp] adding"
         codex mcp add codebase-retrieval --env "AUGMENT_API_TOKEN=$AUG_TOKEN" --env "AUGMENT_API_URL=$AUG_URL" -- auggie --mcp --mcp-auto-workspace || echo "[ai-codex][warning] Augment MCP addition failed"
     else
         echo "[ai-codex][warning] Augment token not found, skipping MCP registration (run 'auggie login' first)"
     fi
 else
-    echo "Augment MCP: already configured"
+    echo "[ai-codex][augment-mcp] already configured"
 fi
 
 # 초기 설정 및 검증
 mkdir -p "$HOME/.codex"
 if [ ! -f "$HOME/.codex/.profile-initialized" ]; then
-    echo "Initializing oh-my-codex..."
+    echo "[ai-codex][oh-my-codex] initializing"
     if omx setup 2>/dev/null && omx doctor 2>/dev/null; then
         touch "$HOME/.codex/.profile-initialized"
     else
@@ -58,4 +58,4 @@ if [ ! -f "$HOME/.codex/.profile-initialized" ]; then
     fi
 fi
 
-echo "[ai-codex] done"
+echo "[ai-codex][done]"

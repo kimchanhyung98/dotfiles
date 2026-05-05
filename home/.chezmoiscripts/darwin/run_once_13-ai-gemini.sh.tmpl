@@ -8,19 +8,19 @@ exit 0
 
 set -eufo pipefail
 
-echo "[ai-gemini]"
+echo "[ai-gemini][start]"
 
 # SuperGemini
 # - Gemini CLI 확장 프레임워크 (슬래시 명령어, AI 에이전트 페르소나)
 if ! command -v supergemini &>/dev/null; then
-    echo "Installing SuperGemini..."
+    echo "[ai-gemini][supergemini] installing"
     if pipx install supergemini; then
         SuperGemini install --force --yes || echo "[ai-gemini][warning] SuperGemini post-install setup failed"
     else
         echo "[ai-gemini][warning] SuperGemini installation failed (requires pipx)"
     fi
 else
-    echo "SuperGemini: already installed"
+    echo "[ai-gemini][supergemini] already installed"
 fi
 
 # superpowers for Gemini
@@ -28,9 +28,9 @@ fi
 GEMINI_SKILLS_DIR="$HOME/.gemini/skills/superpowers"
 
 if [ -d "$HOME/superpowers/skills" ] && [ ! -d "$GEMINI_SKILLS_DIR" ]; then
-    echo "Copying superpowers to Gemini skills..."
+    echo "[ai-gemini][superpowers] copying skills"
     mkdir -p "$(dirname "$GEMINI_SKILLS_DIR")"
     cp -r "$HOME/superpowers/skills" "$GEMINI_SKILLS_DIR"
 fi
 
-echo "[ai-gemini] done"
+echo "[ai-gemini][done]"
