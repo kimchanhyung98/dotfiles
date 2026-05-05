@@ -3,7 +3,7 @@
 # macOS 전용 파일 (macOS가 아닌 경우 무시)
 .chezmoiscripts/darwin/**
 Brewfile
-dot_config/cmux/**
+.config/cmux/**
 {{ end }}
 
 {{ if ne .chezmoi.os "linux" }}
