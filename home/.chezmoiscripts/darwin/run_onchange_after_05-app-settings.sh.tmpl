@@ -35,6 +35,7 @@ if [ -f "$STATS_CONFIG" ]; then
     STATS_ACCESS_TOKEN="$(defaults read eu.exelban.Stats access_token 2>/dev/null || true)"
     STATS_REFRESH_TOKEN="$(defaults read eu.exelban.Stats refresh_token 2>/dev/null || true)"
 
+    killall Stats 2>/dev/null || true
     defaults import eu.exelban.Stats "$STATS_CONFIG"
 
     if [ -n "$STATS_REMOTE_ID" ]; then
