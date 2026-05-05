@@ -52,7 +52,8 @@ MANAGED_PATHS="$(chezmoi managed --include=files 2>/dev/null || true)"
 IGNORE_FAIL=0
 for target in \
     "Brewfile" \
-    ".config/cmux/settings.json"; do
+    ".config/cmux/settings.json" \
+    ".config/rectangle/RectangleConfig.json"; do
     if printf '%s\n' "$MANAGED_PATHS" | grep -Fxq "$target"; then
         echo "    FAIL: $target is managed on Linux"
         IGNORE_FAIL=$((IGNORE_FAIL + 1))

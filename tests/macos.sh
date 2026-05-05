@@ -92,6 +92,33 @@ else
 fi
 rm -f "$rendered_cmux_script" "$cmux_script_err"
 
+# --- 1.3. macOS 앱 설정 자동 적용 검증 ---
+section "macOS app settings automation"
+RECTANGLE_CONFIG_SOURCE="$REPO_DIR/home/dot_config/rectangle/RectangleConfig.json"
+APP_SETTINGS_SCRIPT_SOURCE="$REPO_DIR/home/.chezmoiscripts/darwin/run_onchange_after_05-app-settings.sh.tmpl"
+
+if [ ! -f "$RECTANGLE_CONFIG_SOURCE" ]; then
+    fail "Rectangle config source is missing"
+elif ! command -v jq &>/dev/null; then
+    warn "jq not installed, skipping Rectangle JSON validation"
+elif jq empty "$RECTANGLE_CONFIG_SOURCE" >/dev/null 2>&1; then
+    pass "Rectangle config JSON is valid"
+else
+    fail "Rectangle config JSON is invalid"
+fi
+
+rendered_app_script="$(mktemp -p "$TMPHOME")"
+app_script_err="$(mktemp -p "$TMPHOME")"
+if [ -f "$APP_SETTINGS_SCRIPT_SOURCE" ] \
+   && cz execute-template < "$APP_SETTINGS_SCRIPT_SOURCE" > "$rendered_app_script" 2>"$app_script_err" \
+   && bash -n "$rendered_app_script" \
+   && grep -q 'Application Support/Rectangle/RectangleConfig.json' "$rendered_app_script"; then
+    pass "app settings darwin script imports Rectangle settings"
+else
+    fail "app settings darwin script is missing Rectangle import (stderr: $(cat "$app_script_err"))"
+fi
+rm -f "$rendered_app_script" "$app_script_err"
+
 # --- 1.5. Zsh 설정 회귀 검증 ---
 section "Zsh config regression"
 if bash "$REPO_DIR/tests/zsh-config.sh"; then

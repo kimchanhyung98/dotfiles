@@ -4,6 +4,7 @@
 .chezmoiscripts/darwin/**
 Brewfile
 .config/cmux/**
+.config/rectangle/**
 {{ end }}
 
 {{ if ne .chezmoi.os "linux" }}
