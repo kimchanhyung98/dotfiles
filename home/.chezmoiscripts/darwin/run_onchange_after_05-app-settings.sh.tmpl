@@ -1,0 +1,66 @@
+#!/bin/bash
+#
+# App settings: Rectangle, Stats
+#
+# Rectangle config hash: {{ include "dot_config/rectangle/RectangleConfig.json" | sha256sum }}
+# Stats config hash: {{ include "dot_config/stats/Stats.plist" | sha256sum }}
+
+{{ if ne .chezmoi.os "darwin" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "[app-settings][start]"
+
+RECTANGLE_CONFIG="$HOME/.config/rectangle/RectangleConfig.json"
+RECTANGLE_IMPORT="$HOME/Library/Application Support/Rectangle/RectangleConfig.json"
+STATS_CONFIG="$HOME/.config/stats/Stats.plist"
+STATS_TEMP_DIR=""
+
+trap 'if [ -n "$STATS_TEMP_DIR" ]; then rm -rf "$STATS_TEMP_DIR"; fi' EXIT
+
+# Rectangle
+# - Rectangle reads this file on next launch, then renames/removes it.
+if [ -f "$RECTANGLE_CONFIG" ]; then
+    echo "[app-settings][rectangle] stage import config"
+    mkdir -p "$(dirname "$RECTANGLE_IMPORT")"
+    install -m 0644 "$RECTANGLE_CONFIG" "$RECTANGLE_IMPORT"
+else
+    echo "[app-settings][warning] Rectangle config not found"
+fi
+
+# Stats
+# - Preserve remote credentials managed by the app, then import baseline settings.
+if [ -f "$STATS_CONFIG" ]; then
+    echo "[app-settings][stats] import defaults"
+    killall Stats 2>/dev/null || true
+
+    STATS_TEMP_DIR="$(mktemp -d)"
+    chmod 0700 "$STATS_TEMP_DIR"
+    STATS_CURRENT_PLIST="$STATS_TEMP_DIR/current.plist"
+    STATS_IMPORT_PLIST="$STATS_TEMP_DIR/import.plist"
+    cp "$STATS_CONFIG" "$STATS_IMPORT_PLIST"
+    chmod 0600 "$STATS_IMPORT_PLIST"
+
+    if defaults export eu.exelban.Stats "$STATS_CURRENT_PLIST" 2>/dev/null; then
+        chmod 0600 "$STATS_CURRENT_PLIST"
+        for key in remote_id access_token refresh_token; do
+            key_file="$STATS_TEMP_DIR/$key"
+            if plutil -extract "$key" raw -expect string -o "$key_file" "$STATS_CURRENT_PLIST" 2>/dev/null; then
+                chmod 0600 "$key_file"
+                /usr/libexec/PlistBuddy -c "Delete :$key" "$STATS_IMPORT_PLIST" 2>/dev/null || true
+                /usr/libexec/PlistBuddy -c "Add :$key string" "$STATS_IMPORT_PLIST"
+                /usr/libexec/PlistBuddy -c "Import :$key \"$key_file\"" "$STATS_IMPORT_PLIST"
+            fi
+        done
+    fi
+
+    defaults import eu.exelban.Stats "$STATS_IMPORT_PLIST"
+    rm -rf "$STATS_TEMP_DIR"
+    STATS_TEMP_DIR=""
+else
+    echo "[app-settings][warning] Stats config not found"
+fi
+
+echo "[app-settings][done]"

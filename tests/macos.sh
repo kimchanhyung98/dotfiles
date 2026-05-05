@@ -92,6 +92,53 @@ else
 fi
 rm -f "$rendered_cmux_script" "$cmux_script_err"
 
+# --- 1.3. macOS 앱 설정 자동 적용 검증 ---
+section "macOS app settings automation"
+RECTANGLE_CONFIG_SOURCE="$REPO_DIR/home/dot_config/rectangle/RectangleConfig.json"
+STATS_CONFIG_SOURCE="$REPO_DIR/home/dot_config/stats/Stats.plist"
+APP_SETTINGS_SCRIPT_SOURCE="$REPO_DIR/home/.chezmoiscripts/darwin/run_onchange_after_05-app-settings.sh.tmpl"
+STATS_EXCLUDED_KEYS='NSOSPLastRootDirectory|remote_id|access_token|refresh_token'
+
+if [ ! -f "$RECTANGLE_CONFIG_SOURCE" ]; then
+    fail "Rectangle config source is missing"
+elif ! command -v jq &>/dev/null; then
+    warn "jq not installed, skipping Rectangle JSON validation"
+elif jq empty "$RECTANGLE_CONFIG_SOURCE" >/dev/null 2>&1; then
+    pass "Rectangle config JSON is valid"
+else
+    fail "Rectangle config JSON is invalid"
+fi
+
+if [ -f "$STATS_CONFIG_SOURCE" ] && plutil -lint "$STATS_CONFIG_SOURCE" >/dev/null 2>&1; then
+    pass "Stats plist is valid"
+else
+    fail "Stats plist is missing or invalid"
+fi
+
+if [ -f "$STATS_CONFIG_SOURCE" ] \
+   && ! plutil -p "$STATS_CONFIG_SOURCE" | grep -Eq "$STATS_EXCLUDED_KEYS"; then
+    pass "Stats plist excludes file dialog state and remote credentials"
+else
+    fail "Stats plist contains file dialog state or remote credentials"
+fi
+
+rendered_app_script="$(mktemp -p "$TMPHOME")"
+app_script_err="$(mktemp -p "$TMPHOME")"
+if [ -f "$APP_SETTINGS_SCRIPT_SOURCE" ] \
+   && cz execute-template < "$APP_SETTINGS_SCRIPT_SOURCE" > "$rendered_app_script" 2>"$app_script_err" \
+   && bash -n "$rendered_app_script" \
+   && grep -q 'Application Support/Rectangle/RectangleConfig.json' "$rendered_app_script" \
+   && grep -q 'defaults import eu.exelban.Stats' "$rendered_app_script" \
+   && grep -q 'PlistBuddy' "$rendered_app_script" \
+   && grep -q 'remote_id' "$rendered_app_script" \
+   && ! grep -q 'defaults write eu.exelban.Stats .*access_token' "$rendered_app_script" \
+   && ! grep -q 'defaults write eu.exelban.Stats .*refresh_token' "$rendered_app_script"; then
+    pass "app settings darwin script imports Rectangle and Stats settings"
+else
+    fail "app settings darwin script is missing or incomplete (stderr: $(cat "$app_script_err"))"
+fi
+rm -f "$rendered_app_script" "$app_script_err"
+
 # --- 1.5. Zsh 설정 회귀 검증 ---
 section "Zsh config regression"
 if bash "$REPO_DIR/tests/zsh-config.sh"; then

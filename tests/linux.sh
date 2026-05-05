@@ -46,6 +46,27 @@ else
     fail "$TMPL_FAIL template(s) failed to render"
 fi
 
+# --- 2.2. OS별 ignore 검증 ---
+section "OS-specific ignores"
+MANAGED_PATHS="$(chezmoi managed --include=files 2>/dev/null || true)"
+IGNORE_FAIL=0
+for target in \
+    "Brewfile" \
+    ".config/cmux/settings.json" \
+    ".config/rectangle/RectangleConfig.json" \
+    ".config/stats/Stats.plist"; do
+    if printf '%s\n' "$MANAGED_PATHS" | grep -Fxq "$target"; then
+        echo "    FAIL: $target is managed on Linux"
+        IGNORE_FAIL=$((IGNORE_FAIL + 1))
+    fi
+done
+
+if [ "$IGNORE_FAIL" -eq 0 ]; then
+    pass "macOS-only files are ignored on Linux"
+else
+    fail "$IGNORE_FAIL macOS-only file(s) managed on Linux"
+fi
+
 # --- 2.5. Zsh 설정 회귀 검증 ---
 section "Zsh config regression"
 if bash "$HOME/tests/zsh-config.sh"; then

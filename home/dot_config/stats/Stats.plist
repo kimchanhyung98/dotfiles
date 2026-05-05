@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Battery_notifications_high</key>
+	<string></string>
+	<key>Battery_notifications_low</key>
+	<string>low</string>
+	<key>Battery_state</key>
+	<false/>
+	<key>CPU_state</key>
+	<false/>
+	<key>Disk_state</key>
+	<false/>
+	<key>LaunchAtLoginNext</key>
+	<true/>
+	<key>NSNavPanelExpandedSizeForOpenMode</key>
+	<string>{880, 448}</string>
+	<key>NSStatusItem Preferred Position Network_speed</key>
+	<real>348</real>
+	<key>NSStatusItem Preferred Position RAM_memory</key>
+	<real>270</real>
+	<key>NSStatusItem Preferred Position Sensors_sensors</key>
+	<real>228</real>
+	<key>NSToolbar Configuration eu.exelban.Stats.Settings.Toolbar</key>
+	<dict>
+		<key>TB Display Mode</key>
+		<integer>1</integer>
+		<key>TB Icon Size Mode</key>
+		<integer>1</integer>
+		<key>TB Is Shown</key>
+		<true/>
+		<key>TB Size Mode</key>
+		<integer>1</integer>
+	</dict>
+	<key>NSWindow Frame eu.exelban.Stats.Settings.WindowFrame</key>
+	<string>504 364 728 480 0 0 1728 1084 </string>
+	<key>Network_updateICMPInterval</key>
+	<integer>10</integer>
+	<key>RAM_barChart_position</key>
+	<integer>4</integer>
+	<key>RAM_label_position</key>
+	<integer>2</integer>
+	<key>RAM_lineChart_position</key>
+	<integer>3</integer>
+	<key>RAM_memory_position</key>
+	<integer>0</integer>
+	<key>RAM_mini_position</key>
+	<integer>1</integer>
+	<key>RAM_pieChart_position</key>
+	<integer>5</integer>
+	<key>RAM_state_position</key>
+	<integer>8</integer>
+	<key>RAM_tachometer_position</key>
+	<integer>6</integer>
+	<key>RAM_text_position</key>
+	<integer>7</integer>
+	<key>RAM_updateInterval</key>
+	<integer>10</integer>
+	<key>RAM_updateTopInterval</key>
+	<integer>10</integer>
+	<key>RAM_widget</key>
+	<string>memory</string>
+	<key>Sensors_barChart_position</key>
+	<integer>3</integer>
+	<key>Sensors_label_position</key>
+	<integer>2</integer>
+	<key>Sensors_mini_position</key>
+	<integer>1</integer>
+	<key>Sensors_sensors_alignment</key>
+	<string>center</string>
+	<key>Sensors_sensors_size</key>
+	<false/>
+	<key>Sensors_stack_position</key>
+	<integer>0</integer>
+	<key>Sensors_state</key>
+	<true/>
+	<key>Sensors_updateInterval</key>
+	<integer>10</integer>
+	<key>Sensors_widget</key>
+	<string>sensors</string>
+	<key>runAtLoginInitialized</key>
+	<true/>
+	<key>sensor_Average GPU</key>
+	<false/>
+	<key>sensor_Hottest CPU</key>
+	<true/>
+	<key>sensor_Hottest GPU</key>
+	<true/>
+	<key>sensor_PCI Power</key>
+	<false/>
+	<key>sensor_TB1T</key>
+	<false/>
+	<key>sensor_TB2T</key>
+	<false/>
+	<key>sensor_TW0P</key>
+	<false/>
+	<key>sensor_TaLP</key>
+	<false/>
+	<key>sensor_TaRF</key>
+	<false/>
+	<key>sensor_Tm02</key>
+	<false/>
+	<key>setupProcess</key>
+	<true/>
+	<key>support_ts</key>
+	<integer>1776942994</integer>
+	<key>updater_check_ts</key>
+	<integer>1776942994</integer>
+	<key>version</key>
+	<string>2.12.11</string>
+</dict>
+</plist>
