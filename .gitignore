@@ -1,5 +1,3 @@
-# @todo
-
 # Distribution / packaging
 .Python
 __pycache__/
@@ -133,12 +131,18 @@ Icon?
 $RECYCLE.BIN/
 
 # AI Agent
-.agents/*
-.augment/*
+.aider*
+.air/*
 .amazonq/*
+.amp/*
+.antigravity/*
+.augment/*
+.cline/*
 .codebuddy/*
+.crush/logs/
 .cursor/*
-.gemini/*
+.devin/*
+.goose/*
 .kilocode/*
 .opencode/*
 .qwen/*
@@ -148,19 +152,19 @@ $RECYCLE.BIN/
 # Claude
 **/CLAUDE.md
 !/CLAUDE.md
-.claude/commands/speckit.*
-.claude/hooks/.permissions-checked
-.claude/memory/*
-!.claude/memory/.gitkeep
-.claude/plans
-.claude/settings.local.json
-.claude/scheduled_tasks.lock
-.remember
+.claude/*
+!.claude/settings.json
+!.claude/hookify.*.md
 
 # Codex
-.codex/commands/speckit.*
-.codex/memory/*
-!.codex/memory/.gitkeep
+.agents/*
+.codex/*
+!.codex/config.toml
+
+# Gemini
+.gemini/*
+!.gemini/GEMINI.md
+!.gemini/settings.json
 
 # GitHub
 .github/agents/*
@@ -178,3 +182,5 @@ specs/
 
 # etc
 .cmux
+.omx
+.remember
