@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# AI Tools and extensions (Linux minimal): claude, codex, oh-my-codex, opencode, oh-my-opencode, gemini
+# AI Tools and extensions (Linux minimal): claude, codex, hermes, oh-my-codex, opencode, oh-my-opencode, gemini
 # Runs once on first setup
 
 {{ if ne .chezmoi.os "linux" }}
@@ -75,6 +75,21 @@ if ! command -v gemini &>/dev/null; then
     npm install -g @google/gemini-cli || echo "[ai-tools][warning] Gemini CLI install failed"
 else
     echo "[ai-tools][gemini] already installed"
+fi
+
+# Hermes Agent
+# - Nous Research Hermes 터미널 AI 에이전트
+if ! command -v hermes &>/dev/null; then
+    echo "[ai-tools][hermes] installing"
+    installer=$(mktemp)
+    if curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh -o "$installer"; then
+        bash "$installer" || echo "[ai-tools][warning] Hermes install failed"
+    else
+        echo "[ai-tools][warning] Hermes download failed"
+    fi
+    rm -f "$installer"
+else
+    echo "[ai-tools][hermes] already installed ($(hermes --version 2>/dev/null || echo 'unknown'))"
 fi
 
 echo "[ai-tools][done]"
