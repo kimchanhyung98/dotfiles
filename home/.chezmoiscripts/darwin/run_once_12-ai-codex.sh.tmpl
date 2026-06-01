@@ -19,6 +19,19 @@ else
     echo "[ai-codex][oh-my-codex] already installed"
 fi
 
+# CodeGraph MCP
+# - Codex CLI용 로컬 코드 인텔리전스 서버
+if ! codex mcp list 2>/dev/null | grep -q "codegraph"; then
+    if command -v codegraph &>/dev/null; then
+        echo "[ai-codex][codegraph-mcp] adding"
+        codex mcp add codegraph -- codegraph serve --mcp || echo "[ai-codex][warning] CodeGraph MCP addition failed"
+    else
+        echo "[ai-codex][warning] CodeGraph not found, skipping MCP registration"
+    fi
+else
+    echo "[ai-codex][codegraph-mcp] already configured"
+fi
+
 # superpowers for Codex
 # - ~/superpowers에서 Codex 스킬 경로로 복사 (개별 커스텀 가능)
 CODEX_SKILLS_DIR="$HOME/.agents/skills/superpowers"
