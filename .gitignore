@@ -157,6 +157,7 @@ $RECYCLE.BIN/
 .claude/*
 !.claude/settings.json
 !.claude/hookify.*.md
+!.claude/skills
 
 # Codex
 .agents/*
@@ -164,6 +165,7 @@ $RECYCLE.BIN/
 !.codex/config.toml
 !.codex/hooks.json
 !.codex/hooks
+!.codex/skills
 
 # Gemini
 .gemini/*
@@ -178,11 +180,6 @@ $RECYCLE.BIN/
 # Agent-OS
 .agent-os/
 agent-os/
-
-# Spec-Kit
-.specify/
-.speckit/
-specs/
 
 # etc
 .cmux
