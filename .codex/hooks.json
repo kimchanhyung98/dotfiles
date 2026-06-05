@@ -1,0 +1,46 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^(Edit|Write|apply_patch)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.hooks/block_dependency_folder_edits.sh\"",
+            "timeout": 10,
+            "statusMessage": "Checking dependency folder edit"
+          }
+        ]
+      },
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.hooks/block_git_origin_push.sh\"",
+            "timeout": 10,
+            "statusMessage": "Checking git push origin"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.hooks/block_global_system_commands.sh\"",
+            "timeout": 10,
+            "statusMessage": "Checking global/system command"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.hooks/block_global_package_install.sh\"",
+            "timeout": 10,
+            "statusMessage": "Checking global package install"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.hooks/block_pipe_to_shell.sh\"",
+            "timeout": 10,
+            "statusMessage": "Checking pipe-to-shell"
+          }
+        ]
+      }
+    ]
+  }
+}
