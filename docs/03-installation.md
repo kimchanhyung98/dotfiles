@@ -74,8 +74,8 @@ chezmoi init --apply
 │   Bun (JavaScript/TypeScript 런타임)
 │
 ├─ 10 ai-core
-│   Claude Code, Codex CLI, Gemini CLI, Copilot CLI, superpowers
-│   Claude Code(curl 스크립트), Codex·Gemini·Copilot(npm) 설치, superpowers를 ~/superpowers에 clone
+│   Claude Code, Codex CLI, Gemini CLI, Copilot CLI, Hermes Agent, superpowers
+│   Claude Code·Hermes(curl 스크립트), Codex·Gemini·Copilot(npm) 설치, superpowers를 ~/superpowers에 clone
 │
 ├─ 11 ai-claude
 │   SuperClaude (플러그인·MCP는 설정 파일로 관리)
@@ -125,7 +125,7 @@ chezmoi init --apply
 │   Git 사용자 설정, SSH 기초 설정
 │
 ├─ 04 ai-tools
-│   claude, codex, oh-my-codex, opencode, oh-my-opencode,
+│   claude, codex, hermes, oh-my-codex, opencode, oh-my-opencode,
 │   gemini
 │
 ├─ 05 system-baseline
