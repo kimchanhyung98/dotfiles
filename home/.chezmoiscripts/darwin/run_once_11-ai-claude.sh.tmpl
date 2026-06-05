@@ -23,6 +23,20 @@ else
     echo "[ai-claude][superclaude] already installed"
 fi
 
+# CodeGraph MCP
+# - Claude Code용 로컬 코드 인텔리전스 서버
+if ! claude mcp list 2>/dev/null | grep -q "codegraph"; then
+    if command -v codegraph &>/dev/null; then
+        echo "[ai-claude][codegraph-mcp] adding"
+        MCP_JSON=$(jq -n '{type:"stdio",command:"codegraph",args:["serve","--mcp"]}')
+        claude mcp add-json codegraph --scope user "$MCP_JSON" || echo "[ai-claude][warning] CodeGraph MCP addition failed"
+    else
+        echo "[ai-claude][warning] CodeGraph not found, skipping MCP registration"
+    fi
+else
+    echo "[ai-claude][codegraph-mcp] already configured"
+fi
+
 # Augment Context Engine MCP
 # - credentials.json 에서 토큰을 읽어 env 포함 (토큰 없으면 등록하지 않음)
 if ! claude mcp list 2>/dev/null | grep -q "auggie"; then

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# AI Tools and extensions (Linux minimal): claude, codex, oh-my-codex, opencode, oh-my-opencode, gemini
+# AI Tools and extensions (Linux minimal): claude, codex, codegraph, oh-my-codex, opencode, oh-my-opencode, gemini
 # Runs once on first setup
 
 {{ if ne .chezmoi.os "linux" }}
@@ -41,9 +41,31 @@ else
     echo "[ai-tools][codex] already installed"
 fi
 
+# CodeGraph
+# - Claude Code / Codex 공통 코드 인텔리전스 MCP 서버
+if ! command -v codegraph &>/dev/null; then
+    echo "[ai-tools][codegraph] installing"
+    npm install -g @colbymchenry/codegraph || echo "[ai-tools][warning] CodeGraph install failed"
+else
+    echo "[ai-tools][codegraph] already installed"
+fi
+
+# CodeGraph MCP (Claude)
+# - Claude Code용 로컬 코드 인텔리전스 서버 등록 (Codex는 config.toml로 선언적 관리)
+if command -v claude &>/dev/null && command -v codegraph &>/dev/null; then
+    if ! claude mcp list 2>/dev/null | grep -q "codegraph"; then
+        echo "[ai-tools][codegraph-mcp] adding"
+        claude mcp add-json codegraph --scope user '{"type":"stdio","command":"codegraph","args":["serve","--mcp"]}' || echo "[ai-tools][warning] CodeGraph MCP addition failed"
+    else
+        echo "[ai-tools][codegraph-mcp] already configured"
+    fi
+else
+    echo "[ai-tools][codegraph-mcp] claude or codegraph not found, skipping MCP registration"
+fi
+
 # oh-my-codex
 # - Codex CLI 확장 프레임워크
-if ! command -v oh-my-codex &>/dev/null; then
+if ! command -v omx &>/dev/null; then
     echo "[ai-tools][oh-my-codex] installing"
     npm install -g oh-my-codex || echo "[ai-tools][warning] oh-my-codex install failed"
 else

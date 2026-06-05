@@ -50,7 +50,13 @@ model_reasoning_summary = "auto"
 # 지침 Override
 ################################################################################
 # AGENTS.md 앞에 추가로 주입되는 개발자 지침입니다. 기본값: unset.
-#developer_instructions = ""
+# 기본 지시사항 (andrej-karpathy-skills 4원칙)
+developer_instructions = """
+Think Before Coding: Understand the full context before writing code.
+Simplicity First: Choose the simplest solution and avoid unnecessary complexity.
+Surgical Changes: Minimize change scope and don't modify unrelated code.
+Goal-Driven Execution: Focus on the user's goal and prevent unnecessary expansion.
+"""
 # 히스토리 compaction prompt의 인라인 override입니다. 기본값: unset.
 #compact_prompt = ""
 # 기본 commit 공동 작성자 trailer를 바꿉니다. 이 설정은
@@ -603,3 +609,19 @@ fast_mode = true
 #[windows]
 # Native Windows sandbox mode입니다(Windows 전용): unelevated | elevated
 #sandbox = "unelevated"
+
+# MCP servers
+[mcp_servers.openai_developer_docs]
+command = "npx"
+args = ["-y", "mcp-remote", "https://developers.openai.com/mcp"]
+enabled = true
+
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp@latest"]
+enabled = true
+
+[mcp_servers.codegraph]
+command = "codegraph"
+args = ["serve", "--mcp"]
+enabled = true
