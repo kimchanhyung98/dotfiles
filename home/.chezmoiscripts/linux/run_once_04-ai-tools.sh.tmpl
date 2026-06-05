@@ -50,6 +50,19 @@ else
     echo "[ai-tools][codegraph] already installed"
 fi
 
+# CodeGraph MCP (Claude)
+# - Claude Code용 로컬 코드 인텔리전스 서버 등록 (Codex는 config.toml로 선언적 관리)
+if command -v claude &>/dev/null && command -v codegraph &>/dev/null; then
+    if ! claude mcp list 2>/dev/null | grep -q "codegraph"; then
+        echo "[ai-tools][codegraph-mcp] adding"
+        claude mcp add-json codegraph --scope user '{"type":"stdio","command":"codegraph","args":["serve","--mcp"]}' || echo "[ai-tools][warning] CodeGraph MCP addition failed"
+    else
+        echo "[ai-tools][codegraph-mcp] already configured"
+    fi
+else
+    echo "[ai-tools][codegraph-mcp] claude or codegraph not found, skipping MCP registration"
+fi
+
 # oh-my-codex
 # - Codex CLI 확장 프레임워크
 if ! command -v omx &>/dev/null; then
