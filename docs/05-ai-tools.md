@@ -103,7 +103,7 @@ Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록
 |---------------------|----------------|-------------------------------------------------------------------------------------------------|
 | context7            | 라이브러리 공식 문서 조회 | resolve-library-id로 라이브러리를 식별한 뒤 get-library-docs로 공식 문서와 코드 예제를 검색. 외부 라이브러리 사용 시 최신 공식 패턴을 참조 |
 | sequential-thinking | 체계적 다단계 분석     | 복잡한 문제를 구조화된 사고 단계로 분해하여 분석. 디버깅, 아키텍처 설계, 코드 리뷰 등 다단계 추론이 필요한 작업에 활용                           |
-| codegraph           | 코드 그래프 인텔리전스   | 로컬 knowledge graph를 통해 symbol, callers, callees, impact, context를 직접 조회한다 |
+| codegraph           | 코드 그래프 인텔리전스   | 로컬 knowledge graph를 통해 explore, search, callers, callees, impact, node, files, status를 조회한다 |
 
 ## Codex
 
@@ -129,7 +129,8 @@ Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록
 | 팀 모드      | tmux 기반 병렬 워커 세션                             | tmux 세션으로 여러 Codex 워커를 병렬 실행하여 작업 분산 처리               |
 | MCP 서버    | 상태, 메모리, 코드 인텔리전스, 트레이싱 4종                   | oh-my-codex 자체 MCP 서버. 작업 상태 추적, 메모리 관리, 코드 분석, 실행 추적 |
 
-superpowers도 Codex에 설치된다 (~/superpowers에서 copy). karpathy 지침은 config.toml의 모델 지침으로 적용한다. CodeGraph는 `codegraph serve --mcp`로 연결한다.
+superpowers도 Codex에 설치된다 (~/superpowers에서 copy). karpathy 지침은 config.toml의 모델 지침으로 적용한다. CodeGraph는 `codegraph serve --mcp`로 연결하며,
+프로젝트별 인덱스는 해당 프로젝트에서 `codegraph init -i`로 생성한다.
 
 ## OpenCode
 

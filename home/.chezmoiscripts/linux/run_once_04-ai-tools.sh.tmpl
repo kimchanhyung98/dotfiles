@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# AI Tools and extensions (Linux minimal): claude, codex, oh-my-codex, opencode, oh-my-opencode, gemini
+# AI Tools and extensions (Linux minimal): claude, codex, codegraph, oh-my-codex, opencode, oh-my-opencode, gemini
 # Runs once on first setup
 
 {{ if ne .chezmoi.os "linux" }}
@@ -39,6 +39,15 @@ if ! command -v codex &>/dev/null; then
     npm install -g @openai/codex || echo "[ai-tools][warning] Codex install failed"
 else
     echo "[ai-tools][codex] already installed"
+fi
+
+# CodeGraph
+# - Claude Code / Codex 공통 코드 인텔리전스 MCP 서버
+if ! command -v codegraph &>/dev/null; then
+    echo "[ai-tools][codegraph] installing"
+    npm install -g @colbymchenry/codegraph || echo "[ai-tools][warning] CodeGraph install failed"
+else
+    echo "[ai-tools][codegraph] already installed"
 fi
 
 # oh-my-codex
