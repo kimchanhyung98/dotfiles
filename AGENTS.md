@@ -1,58 +1,77 @@
-## 워크플로우 오케스트레이션 (Workflow Orchestration)
+# AGENTS.md
 
-### 1. 기본 계획 모드 (Plan Node Default)
-- 사소하지 않은 모든 작업(3단계 이상의 절차 또는 아키텍처 결정)에 대해 계획 모드로 진입하십시오.
-- 상황이 잘못될 경우, 즉시 중단하고 다시 계획을 세우십시오. 무리하게 진행하지 마십시오.
-- 구축 단계뿐만 아니라 검증 단계에서도 계획 모드를 사용하십시오.
-- 모호함을 줄이기 위해 사전에 상세 사양을 작성하십시오.
+Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
 
-### 2. 보조 에이전트 전략 (Subagent Strategy)
-- 메인 컨텍스트 윈도우를 깨끗하게 유지하기 위해 보조 에이전트를 아낌없이 활용하십시오.
-- 조사, 탐색 및 병렬 분석 업무를 보조 에이전트에게 위임하십시오.
-- 복잡한 문제의 경우, 보조 에이전트를 통해 더 많은 연산 자원을 투입하십시오.
-- 집중적인 실행을 위해 보조 에이전트 하나당 하나의 작업만 할당하십시오.
+**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
-### 3. 자기 개선 루프 (Self-Improvement Loop)
-- 사용자의 교정이 있을 때마다 해당 패턴을 `tasks/lessons.md`에 업데이트하십시오.
-- 동일한 실수를 방지할 수 있는 자신만의 규칙을 작성하십시오.
-- 실수 빈도가 줄어들 때까지 이 교훈들을 끈질기게 반복 적용하십시오.
-- 세션 시작 시 관련 프로젝트에 대한 교훈들을 검토하십시오.
+## 1. Think Before Coding
 
-### 4. 완료 전 검증 (Verification Before Done)
-- 작동함을 증명하기 전까지는 절대로 작업을 완료로 표시하지 마십시오.
-- 관련이 있는 경우 메인 코드와 변경 사항 간의 동작 차이(Diff)를 확인하십시오.
-- 스스로에게 물으십시오: "스태프 엔지니어(Staff Engineer)가 이 결과물을 승인할 것인가?"
-- 테스트를 실행하고, 로그를 확인하며, 정확성을 입증하십시오.
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
 
-### 5. 우아함 추구 (균형 유지) (Demand Elegance)
-- 사소하지 않은 변경 사항의 경우: 잠시 멈추고 "더 우아한 방법이 있는가?"라고 자문하십시오.
-- 해결책이 임시방편처럼 느껴진다면: "지금 알고 있는 모든 것을 동원해 가장 우아한 솔루션을 구현"하십시오.
-- 간단하고 명확한 수정의 경우 이 단계를 건너뛰어 과잉 엔지니어링을 피하십시오.
-- 결과물을 제시하기 전에 스스로의 작업에 의문을 제기하십시오.
+Before implementing:
 
-### 6. 자율적 버그 수정 (Autonomous Bug Fixing)
-- 버그 보고를 받으면 즉시 수정하십시오. 일일이 지침을 구하지 마십시오.
-- 로그, 오류, 실패한 테스트를 지적하고 이를 해결하십시오.
-- 사용자의 컨텍스트 스위칭(문맥 전환)이 전혀 필요 없도록 하십시오.
-- 지시를 기다리지 말고 실패한 CI 테스트를 직접 수정하십시오.
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them - don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
 
-### 7. 요청한 작업만 수행 (Do Only What Is Asked)
-- 사용자가 명시적으로 요청한 작업만 수행하십시오. 범위를 임의로 확장하지 마십시오.
-- 테스트/확인 요청 시 결과를 보고하십시오. 코드 수정, 커밋, push는 별도 요청 없이 하지 마십시오.
-- 코드 변경이 필요하다고 판단되면, 직접 수정하지 말고 사용자에게 먼저 제안하십시오.
-- git commit, git push 등 원격 저장소에 영향을 주는 작업은 반드시 명시적 요청이 있을 때만 수행하십시오.
+## 2. Simplicity First
 
-## 작업 관리 (Task Management)
+**Minimum code that solves the problem. Nothing speculative.**
 
-1. **계획 우선**: 체크 가능한 항목이 포함된 계획을 `tasks/todo.md`에 작성하십시오.
-2. **계획 검증**: 구현을 시작하기 전에 계획을 확인받으십시오.
-3. **진행 추적**: 진행하면서 완료된 항목을 표시하십시오.
-4. **변경 사항 설명**: 각 단계에서 높은 수준의 요약을 제공하십시오.
-5. **결과 문서화**: `tasks/todo.md`에 리뷰 섹션을 추가하십시오.
-6. **교훈 기록**: 수정 사항이 발생하면 `tasks/lessons.md`를 업데이트하십시오.
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
 
-## 핵심 원칙 (Core Principles)
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
 
-- **단순성 우선**: 모든 변경 사항을 가능한 한 단순하게 만드십시오. 코드 영향도를 최소화하십시오.
-- **나태함 금지**: 근본 원인을 찾으십시오. 임시방편은 안 됩니다. 시니어 개발자 수준의 기준을 준수하십시오.
-- **최소 영향**: 변경 사항은 필요한 부분만 건드려야 합니다. 버그 도입을 방지하십시오.
+## 3. Surgical Changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it - don't delete it.
+
+When your changes create orphans:
+
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: Every changed line should trace directly to the user's request.
+
+## 4. Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
+```
+
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+## 5. Browser Automation
+
+Use `agent-browser` for web automation. Run `agent-browser --help` for all commands.
+
+Core workflow:
+
+1. `agent-browser open <url>` - Navigate to page
+2. `agent-browser snapshot -i` - Get interactive elements with refs (@e1, @e2)
+3. `agent-browser click @e1` / `fill @e2 "text"` - Interact using refs
+4. Re-snapshot after page changes
