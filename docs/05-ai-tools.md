@@ -70,24 +70,6 @@
 | 10-ai-core   | Claude Code (공식 설치 스크립트) | Claude Code CLI 바이너리 |
 | 11-ai-claude | SuperClaude (pipx)       | CLI 확장 프레임워크         |
 
-## Hermes
-
-**설치 (스크립트)**
-
-| 스크립트     | 내용                      | 설치 대상          |
-|----------|-------------------------|----------------|
-| 10-ai-core | Hermes Agent (curl)      | Hermes CLI 바이너리 |
-
-**설정 (home/ → ~/.hermes/)**
-
-| 파일/경로 | 역할 | 상세 |
-|------|----|----|
-| `~/.hermes/` | 실행 홈 디렉토리 | Hermes가 세션, 로그, 설정을 저장하는 기본 홈 |
-| `~/.hermes/.env` | API 키/비밀 | `hermes setup`이 채우는 환경 변수 파일 |
-| `~/.hermes/config.yaml` | 핵심 설정 | provider, tool, memory 설정을 저장하는 기본 구성 |
-
-초기 설정은 `hermes setup`으로 진행한다. 기본 설치만으로는 CLI가 준비되고, API 키와 provider 선택은 이후에 완료한다.
-
 **설정 (dot_claude/ → ~/.claude/)**
 
 | 파일                 | 배포 경로                     | 역할    | 상세                                                                                                                 |
@@ -121,6 +103,24 @@ Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록
 |---------------------|----------------|-------------------------------------------------------------------------------------------------|
 | context7            | 라이브러리 공식 문서 조회 | resolve-library-id로 라이브러리를 식별한 뒤 get-library-docs로 공식 문서와 코드 예제를 검색. 외부 라이브러리 사용 시 최신 공식 패턴을 참조 |
 | sequential-thinking | 체계적 다단계 분석     | 복잡한 문제를 구조화된 사고 단계로 분해하여 분석. 디버깅, 아키텍처 설계, 코드 리뷰 등 다단계 추론이 필요한 작업에 활용                           |
+
+## Hermes
+
+**설치 (스크립트)**
+
+| 스크립트     | 내용                      | 설치 대상          |
+|----------|-------------------------|----------------|
+| 10-ai-core | Hermes Agent (curl)      | Hermes CLI 바이너리 |
+
+**설정 (`hermes setup`이 생성 → ~/.hermes/)**
+
+| 파일/경로 | 역할 | 상세 |
+|------|----|----|
+| `~/.hermes/` | 실행 홈 디렉토리 | Hermes가 세션, 로그, 설정을 저장하는 기본 홈 |
+| `~/.hermes/.env` | API 키/비밀 | `hermes setup`이 채우는 환경 변수 파일 |
+| `~/.hermes/config.yaml` | 핵심 설정 | provider, tool, memory 설정을 저장하는 기본 구성 |
+
+초기 설정은 `hermes setup`으로 진행한다. chezmoi가 배포하는 설정 파일은 없으며, 기본 설치만으로 CLI가 준비되고 API 키와 provider 선택은 이후에 완료한다.
 
 ## Codex
 
