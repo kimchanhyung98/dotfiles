@@ -8,7 +8,7 @@
 
 ## 모듈화 기준
 
-- 코어 설치(10)에서 공식 AI CLI 4종을 설치하고, 프로바이더별 확장 스크립트(11~14)에서 MCP, 스킬, 플러그인을 독립 관리한다.
+- 코어 설치(10)에서 공식 AI CLI 5종을 설치하고, 프로바이더별 확장 스크립트(11~14)에서 MCP, 스킬, 플러그인을 독립 관리한다.
 - 공식 AI CLI(10번대)와 외부 오픈소스 도구(20번대)를 번호 대역으로 구분한다.
 - 서비스별 설정 파일(`settings.json`, `config.toml` 등)과 실행 스크립트(`ai-claude.sh`, `ai-codex.sh` 등)를 분리한다.
 - 인증, 프로필, 권한, 확장(플러그인/스킬) 항목을 독립적으로 관리하여, 하나의 변경이 다른 항목에 영향을 주지 않는다.
@@ -104,6 +104,24 @@ Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록
 | context7            | 라이브러리 공식 문서 조회 | resolve-library-id로 라이브러리를 식별한 뒤 get-library-docs로 공식 문서와 코드 예제를 검색. 외부 라이브러리 사용 시 최신 공식 패턴을 참조 |
 | sequential-thinking | 체계적 다단계 분석     | 복잡한 문제를 구조화된 사고 단계로 분해하여 분석. 디버깅, 아키텍처 설계, 코드 리뷰 등 다단계 추론이 필요한 작업에 활용                           |
 | codegraph           | 코드 그래프 인텔리전스   | 로컬 knowledge graph를 통해 explore, search, callers, callees, impact, node, files, status를 조회한다 |
+
+## Hermes
+
+**설치 (스크립트)**
+
+| 스크립트     | 내용                      | 설치 대상          |
+|----------|-------------------------|----------------|
+| 10-ai-core (macOS), 04-ai-tools (Linux) | Hermes Agent (curl)      | Hermes CLI 바이너리 |
+
+**설정 (`hermes setup`이 생성 → ~/.hermes/)**
+
+| 파일/경로 | 역할 | 상세 |
+|------|----|----|
+| `~/.hermes/` | 실행 홈 디렉토리 | Hermes가 세션, 로그, 설정을 저장하는 기본 홈 |
+| `~/.hermes/.env` | API 키/비밀 | `hermes setup`이 채우는 환경 변수 파일 |
+| `~/.hermes/config.yaml` | 핵심 설정 | model, tools, terminal, gateway, agent 등 비시크릿 설정을 저장하는 기본 구성 |
+
+설치 스크립트는 uv, Python, Node.js, ripgrep, ffmpeg 등 Hermes 런타임 의존성을 함께 준비할 수 있다. 초기 설정은 `hermes setup`으로 진행한다. chezmoi가 배포하는 설정 파일은 없으며, 기본 설치만으로 CLI가 준비되고 API 키와 provider 선택은 이후에 완료한다.
 
 ## Codex
 

@@ -62,6 +62,20 @@ else
     echo "[ai-core][copilot] already installed ($(copilot --version 2>/dev/null || echo 'unknown'))"
 fi
 
+# Hermes Agent
+if ! command -v hermes &>/dev/null; then
+    echo "[ai-core][hermes] installing"
+    installer=$(mktemp)
+    if curl -fsSL https://hermes-agent.nousresearch.com/install.sh -o "$installer"; then
+        bash "$installer" --non-interactive --skip-setup || echo "[ai-core][warning] Hermes installation failed"
+    else
+        echo "[ai-core][warning] Hermes download failed"
+    fi
+    rm -f "$installer"
+else
+    echo "[ai-core][hermes] already installed ($(hermes --version 2>/dev/null || echo 'unknown'))"
+fi
+
 # Augment Context Engine (auggie)
 # - 설치 → 로그인 → 토큰 저장 (각 AI 서비스 MCP 설정에서 참조)
 if ! command -v auggie &>/dev/null; then

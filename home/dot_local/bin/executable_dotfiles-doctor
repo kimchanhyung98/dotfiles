@@ -105,6 +105,7 @@ check "codegraph" "command -v codegraph"
 check "opencode" "command -v opencode"
 check "ollama" "command -v ollama"
 check "gemini" "command -v gemini"
+check "hermes" "command -v hermes"
 
 # AI Plugins
 section "AI Plugins"

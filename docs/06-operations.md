@@ -11,7 +11,7 @@
 | Terminal         | ghostty                                                                                             | Ghostty 터미널의 설치 여부 확인           |
 | Languages        | node, python3, go, rustc, php, ruby                                                                 | 프로그래밍 언어 런타임의 설치 여부와 버전 확인      |
 | Package Managers | brew, zb, pipx, bun                                                                                 | 패키지 관리자의 설치 여부 확인. zb는 zerobrew |
-| AI CLI           | claude, codex, codegraph, opencode, ollama, gemini                                                  | AI 도구 CLI의 설치 여부 확인             |
+| AI CLI           | claude, codex, codegraph, copilot, hermes, opencode, ollama, gemini                                 | AI 도구 CLI의 설치 여부 확인             |
 | AI 플러그인          | superpowers, everything-claude-code, claude-hud, claude-mem, oh-my-codex, oh-my-opencode            | 각 AI 도구의 확장 기능 설치 상태 확인         |
 | 스킬 디렉토리          | Claude, Codex, Copilot, OpenCode 4개 경로                                                              | 글로벌 스킬 디렉토리 존재 여부와 내용물 확인       |
 | AGENTS.md        | `~/AGENTS.md` 존재 여부                                                                                 | 공통 에이전트 지침 파일 배포 상태 확인          |
@@ -32,7 +32,7 @@
 | Languages      | dotnet, go, kotlin, node, openjdk, php, python, ruby, rust                                          |
 | Pkg Managers   | composer, mise, npm, pipx, uv, xcodes, yarn                                                         |
 | Runtime        | Bun                                                                                                 |
-| AI Core        | Claude Code, Codex CLI, Gemini CLI, Copilot CLI, CodeGraph                                          |
+| AI Core        | Claude Code, Codex CLI, Gemini CLI, Copilot CLI, Hermes Agent, CodeGraph                            |
 | Claude         | SuperClaude, superpowers, claude-hud, karpathy-skills, MCP 4종                                       |
 | Codex          | oh-my-codex, CodeGraph MCP, superpowers (copy)                                                      |
 | Gemini         | SuperGemini, superpowers (copy), MCP 3종                                                             |
@@ -41,7 +41,7 @@
 | Skills         | humanizer (Claude, Codex), superpowers (Claude 플러그인 + Codex/Gemini/Copilot/OpenCode copy)           |
 | Apps           | ghostty, docker, iterm2, chrome, rectangle, slack, figma 등                                          |
 | Shell          | Oh My Zsh + autosuggestions + syntax-highlighting                                                   |
-| Linux          | curl, git, vim, zsh, ghostty, 셸/Git baseline, claude, codex, opencode, gemini                       |
+| Linux          | curl, git, vim, zsh, ghostty, 셸/Git baseline, claude, codex, codegraph, hermes, oh-my-codex, opencode, oh-my-opencode, gemini |
 
 ## 운영 체크리스트
 
