@@ -37,6 +37,15 @@ else
     echo "[ai-core][codex] already installed ($(codex --version 2>/dev/null || echo 'unknown'))"
 fi
 
+# CodeGraph
+# - Claude Code / Codex 공통 코드 인텔리전스 MCP 서버
+if ! command -v codegraph &>/dev/null; then
+    echo "[ai-core][codegraph] installing"
+    npm install -g @colbymchenry/codegraph || echo "[ai-core][warning] CodeGraph installation failed"
+else
+    echo "[ai-core][codegraph] already installed ($(codegraph --version 2>/dev/null || echo 'unknown'))"
+fi
+
 # Gemini CLI
 if ! command -v gemini &>/dev/null; then
     echo "[ai-core][gemini] installing"

@@ -67,7 +67,7 @@
 
 | 스크립트         | 내용                       | 설치 대상                |
 |--------------|--------------------------|----------------------|
-| 10-ai-core   | Claude Code (공식 설치 스크립트) | Claude Code CLI 바이너리 |
+| 10-ai-core   | Claude Code (공식 설치 스크립트), CodeGraph | Claude Code / CodeGraph CLI 바이너리 |
 | 11-ai-claude | SuperClaude (pipx)       | CLI 확장 프레임워크         |
 
 **설정 (dot_claude/ → ~/.claude/)**
@@ -103,6 +103,7 @@ Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록
 |---------------------|----------------|-------------------------------------------------------------------------------------------------|
 | context7            | 라이브러리 공식 문서 조회 | resolve-library-id로 라이브러리를 식별한 뒤 get-library-docs로 공식 문서와 코드 예제를 검색. 외부 라이브러리 사용 시 최신 공식 패턴을 참조 |
 | sequential-thinking | 체계적 다단계 분석     | 복잡한 문제를 구조화된 사고 단계로 분해하여 분석. 디버깅, 아키텍처 설계, 코드 리뷰 등 다단계 추론이 필요한 작업에 활용                           |
+| codegraph           | 코드 그래프 인텔리전스   | 로컬 knowledge graph를 통해 explore, search, callers, callees, impact, node, files, status를 조회한다 |
 
 ## Hermes
 
@@ -128,14 +129,14 @@ Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록
 
 | 스크립트        | 내용                                                             | 설치 대상             |
 |-------------|----------------------------------------------------------------|-------------------|
-| 10-ai-core  | Codex CLI (npm)                                                | Codex CLI 바이너리    |
+| 10-ai-core  | Codex CLI (npm), CodeGraph (npm)                               | Codex CLI / CodeGraph 바이너리    |
 | 12-ai-codex | oh-my-codex (npm), superpowers (~/superpowers에서 copy), 프로필 초기화 | Codex 확장 환경 전체 구성 |
 
 **설정 (dot_codex/ → ~/.codex/)**
 
 | 파일               | 배포 경로                  | 역할    | 상세                                                                                                                                |
 |------------------|------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------|
-| config.toml.tmpl | `~/.codex/config.toml` | 핵심 설정 | 기본 모델(`gpt-5.5`), 승인 정책, 기본 프롬프트(karpathy 4원칙), MCP 서버 설정을 단일 파일에서 관리. 별도의 `permissions.toml`이나 `profiles.toml` 파일은 존재하지 않음 |
+| config.toml.tmpl | `~/.codex/config.toml` | 핵심 설정 | 기본 모델(`gpt-5.5`), 승인 정책, 기본 프롬프트(karpathy 4원칙), MCP 서버 설정을 단일 파일에서 관리. CodeGraph도 MCP 서버로 등록한다. 별도의 `permissions.toml`이나 `profiles.toml` 파일은 존재하지 않음 |
 
 **oh-my-codex 주요 기능**
 
@@ -146,7 +147,8 @@ Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록
 | 팀 모드      | tmux 기반 병렬 워커 세션                             | tmux 세션으로 여러 Codex 워커를 병렬 실행하여 작업 분산 처리               |
 | MCP 서버    | 상태, 메모리, 코드 인텔리전스, 트레이싱 4종                   | oh-my-codex 자체 MCP 서버. 작업 상태 추적, 메모리 관리, 코드 분석, 실행 추적 |
 
-superpowers도 Codex에 설치된다 (~/superpowers에서 copy). karpathy 지침은 config.toml의 모델 지침으로 적용한다.
+superpowers도 Codex에 설치된다 (~/superpowers에서 copy). karpathy 지침은 config.toml의 모델 지침으로 적용한다. CodeGraph는 `codegraph serve --mcp`로 연결하며,
+프로젝트별 인덱스는 해당 프로젝트에서 `codegraph init -i`로 생성한다.
 
 ## OpenCode
 
