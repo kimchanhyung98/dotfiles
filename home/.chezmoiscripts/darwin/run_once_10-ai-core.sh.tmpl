@@ -66,8 +66,8 @@ fi
 if ! command -v hermes &>/dev/null; then
     echo "[ai-core][hermes] installing"
     installer=$(mktemp)
-    if curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh -o "$installer"; then
-        bash "$installer" || echo "[ai-core][warning] Hermes installation failed"
+    if curl -fsSL https://hermes-agent.nousresearch.com/install.sh -o "$installer"; then
+        bash "$installer" --non-interactive --skip-setup || echo "[ai-core][warning] Hermes installation failed"
     else
         echo "[ai-core][warning] Hermes download failed"
     fi

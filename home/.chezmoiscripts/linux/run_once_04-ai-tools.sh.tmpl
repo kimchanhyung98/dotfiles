@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# AI Tools and extensions (Linux minimal): claude, codex, codegraph, hermes, oh-my-codex, opencode, oh-my-opencode, gemini
+# AI Tools and extensions (Linux): claude, codex, codegraph, hermes, oh-my-codex, opencode, oh-my-opencode, gemini
 # Runs once on first setup
 
 {{ if ne .chezmoi.os "linux" }}
@@ -104,8 +104,8 @@ fi
 if ! command -v hermes &>/dev/null; then
     echo "[ai-tools][hermes] installing"
     installer=$(mktemp)
-    if curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh -o "$installer"; then
-        bash "$installer" || echo "[ai-tools][warning] Hermes install failed"
+    if curl -fsSL https://hermes-agent.nousresearch.com/install.sh -o "$installer"; then
+        bash "$installer" --non-interactive --skip-setup || echo "[ai-tools][warning] Hermes install failed"
     else
         echo "[ai-tools][warning] Hermes download failed"
     fi

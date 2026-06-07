@@ -111,7 +111,7 @@ Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록
 
 | 스크립트     | 내용                      | 설치 대상          |
 |----------|-------------------------|----------------|
-| 10-ai-core | Hermes Agent (curl)      | Hermes CLI 바이너리 |
+| 10-ai-core (macOS), 04-ai-tools (Linux) | Hermes Agent (curl)      | Hermes CLI 바이너리 |
 
 **설정 (`hermes setup`이 생성 → ~/.hermes/)**
 
@@ -119,9 +119,9 @@ Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록
 |------|----|----|
 | `~/.hermes/` | 실행 홈 디렉토리 | Hermes가 세션, 로그, 설정을 저장하는 기본 홈 |
 | `~/.hermes/.env` | API 키/비밀 | `hermes setup`이 채우는 환경 변수 파일 |
-| `~/.hermes/config.yaml` | 핵심 설정 | provider, tool, memory 설정을 저장하는 기본 구성 |
+| `~/.hermes/config.yaml` | 핵심 설정 | model, tools, terminal, gateway, agent 등 비시크릿 설정을 저장하는 기본 구성 |
 
-초기 설정은 `hermes setup`으로 진행한다. chezmoi가 배포하는 설정 파일은 없으며, 기본 설치만으로 CLI가 준비되고 API 키와 provider 선택은 이후에 완료한다.
+설치 스크립트는 uv, Python, Node.js, ripgrep, ffmpeg 등 Hermes 런타임 의존성을 함께 준비할 수 있다. 초기 설정은 `hermes setup`으로 진행한다. chezmoi가 배포하는 설정 파일은 없으며, 기본 설치만으로 CLI가 준비되고 API 키와 provider 선택은 이후에 완료한다.
 
 ## Codex
 
