@@ -446,6 +446,29 @@ fast_mode = true
 #scopes = ["repo"] # 선택적 OAuth scope
 
 ################################################################################
+# 플러그인
+################################################################################
+# 설치된 플러그인의 활성화 상태를 제어합니다.
+
+[plugins."github@openai-curated"]
+enabled = true
+
+[plugins."codex-security@openai-curated"]
+enabled = true
+
+[plugins."build-web-apps@openai-curated"]
+enabled = true
+
+[plugins."openai-developers@openai-curated"]
+enabled = true
+
+[plugins."vercel@openai-curated"]
+enabled = true
+
+[plugins."cloudflare@openai-curated"]
+enabled = true
+
+################################################################################
 # 모델 Provider
 ################################################################################
 # 내장 provider:
