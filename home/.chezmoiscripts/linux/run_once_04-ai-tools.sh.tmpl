@@ -45,7 +45,12 @@ fi
 # - Claude Code / Codex 공통 코드 인텔리전스 MCP 서버
 if ! command -v codegraph &>/dev/null; then
     echo "[ai-tools][codegraph] installing"
-    npm install -g @colbymchenry/codegraph || echo "[ai-tools][warning] CodeGraph install failed"
+    NPM_CACHE_DIR="${TMPDIR:-/tmp}/dotfiles-npm-cache"
+    mkdir -p "$NPM_CACHE_DIR"
+    npm install -g @colbymchenry/codegraph@latest --cache "$NPM_CACHE_DIR" || echo "[ai-tools][warning] CodeGraph install failed"
+    if ! command -v codegraph &>/dev/null; then
+        echo "[ai-tools][warning] CodeGraph command still not found after installation"
+    fi
 else
     echo "[ai-tools][codegraph] already installed"
 fi
