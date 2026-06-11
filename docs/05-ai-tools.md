@@ -8,7 +8,7 @@
 
 ## 모듈화 기준
 
-- 코어 설치(10)에서 공식 AI CLI 5종을 설치하고, 프로바이더별 확장 스크립트(11~14)에서 MCP, 스킬, 플러그인을 독립 관리한다.
+- 코어 설치(10)에서 공식 AI CLI 5종을 설치하고, 프로바이더별 확장 스크립트(11~12, 20)에서 MCP, 플러그인을 독립 관리한다.
 - 공식 AI CLI(10번대)와 외부 오픈소스 도구(20번대)를 번호 대역으로 구분한다.
 - 서비스별 설정 파일(`settings.json`, `config.toml` 등)과 실행 스크립트(`ai-claude.sh`, `ai-codex.sh` 등)를 분리한다.
 - 인증, 프로필, 권한, 확장(플러그인/스킬) 항목을 독립적으로 관리하여, 하나의 변경이 다른 항목에 영향을 주지 않는다.
@@ -22,15 +22,13 @@
 |----------------|------------------------------------------------------------------------|-----------------------------------------------------------|-------------------------------------------|
 | Claude Code    | `~/.claude/skills/`                                                    | `.claude/skills/`                                         | `.chezmoiexternal.toml`로 humanizer 자동 동기화 |
 | Codex          | `~/.agents/skills/`                                                    | `.agents/skills/`                                         | `.chezmoiexternal.toml`로 humanizer 자동 동기화 |
-| GitHub Copilot | `~/.copilot/skills/`                                                   | `.github/skills/`, `.claude/skills/`                      | ai-copilot 스크립트에서 superpowers copy        |
-| OpenCode       | `~/.config/opencode/skills/`, `~/.claude/skills/`, `~/.agents/skills/` | `.opencode/skills/`, `.claude/skills/`, `.agents/skills/` | ai-opencode 스크립트에서 superpowers copy       |
+| GitHub Copilot | `~/.copilot/skills/`                                                   | `.github/skills/`, `.claude/skills/`                      | -                                          |
+| OpenCode       | `~/.config/opencode/skills/`, `~/.claude/skills/`, `~/.agents/skills/` | `.opencode/skills/`, `.claude/skills/`, `.agents/skills/` | -                                          |
 
 **스킬 소스**:
 
 - **humanizer**: AI 글쓰기 패턴 제거 스킬. AI 특유의 과도한 수식어, 반복 구조, 형식적 표현을 자연스러운 문장으로 교정한다. Claude와 Codex는 `.chezmoiexternal.toml`
   로 자동 배포된다.
-- **superpowers**: 브레인스토밍, TDD, 코드 리뷰, 서브에이전트 기반 개발 등 12종+ 스킬. ai-core(10)에서 ~/superpowers에 한 번 clone하고,
-  Codex/Gemini/Copilot/OpenCode 각 프로바이더 스크립트에서 도구별 스킬 경로로 복사하여 개별 커스텀 가능. Claude는 플러그인 마켓플레이스로 설치.
 - **andrej-karpathy-skills**: 코딩 행동 지침 4대 원칙. Claude에서는 플러그인 마켓플레이스로 설치하고, Codex에서는 config.toml의 모델 지침으로 적용한다.
 
 ## AGENTS.md
@@ -92,7 +90,6 @@ Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록
 
 | 플러그인                   | 역할            | 설치 방식       | 상세                                                                                                                                     |
 |------------------------|---------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------|
-| superpowers            | 구조화된 워크플로우    | 플러그인 마켓플레이스 | 브레인스토밍, TDD, 코드 리뷰, 서브에이전트 기반 개발 등 12종+ 스킬을 제공. 코드 작성 전 계획 수립, 검증 후 완료 선언 등 체계적 개발 프로세스를 강제                                            |
 | claude-hud             | 상태 표시줄        | 플러그인 마켓플레이스 | 컨텍스트 사용량, 현재 모델, Git 상태, 활성 도구, 에이전트, 진행률을 터미널 하단에 실시간 표시. 기본 statusline으로 설정. 설정은 자동 생성됨 (`~/.claude/plugins/claude-hud/config.json`) |
 | andrej-karpathy-skills | 코딩 행동 지침      | 플러그인 마켓플레이스 | Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution 4대 원칙을 Claude Code 세션에 자동 주입하여 코드 품질 기준선 유지             |
 
@@ -129,7 +126,7 @@ Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록
 | 스크립트        | 내용                                                             | 설치 대상             |
 |-------------|----------------------------------------------------------------|-------------------|
 | 10-ai-core  | Codex CLI (npm), CodeGraph (npm)                               | Codex CLI / CodeGraph 바이너리    |
-| 12-ai-codex | oh-my-codex (npm), superpowers (~/superpowers에서 copy), 프로필 초기화 | Codex 확장 환경 전체 구성 |
+| 12-ai-codex | oh-my-codex (npm), 프로필 초기화                                    | Codex 확장 환경 전체 구성 |
 
 **설정 (dot_codex/ → ~/.codex/)**
 
@@ -146,7 +143,7 @@ Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록
 | 팀 모드      | tmux 기반 병렬 워커 세션                             | tmux 세션으로 여러 Codex 워커를 병렬 실행하여 작업 분산 처리               |
 | MCP 서버    | 상태, 메모리, 코드 인텔리전스, 트레이싱 4종                   | oh-my-codex 자체 MCP 서버. 작업 상태 추적, 메모리 관리, 코드 분석, 실행 추적 |
 
-superpowers도 Codex에 설치된다 (~/superpowers에서 copy). karpathy 지침은 config.toml의 모델 지침으로 적용한다. CodeGraph는 `codegraph serve --mcp`로 연결하며,
+karpathy 지침은 config.toml의 모델 지침으로 적용한다. CodeGraph는 `codegraph serve --mcp`로 연결하며,
 프로젝트별 인덱스는 해당 프로젝트에서 `codegraph init -i`로 생성한다.
 
 ## OpenCode
@@ -155,7 +152,7 @@ superpowers도 Codex에 설치된다 (~/superpowers에서 copy). karpathy 지침
 
 | 스크립트           | 내용                                                                       | 설치 대상                |
 |----------------|--------------------------------------------------------------------------|----------------------|
-| 20-ai-opencode | OpenCode (npm), oh-my-opencode (npm), superpowers (~/superpowers에서 copy) | OpenCode 바이너리와 확장 기능 |
+| 20-ai-opencode | OpenCode (npm), oh-my-opencode (npm)                                     | OpenCode 바이너리와 확장 기능 |
 
 **설정 (dot_config/opencode/ → ~/.config/opencode/)**
 
@@ -163,7 +160,7 @@ superpowers도 Codex에 설치된다 (~/superpowers에서 copy). karpathy 지침
 |---------------------------|-------------------------------------------|-------|--------------------------------------------------------------|
 | opencode.json.tmpl        | `~/.config/opencode/opencode.json`        | 핵심 설정 | AI 프로바이더, 권한 정책, 에이전트 설정, MCP 서버 목록을 정의                      |
 | oh-my-opencode.jsonc.tmpl | `~/.config/opencode/oh-my-opencode.jsonc` | 확장 설정 | oh-my-opencode의 에이전트 오버라이드, 훅, 카테고리 설정. JSONC(주석 허용 JSON) 형식 |
-| plugins/                  | `~/.config/opencode/plugins/`             | 플러그인  | superpowers 등 OpenCode 플러그인 배포                               |
+| plugins/                  | `~/.config/opencode/plugins/`             | 플러그인  | OpenCode 플러그인 배포 경로                                         |
 | skills/                   | `~/.config/opencode/skills/`              | 스킬    | OpenCode 전용 스킬과 공유 스킬을 이 경로에 배포                              |
 
 **oh-my-opencode 주요 기능**
@@ -176,7 +173,6 @@ superpowers도 Codex에 설치된다 (~/superpowers에서 copy). karpathy 지침
 | MCP          | Context7, augment-context-engine | 외부 문서 검색(Context7), 코드 컨텍스트 분석(augment-context-engine)을 MCP 서버로 통합               |
 | LSP/AST-Grep | 결정론적 리팩토링 도구                     | LSP와 AST-Grep 기반 리팩토링. AI 추론이 아닌 구문 분석으로 동작                                      |
 
-superpowers도 OpenCode에 설치된다 (~/superpowers에서 copy).
 
 OpenCode는 프로젝트/글로벌 모두에서 `.opencode/skills/` 외에 `.claude/skills/`와 `.agents/skills/`도 자동 탐색한다. 별도 설정 없이 Claude, Codex와
 동일한 스킬을 자동으로 인식한다.
@@ -188,14 +184,13 @@ OpenCode는 프로젝트/글로벌 모두에서 `.opencode/skills/` 외에 `.cla
 | 스크립트          | 내용                                 | 설치 대상            |
 |---------------|------------------------------------|------------------|
 | 10-ai-core    | Copilot CLI (npm)                  | Copilot CLI 바이너리 |
-| 14-ai-copilot | superpowers (~/superpowers에서 copy) | Copilot 확장 환경 구성 |
 
 **설정 (dot_copilot/ → ~/.copilot/)**
 
 | 파일                   | 배포 경로                        | 역할     | 상세                                                       |
 |----------------------|------------------------------|--------|----------------------------------------------------------|
 | mcp-config.json.tmpl | `~/.copilot/mcp-config.json` | MCP 설정 | Copilot CLI의 MCP 서버 설정                                   |
-| skills/              | `~/.copilot/skills/`         | 글로벌 스킬 | superpowers 스킬을 배포. 각 스킬은 `<skill-name>/SKILL.md` 형태로 구성 |
+| skills/              | `~/.copilot/skills/`         | 글로벌 스킬 | 각 스킬은 `<skill-name>/SKILL.md` 형태로 구성 |
 
 Copilot 스킬 경로:
 

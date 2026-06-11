@@ -6,7 +6,7 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 
 - macOS 중심 환경에 시스템, Claude, Codex, Gemini, Copilot, OpenCode 스택을 통합한다.
 - Linux는 기초 셸/패키지/AI 최소 구성으로 유지한다.
-- 지정된 저장소 10개를 실제 원격 기준으로 검증하고, 유지 가능한 항목만 선별 적용한다.
+- 지정된 저장소 9개를 실제 원격 기준으로 검증하고, 유지 가능한 항목만 선별 적용한다.
 - 저장소 원본 전체를 복제하지 않고 유지 가능한 구성만 채택한다.
 
 ## 검토 완료 레포
@@ -14,7 +14,7 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 | 카테고리     | 저장소                                                                                                                                                 |
 |----------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
 | System   | lucasgelfond/zerobrew, ghostty-org/ghostty                                                                                                          |
-| Claude   | obra/superpowers, jarrodwatts/claude-hud, blader/humanizer, VoltAgent/awesome-agent-skills, forrestchang/andrej-karpathy-skills                     |
+| Claude   | jarrodwatts/claude-hud, blader/humanizer, VoltAgent/awesome-agent-skills, forrestchang/andrej-karpathy-skills                                       |
 | Codex    | Yeachan-Heo/oh-my-codex                                                                                                                             |
 | OpenCode | anomalyco/opencode, code-yeongyu/oh-my-opencode                                                                                                     |
 
@@ -27,7 +27,6 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 |-------------------------------------|-----------|
 | lucasgelfond/zerobrew               | `a15119f` |
 | ghostty-org/ghostty                 | `e94c905` |
-| obra/superpowers                    | `e16d611` |
 | jarrodwatts/claude-hud              | `10193cc` |
 | blader/humanizer                    | `c78047b` |
 | VoltAgent/awesome-agent-skills      | `feb81d6` |

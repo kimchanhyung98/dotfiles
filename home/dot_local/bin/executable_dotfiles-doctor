@@ -108,7 +108,6 @@ check "hermes" "command -v hermes"
 
 # AI Plugins
 section "AI Plugins"
-check "superpowers" "[ -d '$HOME/.local/share/superpowers' ] || claude plugin list 2>/dev/null | grep -q superpowers"
 check "everything-claude-code" "claude plugin list 2>/dev/null | grep -q everything-claude-code"
 check "claude-hud" "claude plugin list 2>/dev/null | grep -q claude-hud"
 check "claude-mem" "[ -d '$HOME/.claude-mem' ]"

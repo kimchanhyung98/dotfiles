@@ -16,11 +16,10 @@
 
 | 순서 | 스크립트        | 역할                                                           | 실행 조건 | 상세                                                                                                                                |
 |:--:|-------------|--------------------------------------------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------|
-| 10 | ai-core     | Claude Code, Codex CLI, Gemini CLI, Copilot CLI, Hermes Agent, CodeGraph, superpowers | 최초 1회 | 공식 AI CLI 도구 5종과 CodeGraph 설치 + superpowers를 ~/superpowers에 clone. Claude Code와 Hermes는 공식 설치 스크립트(curl), Codex·Gemini·Copilot·CodeGraph는 npm. 확장 환경 구성은 개별 스크립트(11~14)에서 처리 |
+| 10 | ai-core     | Claude Code, Codex CLI, Gemini CLI, Copilot CLI, Hermes Agent, CodeGraph | 최초 1회 | 공식 AI CLI 도구 5종과 CodeGraph 설치. Claude Code와 Hermes는 공식 설치 스크립트(curl), Codex·Gemini·Copilot·CodeGraph는 npm. 확장 환경 구성은 개별 스크립트(11~12, 20)에서 처리 |
 | 11 | ai-claude   | SuperClaude, CodeGraph MCP                                  | 최초 1회 | SuperClaude 프레임워크(pipx). CodeGraph MCP를 등록하고, 플러그인·MCP는 settings.json·claude.json에서 선언적 관리                                       |
-| 12 | ai-codex    | oh-my-codex, superpowers (copy), 프로필 초기화                      | 최초 1회 | oh-my-codex(npm), ~/superpowers에서 ~/.agents/skills/superpowers로 복사, 프로필 초기화. CodeGraph MCP는 config.toml에서 선언적 관리                       |
-| 14 | ai-copilot  | superpowers (copy)                                           | 최초 1회 | ~/superpowers에서 ~/.copilot/skills/superpowers로 복사. MCP는 mcp-config.json에서 선언적 관리                                                  |
-| 20 | ai-opencode | OpenCode, oh-my-opencode, superpowers (copy)                 | 최초 1회 | OpenCode(npm), oh-my-opencode(npm), ~/superpowers에서 ~/.config/opencode/plugins/superpowers로 복사. MCP는 opencode.json에서 선언적 관리       |
+| 12 | ai-codex    | oh-my-codex, 프로필 초기화                                         | 최초 1회 | oh-my-codex(npm), 프로필 초기화. CodeGraph MCP는 config.toml에서 선언적 관리                       |
+| 20 | ai-opencode | OpenCode, oh-my-opencode                                     | 최초 1회 | OpenCode(npm), oh-my-opencode(npm). MCP는 opencode.json에서 선언적 관리       |
 
 | 순서 | 스크립트           | 역할          | 실행 조건             |
 |:--:|----------------|-------------|-------------------|
@@ -28,10 +27,9 @@
 
 **AI 스크립트 설계 원칙**:
 
-- 코어 설치(10)와 프로바이더별 확장 설치(11~14, 20)를 분리하여 책임 경계를 명확히 유지
-- 각 프로바이더가 MCP 서버, 스킬, 플러그인을 독립적으로 관리하여 한 도구의 실패가 다른 도구에 영향을 주지 않음
+- 코어 설치(10)와 프로바이더별 확장 설치(11~12, 20)를 분리하여 책임 경계를 명확히 유지
+- 각 프로바이더가 MCP 서버, 플러그인을 독립적으로 관리하여 한 도구의 실패가 다른 도구에 영향을 주지 않음
 - 공식 AI CLI(10번대)와 외부 오픈소스 도구(20번대)를 번호 대역으로 구분
-- superpowers는 ai-core(10)에서 ~/superpowers에 한 번 clone하고, 각 프로바이더 스크립트에서 도구별 스킬 경로로 복사하여 개별 커스텀 가능
 - humanizer 스킬은 Claude/Codex는 `.chezmoiexternal.toml`로 자동 배포
 
 ### Linux 스크립트 (linux/)
@@ -75,20 +73,17 @@ chezmoi init --apply
 │   Bun (JavaScript/TypeScript 런타임)
 │
 ├─ 10 ai-core
-│   Claude Code, Codex CLI, Gemini CLI, Copilot CLI, Hermes Agent, CodeGraph, superpowers
-│   Claude Code·Hermes(curl 스크립트), Codex·Gemini·Copilot·CodeGraph(npm) 설치, superpowers를 ~/superpowers에 clone
+│   Claude Code, Codex CLI, Gemini CLI, Copilot CLI, Hermes Agent, CodeGraph
+│   Claude Code·Hermes(curl 스크립트), Codex·Gemini·Copilot·CodeGraph(npm) 설치
 │
 ├─ 11 ai-claude
 │   SuperClaude (플러그인·MCP는 설정 파일로 관리)
 │
 ├─ 12 ai-codex
-│   oh-my-codex → superpowers (copy) → 프로필 초기화 (CodeGraph MCP는 config.toml로 관리)
-│
-├─ 14 ai-copilot
-│   superpowers (copy) (MCP는 mcp-config.json으로 관리)
+│   oh-my-codex → 프로필 초기화 (CodeGraph MCP는 config.toml로 관리)
 │
 ├─ 20 ai-opencode
-│   OpenCode → oh-my-opencode → superpowers (copy)
+│   OpenCode → oh-my-opencode
 │
 ├─ dotfiles 배포
 │   ~/.zshrc, ~/.gitconfig, ~/.gitignore_global, ~/.vimrc

@@ -98,13 +98,4 @@ else
     echo "[ai-core][auggie] not installed, skipping login"
 fi
 
-# superpowers
-# - 공유 스킬 저장소 (각 AI 도구에서 개별 복사하여 사용)
-if [ ! -d "$HOME/superpowers" ]; then
-    echo "[ai-core][superpowers] cloning"
-    git clone https://github.com/obra/superpowers.git "$HOME/superpowers" || echo "[ai-core][warning] superpowers clone failed"
-else
-    echo "[ai-core][superpowers] already cloned"
-fi
-
 echo "[ai-core][done]"
