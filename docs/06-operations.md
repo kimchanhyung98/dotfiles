@@ -35,7 +35,6 @@
 | AI Core        | Claude Code, Codex CLI, Gemini CLI, Copilot CLI, Hermes Agent, CodeGraph                            |
 | Claude         | SuperClaude, superpowers, claude-hud, karpathy-skills, MCP 4종                                       |
 | Codex          | oh-my-codex, CodeGraph MCP, superpowers (copy)                                                      |
-| Gemini         | SuperGemini, superpowers (copy), MCP 3종                                                             |
 | Copilot        | superpowers (copy), MCP 2종                                                                          |
 | OpenCode       | OpenCode, oh-my-opencode, superpowers (copy)                                                        |
 | Skills         | humanizer (Claude, Codex), superpowers (Claude 플러그인 + Codex/Gemini/Copilot/OpenCode copy)           |
@@ -61,7 +60,7 @@
 ## 문서 규칙
 
 - 구조 변경 시 파일 트리를 먼저 갱신하고, 디렉토리 배포 매핑 테이블도 함께 반영한다.
-- AI 설정 추가 시 Claude, Codex, Gemini, Copilot, OpenCode 5개 도구 섹션을 모두 검토한다.
+- AI 설정 추가 시 Claude, Codex, Copilot, OpenCode 4개 도구 섹션을 모두 검토한다.
 - Linux 항목 추가 시 macOS 항목과 동일 수준으로 명시한다.
 - 스킬 추가 시 지원 도구별 글로벌/프로젝트 경로를 함께 명시한다.
 - 경로와 설정 파일명은 실제 도구 공식 문서 또는 저장소 기준으로 검증 후 기재한다.
@@ -90,7 +89,6 @@
 - [Codex Configuration](https://developers.openai.com/codex/config-reference/)
 - [Codex Agent Skills](https://developers.openai.com/codex/skills/)
 - [Codex AGENTS.md](https://developers.openai.com/codex/guides/agents-md/)
-- [Gemini CLI](https://ai.google.dev/gemini-api/docs/gemini-cli)
 - [GitHub Copilot CLI](https://docs.github.com/en/copilot/using-github-copilot/using-github-copilot-in-the-command-line)
 - [GitHub Copilot Skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)
 - [Ghostty Configuration](https://ghostty.org/docs/config)
@@ -108,4 +106,3 @@
 - [OpenCode](https://github.com/anomalyco/opencode)
 - [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode)
 - [oh-my-codex](https://github.com/Yeachan-Heo/oh-my-codex)
-- [Gemini CLI](https://github.com/google-gemini/gemini-cli)

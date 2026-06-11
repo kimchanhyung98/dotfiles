@@ -95,15 +95,6 @@ else
     echo "[ai-tools][oh-my-opencode] already installed"
 fi
 
-# Gemini CLI
-# - Google Gemini 터미널 AI 도우미
-if ! command -v gemini &>/dev/null; then
-    echo "[ai-tools][gemini] installing"
-    npm install -g @google/gemini-cli || echo "[ai-tools][warning] Gemini CLI install failed"
-else
-    echo "[ai-tools][gemini] already installed"
-fi
-
 # Hermes Agent
 # - Nous Research Hermes 터미널 AI 에이전트
 if ! command -v hermes &>/dev/null; then

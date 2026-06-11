@@ -22,7 +22,6 @@
 |----------------|------------------------------------------------------------------------|-----------------------------------------------------------|-------------------------------------------|
 | Claude Code    | `~/.claude/skills/`                                                    | `.claude/skills/`                                         | `.chezmoiexternal.toml`로 humanizer 자동 동기화 |
 | Codex          | `~/.agents/skills/`                                                    | `.agents/skills/`                                         | `.chezmoiexternal.toml`로 humanizer 자동 동기화 |
-| Gemini         | `~/.gemini/skills/`                                                    | -                                                         | ai-gemini 스크립트에서 superpowers copy         |
 | GitHub Copilot | `~/.copilot/skills/`                                                   | `.github/skills/`, `.claude/skills/`                      | ai-copilot 스크립트에서 superpowers copy        |
 | OpenCode       | `~/.config/opencode/skills/`, `~/.claude/skills/`, `~/.agents/skills/` | `.opencode/skills/`, `.claude/skills/`, `.agents/skills/` | ai-opencode 스크립트에서 superpowers copy       |
 
@@ -181,25 +180,6 @@ superpowers도 OpenCode에 설치된다 (~/superpowers에서 copy).
 
 OpenCode는 프로젝트/글로벌 모두에서 `.opencode/skills/` 외에 `.claude/skills/`와 `.agents/skills/`도 자동 탐색한다. 별도 설정 없이 Claude, Codex와
 동일한 스킬을 자동으로 인식한다.
-
-## Gemini
-
-**설치 (스크립트)**
-
-| 스크립트         | 내용                                                     | 설치 대상               |
-|--------------|--------------------------------------------------------|---------------------|
-| 10-ai-core   | Gemini CLI (npm)                                       | Gemini CLI 바이너리     |
-| 13-ai-gemini | SuperGemini (pipx), superpowers (~/superpowers에서 copy) | Gemini CLI 확장 프레임워크 |
-
-SuperGemini는 Gemini CLI의 확장 프레임워크로, 슬래시 명령어와 AI 에이전트 페르소나를 제공한다. superpowers는 ~/superpowers에서 ~
-/.gemini/skills/superpowers로 복사된다.
-
-**설정 (dot_gemini/ → ~/.gemini/)**
-
-- `settings.json` 기본 승인 모드는 `auto_edit`로 설정한다.
-- MCP 서버: context7, sequential-thinking, augment-context-engine 3종.
-- YOLO 모드는 설정 파일 기본값(`general.defaultApprovalMode`)으로는 지정할 수 없으며, 실행 시 `--approval-mode=yolo` 옵션을 사용해야 한다.
-- 이 dotfiles는 `gemini-yolo` 별칭(`gemini --approval-mode=yolo`)을 제공한다.
 
 ## Copilot
 

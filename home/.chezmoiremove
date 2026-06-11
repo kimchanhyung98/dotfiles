@@ -1,2 +1,5 @@
 # 다음 `chezmoi apply` 시 삭제할 파일
 # 더 이상 관리하지 않는 홈 디렉토리 상대 경로 기재
+
+# Gemini CLI 제거 (dotfiles 관리 중단)
+.gemini/settings.json

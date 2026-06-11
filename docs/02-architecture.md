@@ -25,7 +25,6 @@ dotfiles/
     │   │   ├── run_once_10-ai-core.sh.tmpl
     │   │   ├── run_once_11-ai-claude.sh.tmpl
     │   │   ├── run_once_12-ai-codex.sh.tmpl
-    │   │   ├── run_once_13-ai-gemini.sh.tmpl
     │   │   ├── run_once_14-ai-copilot.sh.tmpl
     │   │   ├── run_once_20-ai-opencode.sh.tmpl
     │   │   └── run_once_after_99-manual-install.sh.tmpl
@@ -80,9 +79,6 @@ dotfiles/
     │   ├── mcp-config.json.tmpl
     │   └── skills/
     │
-    ├── dot_gemini/
-    │   └── settings.json.tmpl
-    │
     └── dot_local/bin/
         └── executable_dotfiles-doctor
 ```
@@ -101,7 +97,6 @@ dotfiles/
 | `dot_codex/`           | `~/.codex/`           | Codex CLI 설정                            |
 | `dot_agents/skills/`   | `~/.agents/skills/`   | Codex 글로벌 스킬                            |
 | `dot_copilot/`         | `~/.copilot/`         | Copilot MCP 설정, 글로벌 스킬                  |
-| `dot_gemini/`          | `~/.gemini/`          | Gemini CLI 설정 (승인 모드, 알림/UI, MCP 서버)   |
 | `dot_local/bin/`       | `~/.local/bin/`       | 사용자 스크립트 (dotfiles-doctor)              |
 
 ## chezmoi special 파일

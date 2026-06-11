@@ -51,14 +51,6 @@ else
     echo "[ai-core][codegraph] already installed ($(codegraph --version 2>/dev/null || echo 'unknown'))"
 fi
 
-# Gemini CLI
-if ! command -v gemini &>/dev/null; then
-    echo "[ai-core][gemini] installing"
-    npm install -g @google/gemini-cli || echo "[ai-core][warning] Gemini CLI installation failed"
-else
-    echo "[ai-core][gemini] already installed ($(gemini --version 2>/dev/null || echo 'unknown'))"
-fi
-
 # Copilot CLI
 if ! command -v copilot &>/dev/null; then
     echo "[ai-core][copilot] installing"

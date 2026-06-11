@@ -19,7 +19,6 @@
 | 10 | ai-core     | Claude Code, Codex CLI, Gemini CLI, Copilot CLI, Hermes Agent, CodeGraph, superpowers | 최초 1회 | 공식 AI CLI 도구 5종과 CodeGraph 설치 + superpowers를 ~/superpowers에 clone. Claude Code와 Hermes는 공식 설치 스크립트(curl), Codex·Gemini·Copilot·CodeGraph는 npm. 확장 환경 구성은 개별 스크립트(11~14)에서 처리 |
 | 11 | ai-claude   | SuperClaude, CodeGraph MCP                                  | 최초 1회 | SuperClaude 프레임워크(pipx). CodeGraph MCP를 등록하고, 플러그인·MCP는 settings.json·claude.json에서 선언적 관리                                       |
 | 12 | ai-codex    | oh-my-codex, superpowers (copy), 프로필 초기화                      | 최초 1회 | oh-my-codex(npm), ~/superpowers에서 ~/.agents/skills/superpowers로 복사, 프로필 초기화. CodeGraph MCP는 config.toml에서 선언적 관리                       |
-| 13 | ai-gemini   | SuperGemini, superpowers (copy)                              | 최초 1회 | SuperGemini 확장 프레임워크(pipx), ~/superpowers에서 ~/.gemini/skills/superpowers로 복사. MCP는 settings.json에서 선언적 관리                         |
 | 14 | ai-copilot  | superpowers (copy)                                           | 최초 1회 | ~/superpowers에서 ~/.copilot/skills/superpowers로 복사. MCP는 mcp-config.json에서 선언적 관리                                                  |
 | 20 | ai-opencode | OpenCode, oh-my-opencode, superpowers (copy)                 | 최초 1회 | OpenCode(npm), oh-my-opencode(npm), ~/superpowers에서 ~/.config/opencode/plugins/superpowers로 복사. MCP는 opencode.json에서 선언적 관리       |
 
@@ -85,9 +84,6 @@ chezmoi init --apply
 ├─ 12 ai-codex
 │   oh-my-codex → superpowers (copy) → 프로필 초기화 (CodeGraph MCP는 config.toml로 관리)
 │
-├─ 13 ai-gemini
-│   SuperGemini, superpowers (copy) (MCP는 settings.json으로 관리)
-│
 ├─ 14 ai-copilot
 │   superpowers (copy) (MCP는 mcp-config.json으로 관리)
 │
@@ -101,7 +97,6 @@ chezmoi init --apply
 │   ~/.claude/settings.json
 │   ~/.codex/config.toml
 │   ~/.agents/skills/*, ~/.copilot/mcp-config.json, ~/.copilot/skills/*
-│   ~/.gemini/settings.json
 │   ~/.local/bin/dotfiles-doctor
 │
 └─ 99 manual-install
@@ -138,7 +133,6 @@ chezmoi init --apply
     ~/AGENTS.md
     ~/.config/ghostty/config, ~/.config/opencode/*
     ~/.claude/*, ~/.codex/*, ~/.agents/*, ~/.copilot/*
-    ~/.gemini/*
 ```
 
 ## Brewfile 패키지

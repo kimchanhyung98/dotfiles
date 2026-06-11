@@ -5,9 +5,6 @@ alias ll='ls -la'
 alias la='ls -A'
 alias l='ls -CF'
 
-# Gemini CLI 단축키
-alias gemini-yolo='gemini --approval-mode=yolo'
-
 # Git 단축키
 alias gs='git status'
 alias ga='git add'
