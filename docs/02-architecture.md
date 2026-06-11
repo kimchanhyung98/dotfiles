@@ -25,7 +25,6 @@ dotfiles/
     │   │   ├── run_once_10-ai-core.sh.tmpl
     │   │   ├── run_once_11-ai-claude.sh.tmpl
     │   │   ├── run_once_12-ai-codex.sh.tmpl
-    │   │   ├── run_once_14-ai-copilot.sh.tmpl
     │   │   ├── run_once_20-ai-opencode.sh.tmpl
     │   │   └── run_once_after_99-manual-install.sh.tmpl
     │   │

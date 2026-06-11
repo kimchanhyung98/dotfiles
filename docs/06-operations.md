@@ -11,7 +11,7 @@
 | Terminal         | ghostty                                                                                             | Ghostty 터미널의 설치 여부 확인           |
 | Languages        | node, python3, go, rustc, php, ruby                                                                 | 프로그래밍 언어 런타임의 설치 여부와 버전 확인      |
 | Package Managers | brew, zb, pipx, bun                                                                                 | 패키지 관리자의 설치 여부 확인. zb는 zerobrew |
-| AI CLI           | claude, codex, codegraph, copilot, hermes, opencode, ollama, gemini                                 | AI 도구 CLI의 설치 여부 확인             |
+| AI CLI           | claude, codex, codegraph, copilot, hermes, opencode, ollama                                         | AI 도구 CLI의 설치 여부 확인             |
 | AI 플러그인          | everything-claude-code, claude-hud, claude-mem, oh-my-codex, oh-my-opencode                         | 각 AI 도구의 확장 기능 설치 상태 확인         |
 | 스킬 디렉토리          | Claude, Codex, Copilot, OpenCode 4개 경로                                                              | 글로벌 스킬 디렉토리 존재 여부와 내용물 확인       |
 | AGENTS.md        | `~/AGENTS.md` 존재 여부                                                                                 | 공통 에이전트 지침 파일 배포 상태 확인          |
@@ -32,7 +32,7 @@
 | Languages      | dotnet, go, kotlin, node, openjdk, php, python, ruby, rust                                          |
 | Pkg Managers   | composer, mise, npm, pipx, uv, xcodes, yarn                                                         |
 | Runtime        | Bun                                                                                                 |
-| AI Core        | Claude Code, Codex CLI, Gemini CLI, Copilot CLI, Hermes Agent, CodeGraph                            |
+| AI Core        | Claude Code, Codex CLI, Copilot CLI, Hermes Agent, CodeGraph                                        |
 | Claude         | SuperClaude, claude-hud, karpathy-skills, MCP 4종                                                   |
 | Codex          | oh-my-codex, CodeGraph MCP                                                                          |
 | Copilot        | MCP 2종                                                                                             |
@@ -40,7 +40,7 @@
 | Skills         | humanizer (Claude, Codex)                                                                           |
 | Apps           | ghostty, docker, iterm2, chrome, rectangle, slack, figma 등                                          |
 | Shell          | Oh My Zsh + autosuggestions + syntax-highlighting                                                   |
-| Linux          | curl, git, vim, zsh, ghostty, 셸/Git baseline, claude, codex, codegraph, hermes, oh-my-codex, opencode, oh-my-opencode, gemini |
+| Linux          | curl, git, vim, zsh, ghostty, 셸/Git baseline, claude, codex, codegraph, hermes, oh-my-codex, opencode, oh-my-opencode |
 
 ## 운영 체크리스트
 
@@ -50,7 +50,7 @@
 | 스크립트 번호 체계 일관성      | darwin/(01~04, 10~12, 20, 99), linux/(01~05) 번호가 중복 없이 순서대로 유지되는지 확인             |
 | 외부 리소스 선언 파일 최신화    | `.chezmoiexternal.toml`의 URL, 브랜치, 해시가 최신 원격 저장소와 일치하는지 확인                       |
 | AI 모듈 경계 준수         | 설치 스크립트는 바이너리 설치만, 설정 파일은 사용자 설정만 담당하는 분리 원칙이 유지되는지 확인                           |
-| 스킬 디렉토리 동기화 상태      | Claude, Codex, Gemini, Copilot, OpenCode 5개 글로벌 스킬 경로에 humanizer 스킬이 배포되어 있는지 확인 |
+| 스킬 디렉토리 동기화 상태      | Claude, Codex, Copilot, OpenCode 4개 글로벌 스킬 경로에 humanizer 스킬이 배포되어 있는지 확인         |
 | AGENTS.md 공통 지침 최신화 | `~/AGENTS.md`와 `~/.codex/AGENTS.md`의 4대 원칙과 공통 규칙이 최신 상태인지 확인                    |
 | 플러그인 버전 호환성         | Claude Code, Codex, OpenCode의 플러그인이 현재 도구 버전과 호환되는지 확인                           |
 | Linux 기초 설정 누락 여부   | macOS에 추가된 AI 도구가 Linux ai-tools 스크립트에도 반영되어 있는지 확인                              |
