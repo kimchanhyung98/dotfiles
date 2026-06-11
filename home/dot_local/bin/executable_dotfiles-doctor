@@ -104,6 +104,7 @@ check "codex" "command -v codex"
 check "codegraph" "command -v codegraph"
 check "opencode" "command -v opencode"
 check "ollama" "command -v ollama"
+check "antigravity (agy)" "command -v agy"
 check "hermes" "command -v hermes"
 
 # AI Plugins

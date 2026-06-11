@@ -119,6 +119,16 @@ Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록
 
 설치 스크립트는 uv, Python, Node.js, ripgrep, ffmpeg 등 Hermes 런타임 의존성을 함께 준비할 수 있다. 초기 설정은 `hermes setup`으로 진행한다. chezmoi가 배포하는 설정 파일은 없으며, 기본 설치만으로 CLI가 준비되고 API 키와 provider 선택은 이후에 완료한다.
 
+## Antigravity
+
+**설치 (스크립트)**
+
+| 스크립트                                    | 내용                                                                  | 설치 대상                  |
+|-----------------------------------------|---------------------------------------------------------------------|------------------------|
+| 10-ai-core (macOS), 04-ai-tools (Linux) | Antigravity CLI (`curl -fsSL https://antigravity.google/cli/install.sh`) | `agy` 바이너리 (`~/.local/bin`) |
+
+Google Antigravity의 터미널 AI 에이전트다. 설치 시 `agy` 바이너리가 `~/.local/bin`에 등록된다. chezmoi가 배포하는 설정 파일은 없으며, 인증과 초기 설정은 `agy` 첫 실행 시 진행한다.
+
 ## Codex
 
 **설치 (스크립트)**

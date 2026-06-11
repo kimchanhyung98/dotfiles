@@ -11,7 +11,7 @@
 | Terminal         | ghostty                                                                                             | Ghostty 터미널의 설치 여부 확인           |
 | Languages        | node, python3, go, rustc, php, ruby                                                                 | 프로그래밍 언어 런타임의 설치 여부와 버전 확인      |
 | Package Managers | brew, zb, pipx, bun                                                                                 | 패키지 관리자의 설치 여부 확인. zb는 zerobrew |
-| AI CLI           | claude, codex, codegraph, copilot, hermes, opencode, ollama                                         | AI 도구 CLI의 설치 여부 확인             |
+| AI CLI           | claude, codex, codegraph, copilot, hermes, opencode, ollama, antigravity(agy)                       | AI 도구 CLI의 설치 여부 확인             |
 | AI 플러그인          | everything-claude-code, claude-hud, claude-mem, oh-my-codex, oh-my-opencode                         | 각 AI 도구의 확장 기능 설치 상태 확인         |
 | 스킬 디렉토리          | Claude, Codex, Copilot, OpenCode 4개 경로                                                              | 글로벌 스킬 디렉토리 존재 여부와 내용물 확인       |
 | AGENTS.md        | `~/AGENTS.md` 존재 여부                                                                                 | 공통 에이전트 지침 파일 배포 상태 확인          |
@@ -32,7 +32,7 @@
 | Languages      | dotnet, go, kotlin, node, openjdk, php, python, ruby, rust                                          |
 | Pkg Managers   | composer, mise, npm, pipx, uv, xcodes, yarn                                                         |
 | Runtime        | Bun                                                                                                 |
-| AI Core        | Claude Code, Codex CLI, Copilot CLI, Hermes Agent, CodeGraph                                        |
+| AI Core        | Claude Code, Codex CLI, Antigravity CLI, Copilot CLI, Hermes Agent, CodeGraph                       |
 | Claude         | SuperClaude, claude-hud, karpathy-skills, MCP 4종                                                   |
 | Codex          | oh-my-codex, CodeGraph MCP                                                                          |
 | Copilot        | MCP 2종                                                                                             |
@@ -40,7 +40,7 @@
 | Skills         | humanizer (Claude, Codex)                                                                           |
 | Apps           | ghostty, docker, iterm2, chrome, rectangle, slack, figma 등                                          |
 | Shell          | Oh My Zsh + autosuggestions + syntax-highlighting                                                   |
-| Linux          | curl, git, vim, zsh, ghostty, 셸/Git baseline, claude, codex, codegraph, hermes, oh-my-codex, opencode, oh-my-opencode |
+| Linux          | curl, git, vim, zsh, ghostty, 셸/Git baseline, claude, codex, codegraph, antigravity, hermes, oh-my-codex, opencode, oh-my-opencode |
 
 ## 운영 체크리스트
 
@@ -89,6 +89,7 @@
 - [Codex Configuration](https://developers.openai.com/codex/config-reference/)
 - [Codex Agent Skills](https://developers.openai.com/codex/skills/)
 - [Codex AGENTS.md](https://developers.openai.com/codex/guides/agents-md/)
+- [Antigravity CLI](https://antigravity.google/docs/cli-getting-started)
 - [GitHub Copilot CLI](https://docs.github.com/en/copilot/using-github-copilot/using-github-copilot-in-the-command-line)
 - [GitHub Copilot Skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)
 - [Ghostty Configuration](https://ghostty.org/docs/config)

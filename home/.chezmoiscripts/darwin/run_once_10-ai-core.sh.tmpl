@@ -51,6 +51,21 @@ else
     echo "[ai-core][codegraph] already installed ($(codegraph --version 2>/dev/null || echo 'unknown'))"
 fi
 
+# Antigravity CLI
+# - Google Antigravity 터미널 AI 에이전트 (바이너리: agy)
+if ! command -v agy &>/dev/null; then
+    echo "[ai-core][antigravity] installing"
+    installer=$(mktemp)
+    if curl -fsSL https://antigravity.google/cli/install.sh -o "$installer"; then
+        bash "$installer" || echo "[ai-core][warning] Antigravity CLI installation failed"
+    else
+        echo "[ai-core][warning] Antigravity CLI download failed"
+    fi
+    rm -f "$installer"
+else
+    echo "[ai-core][antigravity] already installed ($(agy --version 2>/dev/null || echo 'unknown'))"
+fi
+
 # Copilot CLI
 if ! command -v copilot &>/dev/null; then
     echo "[ai-core][copilot] installing"

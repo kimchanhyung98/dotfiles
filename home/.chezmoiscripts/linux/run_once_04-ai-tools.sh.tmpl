@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# AI Tools and extensions (Linux): claude, codex, codegraph, hermes, oh-my-codex, opencode, oh-my-opencode
+# AI Tools and extensions (Linux): claude, codex, codegraph, antigravity, hermes, oh-my-codex, opencode, oh-my-opencode
 # Runs once on first setup
 
 {{ if ne .chezmoi.os "linux" }}
@@ -93,6 +93,21 @@ if ! command -v oh-my-opencode &>/dev/null; then
     npm install -g oh-my-opencode || echo "[ai-tools][warning] oh-my-opencode install failed"
 else
     echo "[ai-tools][oh-my-opencode] already installed"
+fi
+
+# Antigravity CLI
+# - Google Antigravity 터미널 AI 에이전트 (바이너리: agy)
+if ! command -v agy &>/dev/null; then
+    echo "[ai-tools][antigravity] installing"
+    installer=$(mktemp)
+    if curl -fsSL https://antigravity.google/cli/install.sh -o "$installer"; then
+        bash "$installer" || echo "[ai-tools][warning] Antigravity CLI install failed"
+    else
+        echo "[ai-tools][warning] Antigravity CLI download failed"
+    fi
+    rm -f "$installer"
+else
+    echo "[ai-tools][antigravity] already installed ($(agy --version 2>/dev/null || echo 'unknown'))"
 fi
 
 # Hermes Agent
