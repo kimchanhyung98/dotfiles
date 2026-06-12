@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# 스킬 SSOT 마이그레이션 (darwin/linux 공통)
+# - 각 AI CLI 의 skills 경로가 symlink 전환 이전의 실제 디렉터리면, 내용물(oh-my-codex 스킬 등)을
+#   단일 출처 ~/.skills 로 이전한 뒤 디렉터리를 제거한다. 이전하지 않으면 chezmoi 가 디렉터리를
+#   통째로 삭제하고 symlink 를 만들면서 기존 스킬이 유실된다.
+# - 모든 경로가 이미 symlink 인 머신에서는 아무 일도 하지 않는다 (멱등).
+
+# 주의: 이 스크립트는 glob 순회가 필요하므로 -f(noglob)를 켜지 않는다
+set -euo pipefail
+
+SSOT="$HOME/.skills"
+
+for dir in \
+    "$HOME/.claude/skills" \
+    "$HOME/.agents/skills" \
+    "$HOME/.codex/skills" \
+    "$HOME/.copilot/skills"; do
+    if [ ! -d "$dir" ] || [ -L "$dir" ]; then
+        continue
+    fi
+
+    echo "[skills-migrate] $dir -> $SSOT"
+    mkdir -p "$SSOT"
+    for item in "$dir"/*; do
+        [ -e "$item" ] || continue
+        name="$(basename "$item")"
+        if is_removed "$name"; then
+            continue
+        fi
+        if [ -e "$SSOT/$name" ]; then
+            echo "[skills-migrate] skip $name (already exists)"
+        else
+            mv "$item" "$SSOT/$name"
+        fi
+    done
+    rm -rf "$dir"
+done
