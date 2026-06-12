@@ -37,7 +37,6 @@
 | Codex          | oh-my-codex, CodeGraph MCP                                                                          |
 | Copilot        | MCP 2종                                                                                             |
 | OpenCode       | OpenCode, oh-my-opencode                                                                            |
-| Skills         | humanizer (Claude, Codex)                                                                           |
 | Apps           | ghostty, docker, iterm2, chrome, rectangle, slack, figma 등                                          |
 | Shell          | Oh My Zsh + autosuggestions + syntax-highlighting                                                   |
 | Linux          | curl, git, vim, zsh, ghostty, 셸/Git baseline, claude, codex, codegraph, antigravity, hermes, oh-my-codex, opencode, oh-my-opencode |
@@ -99,7 +98,6 @@
 - [zerobrew](https://github.com/lucasgelfond/zerobrew)
 - [Ghostty](https://github.com/ghostty-org/ghostty)
 - [claude-hud](https://github.com/jarrodwatts/claude-hud)
-- [humanizer](https://github.com/blader/humanizer)
 - [awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills)
 - [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)
 - [CodeGraph](https://github.com/colbymchenry/codegraph)

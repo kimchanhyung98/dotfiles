@@ -105,7 +105,7 @@ dotfiles/
 | `.chezmoiroot`          | source root 경로 고정 (`home`) | chezmoi가 `home/` 디렉토리를 소스 루트로 인식하게 하여, 저장소 루트의 docs/, install.sh 등이 홈 디렉토리에 배포되지 않도록 격리                              |
 | `.chezmoiversion`       | 최소 chezmoi 실행 버전 고정        | 이 dotfiles가 요구하는 chezmoi 최소 버전을 명시하여, 이전 버전의 호환성 문제를 사전 차단                                                           |
 | `.chezmoiignore`        | OS별·런타임 경로 제외              | 템플릿 조건문으로 현재 OS에 해당하지 않는 설정 파일을 배포 대상에서 제외. 저장소 메타 파일(README, LICENSE 등)과 Claude Code 런타임 데이터(`.claude.json`)도 공통 제외 |
-| `.chezmoiexternal.toml` | 외부 리소스 선언적 동기화             | Oh My Zsh, zsh 플러그인, humanizer 등 외부 Git 저장소를 선언하여 `chezmoi apply` 시 자동 다운로드/갱신. 갱신 주기를 리소스별로 개별 설정                   |
+| `.chezmoiexternal.toml` | 외부 리소스 선언적 동기화             | Oh My Zsh, zsh 플러그인 등 외부 Git 저장소를 선언하여 `chezmoi apply` 시 자동 다운로드/갱신. 갱신 주기를 리소스별로 개별 설정                              |
 | `.chezmoiremove`        | 더 이상 필요 없는 파일 제거 대상 관리     | dotfiles에서 관리를 중단한 파일을 나열하여 다음 apply 시 자동 삭제. 설정 파일 이름이 변경되었거나 도구를 제거한 경우 잔여 파일 정리에 활용                               |
 
 ## 템플릿 변수

@@ -30,7 +30,6 @@
 - 코어 설치(10)와 프로바이더별 확장 설치(11~12, 20)를 분리하여 책임 경계를 명확히 유지
 - 각 프로바이더가 MCP 서버, 플러그인을 독립적으로 관리하여 한 도구의 실패가 다른 도구에 영향을 주지 않음
 - 공식 AI CLI(10번대)와 외부 오픈소스 도구(20번대)를 번호 대역으로 구분
-- humanizer 스킬은 Claude/Codex는 `.chezmoiexternal.toml`로 자동 배포
 
 ### Linux 스크립트 (linux/)
 
@@ -54,7 +53,7 @@ chezmoi init --apply
 │   시스템 패키지 관리 기반 구성. Homebrew와 zerobrew 모두 공식 curl | bash 방식으로 설치
 │
 ├─ .chezmoiexternal.toml
-│   Oh My Zsh, zsh-autosuggestions, zsh-syntax-highlighting, humanizer
+│   Oh My Zsh, zsh-autosuggestions, zsh-syntax-highlighting
 │   외부 Git 리소스를 선언적으로 다운로드. 168시간(1주) 주기로 자동 갱신
 │
 ├─ 02 macos-settings
@@ -108,7 +107,7 @@ chezmoi init --apply
 │   패키지 관리자 자동 감지 (apt-get → dnf → yum)
 │
 ├─ .chezmoiexternal.toml
-│   Oh My Zsh, zsh-autosuggestions, zsh-syntax-highlighting, humanizer
+│   Oh My Zsh, zsh-autosuggestions, zsh-syntax-highlighting
 │
 ├─ 02 shell-baseline
 │   기본 셸 zsh 전환, 히스토리, 키바인딩, 로케일, 타임존
@@ -171,5 +170,3 @@ AI 도구(Claude Code, Codex, Antigravity, Copilot, Hermes, CodeGraph)는 설치
 | Oh My Zsh               | `~/.oh-my-zsh`                | Zsh 프레임워크. 테마, 플러그인 관리 기반                               | 168h (1주) | archive |
 | zsh-autosuggestions     | Oh My Zsh custom/plugins/     | 히스토리 기반 입력 자동완성. 타이핑 중 이전 명령을 흐린 글씨로 제안                 | 168h      | archive |
 | zsh-syntax-highlighting | Oh My Zsh custom/plugins/     | 명령어 구문 강조. 유효한 명령은 녹색, 잘못된 명령은 빨간색으로 표시                 | 168h      | archive |
-| humanizer               | `~/.claude/skills/humanizer/` | AI 글쓰기 패턴 제거 스킬. SKILL.md 기반으로 AI 특유의 표현을 자연스러운 문장으로 교정 | 168h      | archive |
-| humanizer (Codex)       | `~/.agents/skills/humanizer/` | 동일 humanizer 스킬을 Codex 글로벌 스킬 경로에 배포                    | 168h      | archive |
