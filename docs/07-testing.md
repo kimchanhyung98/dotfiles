@@ -6,7 +6,7 @@
 
 - chezmoi로 관리되는 dotfiles의 정상 동작을 검증하기 위한 테스트 전략
 - macOS와 Linux 환경 모두 지원 필요
-- 설정 템플릿 15개, 스크립트 17개(darwin 12, linux 5)를 대상으로 함
+- 템플릿 26개(설정 10개, 스크립트 16개: 공통 1, darwin 10, linux 5)를 대상으로 함
 
 ---
 
@@ -32,7 +32,7 @@ make check
 | Dry-run      | `chezmoi apply --dry-run --verbose` | 적용 시뮬레이션만 수행 (실제 변경 없음)       |
 | 상태 검증        | `chezmoi verify`                    | 배포된 파일이 source와 일치하는지 확인      |
 | 진단           | `chezmoi doctor`                    | 환경 진단                         |
-| ShellCheck   | `shellcheck`                        | darwin 스크립트 정적 분석             |
+| ShellCheck   | `shellcheck`                        | 공통+darwin 스크립트 정적 분석          |
 
 > 템플릿 검증은 `find home -name '*.tmpl' | while read f; do chezmoi execute-template < "$f"; done` 등의 방식으로 전체 파일을 순회해야 한다. (
 `-exec`에서는 쉘 리다이렉션(`<`)을 직접 사용할 수 없으므로 파이프라인 또는 `sh -c` 래퍼를 사용한다.)
@@ -75,7 +75,7 @@ make check
 | 9. Dry-run 적용          | `chezmoi apply --dry-run --verbose`                                  |
 | 10. 실제 적용              | `chezmoi apply --force --verbose 2>&1 \| tee /tmp/chezmoi-apply.log` |
 | 11. 배포 검증              | `chezmoi managed`로 전체 관리 대상 목록 확인 + `chezmoi verify`로 상태 일치 검증       |
-| 12. ShellCheck         | linux 스크립트 정적 분석                                                     |
+| 12. ShellCheck         | 공통+linux 스크립트 정적 분석                                                  |
 
 **비대화형 설정 주입:**
 
@@ -126,14 +126,14 @@ make check
 ├── [macOS] chezmoi apply --dry-run --verbose
 ├── [macOS] chezmoi verify
 ├── [macOS] chezmoi doctor
-├── [macOS] ShellCheck (darwin 스크립트, 렌더링 후 실행)
+├── [macOS] ShellCheck (공통+darwin 스크립트, 렌더링 후 실행)
 ├── [Linux] Docker Ubuntu 컨테이너 빌드 & 실행
 │   ├── 템플릿 검증
 │   ├── Zsh 설정 회귀 검증
 │   ├── chezmoi doctor
 │   ├── chezmoi apply (실제 적용, 로그 기록)
 │   ├── chezmoi managed + chezmoi verify (전체 파일 검증)
-│   └── ShellCheck (linux 스크립트, 렌더링 후 실행)
+│   └── ShellCheck (공통+linux 스크립트, 렌더링 후 실행)
 └── 결과 요약 출력
 ```
 

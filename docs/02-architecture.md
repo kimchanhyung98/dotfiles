@@ -16,6 +16,8 @@ dotfiles/
     ├── .chezmoiremove
     │
     ├── .chezmoiscripts/
+    │   ├── run_once_before_00-skills-ssot-migrate.sh.tmpl   # OS 공통: 기존 스킬 디렉토리 → ~/.skills 이전
+    │   │
     │   ├── darwin/
     │   │   ├── run_once_before_01-prerequisites.sh.tmpl
     │   │   ├── run_onchange_after_02-macos-settings.sh.tmpl
@@ -58,15 +60,19 @@ dotfiles/
     │   │   ├── 60-tools.zsh
     │   │   ├── 70-aliases.zsh
     │   │   └── 80-secrets.zsh
+    ├── dot_skills/                    # 공통 스킬 단일 출처 (→ ~/.skills)
+    │   └── sample/SKILL.md
     │
     ├── dot_claude/
-    │   └── settings.json.tmpl
+    │   ├── settings.json.tmpl
+    │   └── symlink_skills             # → ~/.skills
     │
     ├── dot_codex/
-    │   └── config.toml.tmpl
+    │   ├── config.toml.tmpl
+    │   └── symlink_skills             # → ~/.skills
     │
     ├── dot_agents/
-    │   └── skills/
+    │   └── symlink_skills             # → ~/.skills
     │
     └── dot_local/bin/
         └── executable_dotfiles-doctor
@@ -74,17 +80,18 @@ dotfiles/
 
 ## 배포 매핑
 
-| 소스 (chezmoi)           | 배포 대상                 | 용도                                      |
-|------------------------|-----------------------|-----------------------------------------|
-| `AGENTS.md.tmpl`       | `~/AGENTS.md`         | 공통 에이전트 지침 (홈 루트)                       |
-| `dot_config/bat/`      | `~/.config/bat/`      | bat(cat 대체 뷰어) 설정                       |
-| `dot_config/cmux/`     | `~/.config/cmux/`     | cmux 설정 (`socketControlMode` 등 자동화 기본값) |
-| `dot_config/ghostty/`  | `~/.config/ghostty/`  | Ghostty 터미널 설정                          |
-| `dot_config/zsh/`      | `~/.config/zsh/`      | `.zshrc`에서 순차 로드하는 모듈형 Zsh 설정           |
-| `dot_claude/`          | `~/.claude/`          | Claude Code 설정                          |
-| `dot_codex/`           | `~/.codex/`           | Codex CLI 설정                            |
-| `dot_agents/skills/`   | `~/.agents/skills/`   | Codex 글로벌 스킬                            |
-| `dot_local/bin/`       | `~/.local/bin/`       | 사용자 스크립트 (dotfiles-doctor)              |
+| 소스 (chezmoi)                | 배포 대상                              | 용도                                                |
+|-----------------------------|------------------------------------|---------------------------------------------------|
+| `AGENTS.md.tmpl`            | `~/AGENTS.md`                      | 공통 에이전트 지침 (홈 루트)                                 |
+| `dot_config/bat/`           | `~/.config/bat/`                   | bat(cat 대체 뷰어) 설정                                 |
+| `dot_config/cmux/`          | `~/.config/cmux/`                  | cmux 설정 (`socketControlMode` 등 자동화 기본값)           |
+| `dot_config/ghostty/`       | `~/.config/ghostty/`               | Ghostty 터미널 설정                                    |
+| `dot_config/zsh/`           | `~/.config/zsh/`                   | `.zshrc`에서 순차 로드하는 모듈형 Zsh 설정                     |
+| `dot_claude/`               | `~/.claude/`                       | Claude Code 설정                                    |
+| `dot_codex/`                | `~/.codex/`                        | Codex CLI 설정                                      |
+| `dot_skills/`               | `~/.skills/`                       | 공통 스킬 단일 출처 (Claude Code와 Codex가 symlink로 공유)     |
+| `dot_<tool>/symlink_skills` | `~/.<tool>/skills/` → `~/.skills/` | 지원 스킬 경로를 단일 출처로 잇는 symlink (claude·agents·codex) |
+| `dot_local/bin/`            | `~/.local/bin/`                    | 사용자 스크립트 (dotfiles-doctor)                        |
 
 ## chezmoi special 파일
 
