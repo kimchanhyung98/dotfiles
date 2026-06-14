@@ -67,6 +67,15 @@ else
     fail "$IGNORE_FAIL macOS-only file(s) managed on Linux"
 fi
 
+# --- 2.3. 공통 스킬 디렉토리 정리 검증 ---
+section "Skills cleanup"
+SKILLS_CLEANUP_SOURCE="$HOME/.local/share/chezmoi/.chezmoiscripts/run_once_before_00-skills-ssot-migrate.sh.tmpl"
+if bash "$HOME/tests/skills-migrate.sh" "$SKILLS_CLEANUP_SOURCE"; then
+    pass "skills cleanup script removes legacy skills directories"
+else
+    fail "skills cleanup script"
+fi
+
 # --- 2.5. Zsh 설정 회귀 검증 ---
 section "Zsh config regression"
 if bash "$HOME/tests/zsh-config.sh"; then

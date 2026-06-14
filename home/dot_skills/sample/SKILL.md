@@ -1,6 +1,6 @@
 ---
 name: sample
-description: Example user-level skill shared across every AI CLI through ~/.skills symlinks.
+description: Example user-level skill shared across Claude Code and Codex through ~/.skills symlinks.
 ---
 
 # Sample Skill
@@ -8,7 +8,7 @@ description: Example user-level skill shared across every AI CLI through ~/.skil
 This file shows the expected shape of a skill placed in `~/.skills`, the single
 source of truth for user-level skills.
 
-Each AI CLI (Claude, Codex, agents) reaches this directory through a
+Claude Code and Codex reach this directory through a
 `skills -> ../.skills` symlink, so dropping a real skill here makes it available
-to all of them at once. Keep one skill per directory, each with its own
+to both tools at once. Keep one skill per directory, each with its own
 `SKILL.md`.

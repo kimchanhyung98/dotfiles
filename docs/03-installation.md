@@ -7,7 +7,7 @@
 
 | 스크립트                | 역할                          | 실행 조건       | 상세                                                                                                                                                                                                                                                                                                                 |
 |---------------------|-----------------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| skills-ssot-migrate | 기존 스킬 디렉토리 → `~/.skills` 이전 | 최초 1회, 배포 전 | `run_once_before_`로 dotfiles 배포 전에 실행. Claude Code와 Codex의 skills 경로가 symlink 전환 이전의 실제 디렉토리면 내용물(oh-my-codex 스킬 등)을 `~/.skills`로 이전한 뒤 디렉토리를 제거하여, symlink 교체 시 기존 스킬이 유실되지 않도록 보호. 설치 해제된 스킬(superpowers, humanizer, humanize-korean, humanizer-ko, peon-ping-*)은 이전하지 않고 폐기. 모든 경로가 이미 symlink면 아무 일도 하지 않음(멱등) |
+| skills-ssot-migrate | 기존 스킬 디렉토리 제거 | 최초 1회, 배포 전 | `run_once_before_`로 dotfiles 배포 전에 실행. Claude Code와 Codex의 skills 경로가 symlink 전환 이전의 실제 디렉토리면 삭제하여, dotfiles 배포 단계에서 `~/.skills` symlink로 교체될 수 있게 한다. 모든 경로가 이미 symlink면 아무 일도 하지 않음(멱등) |
 
 ## macOS 스크립트 (darwin/)
 
@@ -55,7 +55,7 @@
 chezmoi init --apply
 │
 ├─ skills-ssot-migrate (run_once_before, OS 공통)
-│   기존 실제 디렉토리 스킬(oh-my-codex 등)을 ~/.skills로 이전, 설치 해제 스킬은 폐기
+│   기존 실제 skills 디렉토리를 삭제해 symlink 교체 준비
 │
 ├─ 01 prerequisites
 │   Xcode CLI Tools → Homebrew → zerobrew → Rosetta 2 (Apple Silicon)
@@ -109,7 +109,7 @@ chezmoi init --apply
 chezmoi init --apply
 │
 ├─ skills-ssot-migrate (run_once_before, OS 공통)
-│   기존 실제 디렉토리 스킬을 ~/.skills로 이전, 설치 해제 스킬은 폐기
+│   기존 실제 skills 디렉토리를 삭제해 symlink 교체 준비
 │
 ├─ 01 install-packages
 │   curl, git, vim, zsh, ghostty

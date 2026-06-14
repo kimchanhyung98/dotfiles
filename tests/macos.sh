@@ -139,6 +139,15 @@ else
 fi
 rm -f "$rendered_app_script" "$app_script_err"
 
+# --- 1.4. 공통 스킬 디렉토리 정리 검증 ---
+section "Skills cleanup"
+SKILLS_CLEANUP_SOURCE="$REPO_DIR/home/.chezmoiscripts/run_once_before_00-skills-ssot-migrate.sh.tmpl"
+if bash "$REPO_DIR/tests/skills-migrate.sh" "$SKILLS_CLEANUP_SOURCE"; then
+    pass "skills cleanup script removes legacy skills directories"
+else
+    fail "skills cleanup script"
+fi
+
 # --- 1.5. Zsh 설정 회귀 검증 ---
 section "Zsh config regression"
 if bash "$REPO_DIR/tests/zsh-config.sh"; then

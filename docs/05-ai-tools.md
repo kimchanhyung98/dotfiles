@@ -27,10 +27,9 @@ Claude Code와 Codex가 단일 출처 `~/.skills`를 공유한다. 지원하는 
 `home/dot_codex/symlink_skills`로 symlink를 관리한다. 이 패턴은 프로젝트 루트의 `.skills` + `.claude/skills`·
 `.codex/skills` symlink 구조와 동일하다.
 
-**기존 머신 마이그레이션**: symlink 전환 이전에 지원 스킬 경로가 실제 디렉토리였던 머신에서는, `run_once_before_00-skills-ssot-migrate` 스크립트가 dotfiles 배포
-전에
-기존 스킬(oh-my-codex 스킬 등)을 `~/.skills`로 이전한다. 설치 해제된 스킬(superpowers, humanizer, humanize-korean, humanizer-ko,
-peon-ping-*)은 이전하지 않고 폐기한다.
+**기존 머신 정리**: symlink 전환 이전에 지원 스킬 경로가 실제 디렉토리였던 머신에서는, `run_once_before_00-skills-ssot-migrate` 스크립트가 dotfiles 배포
+전에 기존 skills 디렉토리를 삭제한다. 기존 실제 디렉토리가 남아 있으면 chezmoi가 해당 경로를 symlink로 교체할 수 없으므로, 삭제 후 dotfiles 배포 단계에서
+`~/.skills` symlink로 교체한다.
 
 **스킬 소스**:
 
