@@ -199,7 +199,7 @@ while IFS= read -r -d '' script; do
         echo "    SKIP: $(basename "$script") (template render failed)"
     fi
     rm -f "$rendered"
-done < <(find "$REPO_DIR/home/.chezmoiscripts/darwin" -name '*.sh.tmpl' -type f -print0 2>/dev/null)
+done < <(find "$REPO_DIR/home/.chezmoiscripts" "$REPO_DIR/home/.chezmoiscripts/darwin" -maxdepth 1 -name '*.sh.tmpl' -type f -print0 2>/dev/null)
 
 if [ "$SC_FAIL" -eq 0 ]; then
     pass "ShellCheck passed for all darwin scripts"

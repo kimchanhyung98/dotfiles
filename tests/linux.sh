@@ -140,7 +140,7 @@ while IFS= read -r -d '' script; do
         fi
     fi
     rm -f "$rendered"
-done < <(find "$CHEZMOI_SOURCE/.chezmoiscripts/linux" -name '*.sh.tmpl' -print0 2>/dev/null)
+done < <(find "$CHEZMOI_SOURCE/.chezmoiscripts" "$CHEZMOI_SOURCE/.chezmoiscripts/linux" -maxdepth 1 -name '*.sh.tmpl' -print0 2>/dev/null)
 
 if [ "$SC_FAIL" -eq 0 ]; then
     pass "ShellCheck passed for all linux scripts"
