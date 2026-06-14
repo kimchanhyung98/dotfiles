@@ -66,14 +66,6 @@ else
     echo "[ai-core][antigravity] already installed ($(agy --version 2>/dev/null || echo 'unknown'))"
 fi
 
-# Copilot CLI
-if ! command -v copilot &>/dev/null; then
-    echo "[ai-core][copilot] installing"
-    npm install -g @github/copilot || echo "[ai-core][warning] Copilot CLI installation failed"
-else
-    echo "[ai-core][copilot] already installed ($(copilot --version 2>/dev/null || echo 'unknown'))"
-fi
-
 # Hermes Agent
 if ! command -v hermes &>/dev/null; then
     echo "[ai-core][hermes] installing"

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# AI Tools and extensions (Linux): claude, codex, codegraph, antigravity, hermes, oh-my-codex, opencode, oh-my-opencode
+# AI Tools and extensions (Linux): claude, codex, codegraph, antigravity, hermes, oh-my-codex
 # Runs once on first setup
 
 {{ if ne .chezmoi.os "linux" }}
@@ -75,24 +75,6 @@ if ! command -v omx &>/dev/null; then
     npm install -g oh-my-codex || echo "[ai-tools][warning] oh-my-codex install failed"
 else
     echo "[ai-tools][oh-my-codex] already installed"
-fi
-
-# OpenCode
-# - 오픈소스 터미널 AI 코딩 도우미
-if ! command -v opencode &>/dev/null; then
-    echo "[ai-tools][opencode] installing"
-    npm install -g opencode-ai || echo "[ai-tools][warning] OpenCode install failed"
-else
-    echo "[ai-tools][opencode] already installed"
-fi
-
-# oh-my-opencode
-# - OpenCode 확장 프레임워크
-if ! command -v oh-my-opencode &>/dev/null; then
-    echo "[ai-tools][oh-my-opencode] installing"
-    npm install -g oh-my-opencode || echo "[ai-tools][warning] oh-my-opencode install failed"
-else
-    echo "[ai-tools][oh-my-opencode] already installed"
 fi
 
 # Antigravity CLI

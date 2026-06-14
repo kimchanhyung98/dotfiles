@@ -16,10 +16,9 @@
 
 | 순서 | 스크립트        | 역할                                                           | 실행 조건 | 상세                                                                                                                                |
 |:--:|-------------|--------------------------------------------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------|
-| 10 | ai-core     | Claude Code, Codex CLI, Antigravity CLI, Copilot CLI, Hermes Agent, CodeGraph | 최초 1회 | 공식 AI CLI 도구 5종과 CodeGraph 설치. Claude Code·Antigravity·Hermes는 공식 설치 스크립트(curl), Codex·Copilot·CodeGraph는 npm. 확장 환경 구성은 개별 스크립트(11~12, 20)에서 처리 |
+| 10 | ai-core     | Claude Code, Codex CLI, Antigravity CLI, Hermes Agent, CodeGraph | 최초 1회 | 공식 AI CLI 도구 4종과 CodeGraph 설치. Claude Code·Antigravity·Hermes는 공식 설치 스크립트(curl), Codex·CodeGraph는 npm. 확장 환경 구성은 개별 스크립트(11~12)에서 처리 |
 | 11 | ai-claude   | SuperClaude, CodeGraph MCP                                  | 최초 1회 | SuperClaude 프레임워크(pipx). CodeGraph MCP를 등록하고, 플러그인·MCP는 settings.json·claude.json에서 선언적 관리                                       |
 | 12 | ai-codex    | oh-my-codex, 프로필 초기화                                         | 최초 1회 | oh-my-codex(npm), 프로필 초기화. CodeGraph MCP는 config.toml에서 선언적 관리                       |
-| 20 | ai-opencode | OpenCode, oh-my-opencode                                     | 최초 1회 | OpenCode(npm), oh-my-opencode(npm). MCP는 opencode.json에서 선언적 관리       |
 
 | 순서 | 스크립트           | 역할          | 실행 조건             |
 |:--:|----------------|-------------|-------------------|
@@ -27,9 +26,8 @@
 
 **AI 스크립트 설계 원칙**:
 
-- 코어 설치(10)와 프로바이더별 확장 설치(11~12, 20)를 분리하여 책임 경계를 명확히 유지
+- 코어 설치(10)와 프로바이더별 확장 설치(11~12)를 분리하여 책임 경계를 명확히 유지
 - 각 프로바이더가 MCP 서버, 플러그인을 독립적으로 관리하여 한 도구의 실패가 다른 도구에 영향을 주지 않음
-- 공식 AI CLI(10번대)와 외부 오픈소스 도구(20번대)를 번호 대역으로 구분
 
 ### Linux 스크립트 (linux/)
 
@@ -38,7 +36,7 @@
 | 01 | install-packages | curl, git, vim, zsh, ghostty                                 | 최초 1회, dotfiles 전 | 패키지 관리자를 자동 감지(apt-get → dnf → yum)하여 기초 도구를 설치. 이미 설치된 패키지는 건너뜀 |
 | 02 | shell-baseline   | 기본 셸, 로케일, 타임존                                               | 설정 변경 시           | zsh를 기본 셸로 전환하고 히스토리, 키바인딩 기본값을 설정. 로케일과 타임존 정책도 함께 적용           |
 | 03 | git-baseline     | Git 사용자 설정, SSH 기초                                           | 설정 변경 시           | 템플릿 변수(name, email)로 Git 사용자 정보를 설정하고 SSH 키 생성 기초 환경을 구성         |
-| 04 | ai-tools         | claude, codex, codegraph, antigravity, hermes, oh-my-codex, opencode, oh-my-opencode | 최초 1회             | macOS와 동일한 AI 도구를 Linux용 구성으로 설치. Hermes는 자체 의존성을 함께 준비하므로 설치 시간이 길 수 있음 |
+| 04 | ai-tools         | claude, codex, codegraph, antigravity, hermes, oh-my-codex | 최초 1회             | macOS와 동일한 AI 도구를 Linux용 구성으로 설치. Hermes는 자체 의존성을 함께 준비하므로 설치 시간이 길 수 있음 |
 | 05 | system-baseline  | 시스템 기초 설정                                                    | 설정 변경 시           | 기본 에디터, 시스템 경로, 기초 보안 설정 등 OS 수준 기본값 적용                          |
 
 ## 설치 흐름
@@ -72,8 +70,8 @@ chezmoi init --apply
 │   Bun (JavaScript/TypeScript 런타임)
 │
 ├─ 10 ai-core
-│   Claude Code, Codex CLI, Antigravity CLI, Copilot CLI, Hermes Agent, CodeGraph
-│   Claude Code·Antigravity·Hermes(curl 스크립트), Codex·Copilot·CodeGraph(npm) 설치
+│   Claude Code, Codex CLI, Antigravity CLI, Hermes Agent, CodeGraph
+│   Claude Code·Antigravity·Hermes(curl 스크립트), Codex·CodeGraph(npm) 설치
 │
 ├─ 11 ai-claude
 │   SuperClaude (플러그인·MCP는 설정 파일로 관리)
@@ -81,16 +79,13 @@ chezmoi init --apply
 ├─ 12 ai-codex
 │   oh-my-codex → 프로필 초기화 (CodeGraph MCP는 config.toml로 관리)
 │
-├─ 20 ai-opencode
-│   OpenCode → oh-my-opencode
-│
 ├─ dotfiles 배포
 │   ~/.zshrc, ~/.gitconfig, ~/.gitignore_global, ~/.vimrc
 │   ~/AGENTS.md (공통 에이전트 지침)
-│   ~/.config/cmux/settings.json, ~/.config/ghostty/config, ~/.config/opencode/*
+│   ~/.config/cmux/settings.json, ~/.config/ghostty/config
 │   ~/.claude/settings.json
 │   ~/.codex/config.toml
-│   ~/.agents/skills/*, ~/.copilot/mcp-config.json, ~/.copilot/skills/*
+│   ~/.agents/skills/*
 │   ~/.local/bin/dotfiles-doctor
 │
 └─ 99 manual-install
@@ -117,7 +112,7 @@ chezmoi init --apply
 │
 ├─ 04 ai-tools
 │   claude, codex, codegraph, antigravity, hermes,
-│   oh-my-codex, opencode, oh-my-opencode
+│   oh-my-codex
 │
 ├─ 05 system-baseline
 │   시스템 기초 설정
@@ -125,15 +120,15 @@ chezmoi init --apply
 └─ dotfiles 배포
     ~/.zshrc, ~/.gitconfig, ~/.gitignore_global
     ~/AGENTS.md
-    ~/.config/ghostty/config, ~/.config/opencode/*
-    ~/.claude/*, ~/.codex/*, ~/.agents/*, ~/.copilot/*
+    ~/.config/ghostty/config
+    ~/.claude/*, ~/.codex/*, ~/.agents/*
 ```
 
 ## Brewfile 패키지
 
 Brewfile은 `zb bundle`(zerobrew) 명령으로 동기화한다. zerobrew 실패 시 `brew bundle`로 폴백한다. 패키지 추가/제거는 Brewfile만 수정하면 다음
 `chezmoi apply`에서 자동 반영된다.
-AI 도구(Claude Code, Codex, Antigravity, Copilot, Hermes, CodeGraph)는 설치 채널 정책에 따라 AI 스크립트에서 각 채널(curl/npm)로 관리하고, Brewfile은 Homebrew 직접 관리
+AI 도구(Claude Code, Codex, Antigravity, Hermes, CodeGraph)는 설치 채널 정책에 따라 AI 스크립트에서 각 채널(curl/npm)로 관리하고, Brewfile은 Homebrew 직접 관리
 대상만 유지한다.
 
 | 대주제    | 소주제         | 상세 패키지                                                                                                              |
@@ -156,9 +151,7 @@ AI 도구(Claude Code, Codex, Antigravity, Copilot, Hermes, CodeGraph)는 설치
 | Codex    | 공식 | npm (`npm install -g @openai/codex`)                        | npm      |
 | CodeGraph | 외부 | shell installer 또는 npm (`npm install -g @colbymchenry/codegraph`) | npm      |
 | Antigravity | 공식 | 공식 스크립트 (`curl -fsSL https://antigravity.google/cli/install.sh \| bash`) | curl     |
-| Copilot  | 공식 | npm (`npm install -g @github/copilot`)                      | npm      |
 | Hermes   | 공식 | 공식 스크립트 (`curl -fsSL https://hermes-agent.nousresearch.com/install.sh \| bash`) | curl     |
-| OpenCode | 외부 | npm (`npm install -g opencode-ai`)                          | npm      |
 
 ## 외부 리소스
 

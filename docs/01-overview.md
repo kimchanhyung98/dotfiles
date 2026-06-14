@@ -4,9 +4,9 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 
 ## 범위
 
-- macOS 중심 환경에 시스템, Claude, Codex, Antigravity, Copilot, OpenCode 스택을 통합한다.
+- macOS 중심 환경에 시스템, Claude, Codex, Antigravity 스택을 통합한다.
 - Linux는 기초 셸/패키지/AI 최소 구성으로 유지한다.
-- 지정된 저장소 9개를 실제 원격 기준으로 검증하고, 유지 가능한 항목만 선별 적용한다.
+- 지정된 저장소 7개를 실제 원격 기준으로 검증하고, 유지 가능한 항목만 선별 적용한다.
 - 저장소 원본 전체를 복제하지 않고 유지 가능한 구성만 채택한다.
 
 ## 검토 완료 레포
@@ -16,7 +16,6 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 | System   | lucasgelfond/zerobrew, ghostty-org/ghostty                                                                                                          |
 | Claude   | jarrodwatts/claude-hud, VoltAgent/awesome-agent-skills, forrestchang/andrej-karpathy-skills                                                         |
 | Codex    | Yeachan-Heo/oh-my-codex                                                                                                                             |
-| OpenCode | anomalyco/opencode, code-yeongyu/oh-my-opencode                                                                                                     |
 
 ## 검증 스냅샷
 
@@ -30,8 +29,6 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 | jarrodwatts/claude-hud              | `10193cc` |
 | VoltAgent/awesome-agent-skills      | `feb81d6` |
 | forrestchang/andrej-karpathy-skills | `aa4467f` |
-| anomalyco/opencode                  | `ef979cc` |
-| code-yeongyu/oh-my-opencode         | `7d2c798` |
 | Yeachan-Heo/oh-my-codex             | `c25edb0` |
 
 ## 설계 원칙
@@ -46,6 +43,6 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
   관리할 수 있다.
 - **설치와 설정 분리**: 도구의 바이너리 설치는 스크립트가 담당하고, 사용자 설정은 chezmoi가 배포하는 설정 파일(`.tmpl`)이 담당한다. 설치 방식이 바뀌어도 설정은 그대로 유지되고, 설정을 변경해도
   재설치가 필요 없다.
-- **실패 격리**: 각 AI 도구의 설치를 독립 스크립트로 분리하여, 한 도구의 설치 실패가 다른 도구에 영향을 주지 않는다. Claude 설치가 실패해도 Codex, OpenCode는 정상적으로 설치된다.
+- **실패 격리**: 각 AI 도구의 설치를 독립 스크립트로 분리하여, 한 도구의 설치 실패가 다른 도구에 영향을 주지 않는다. Claude 설치가 실패해도 Codex는 정상적으로 설치된다.
 - **사용자 설정 우선**: 도구의 기본 동작보다 사용자가 선언한 설정을 우선 적용한다. 도구 업데이트로 기본값이 변경되어도 사용자 설정은 유지된다.
 - **검증 가능한 근거 유지**: 모든 경로, 설정 파일명, 도구 동작은 공식 문서 또는 실제 저장소 기준으로 검증한다. 문서에 기재된 정보는 검증 스냅샷의 커밋 해시로 추적할 수 있어야 한다.

@@ -14,8 +14,7 @@ SSOT="$HOME/.skills"
 for dir in \
     "$HOME/.claude/skills" \
     "$HOME/.agents/skills" \
-    "$HOME/.codex/skills" \
-    "$HOME/.copilot/skills"; do
+    "$HOME/.codex/skills"; do
     if [ ! -d "$dir" ] || [ -L "$dir" ]; then
         continue
     fi
