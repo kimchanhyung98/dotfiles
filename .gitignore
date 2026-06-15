@@ -160,11 +160,11 @@ $RECYCLE.BIN/
 
 # Codex
 .agents/*
+!.agents/skills
 .codex/*
 !.codex/config.toml
 !.codex/hooks.json
 !.codex/hooks
-!.codex/skills
 
 # Gemini
 .gemini/*

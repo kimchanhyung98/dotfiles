@@ -26,7 +26,7 @@
 |:--:|-----------|------------------------------------------------------------------|-------|------------------------------------------------------------------------------------------------------------------------------------|
 | 10 | ai-core   | Claude Code, Codex CLI, Antigravity CLI, Hermes Agent, CodeGraph | 최초 1회 | AI CLI 도구 4종과 CodeGraph 설치. Claude Code·Antigravity·Hermes는 공식 설치 스크립트(curl), Codex·CodeGraph는 npm. 확장 환경 구성은 개별 스크립트(11~12)에서 처리  |
 | 11 | ai-claude | SuperClaude, CodeGraph MCP                                       | 최초 1회 | SuperClaude 프레임워크(pipx). CodeGraph MCP를 등록하고, 플러그인·MCP는 settings.json·claude.json에서 선언적 관리                                         |
-| 12 | ai-codex  | oh-my-codex, 프로필 초기화                                             | 최초 1회 | oh-my-codex(npm), 프로필 초기화. Codex 스킬은 ~/.agents/skills·~/.codex/skills → ~/.skills symlink로 공유. CodeGraph MCP는 config.toml에서 선언적 관리 |
+| 12 | ai-codex  | oh-my-codex, 프로필 초기화                                             | 최초 1회 | oh-my-codex(npm), 프로필 초기화. Codex 스킬은 ~/.agents/skills → ~/.skills symlink로 공유. CodeGraph MCP는 config.toml에서 선언적 관리 |
 
 | 순서 | 스크립트           | 역할          | 실행 조건             |
 |:--:|----------------|-------------|-------------------|
@@ -97,7 +97,7 @@ chezmoi init --apply
 │   ~/.config/cmux/settings.json, ~/.config/ghostty/config
 │   ~/.claude/settings.json
 │   ~/.codex/config.toml
-│   ~/.skills/* (공통 스킬 단일 출처), 지원 스킬 경로(~/.claude/skills, ~/.agents/skills, ~/.codex/skills) → ~/.skills symlink
+│   ~/.skills/* (공통 스킬 단일 출처), 지원 스킬 경로(~/.claude/skills, ~/.agents/skills) → ~/.skills symlink
 │   ~/.local/bin/dotfiles-doctor, ~/.local/bin/mattpocock-skills-sync
 │
 ├─ mattpocock-skills (run_onchange_after, OS 공통)
@@ -140,7 +140,7 @@ chezmoi init --apply
 │   ~/AGENTS.md
 │   ~/.config/ghostty/config
 │   ~/.claude/*, ~/.codex/*, ~/.agents/*
-│   ~/.skills/* (공통 스킬 단일 출처), 지원 스킬 경로(~/.claude/skills, ~/.agents/skills, ~/.codex/skills) → ~/.skills symlink
+│   ~/.skills/* (공통 스킬 단일 출처), 지원 스킬 경로(~/.claude/skills, ~/.agents/skills) → ~/.skills symlink
 │   ~/.local/bin/mattpocock-skills-sync
 │
 └─ mattpocock-skills (run_onchange_after, OS 공통)

@@ -13,3 +13,6 @@
 .config/opencode/oh-my-opencode.jsonc
 .config/opencode/plugins
 .config/opencode/skills
+
+# Codex legacy skills path removal (official path is ~/.agents/skills)
+.codex/skills

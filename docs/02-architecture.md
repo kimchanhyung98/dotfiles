@@ -88,7 +88,7 @@ dotfiles/
 | `dot_config/zsh/`           | `~/.config/zsh/`                   | `.zshrc`에서 순차 로드하는 모듈형 Zsh 설정                     |
 | `dot_claude/`               | `~/.claude/`                       | Claude Code 설정                                    |
 | `dot_codex/`                | `~/.codex/`                        | Codex CLI 설정                                      |
-| `dot_<tool>/symlink_skills` | `~/.<tool>/skills/` → `~/.skills/` | 지원 스킬 경로를 단일 출처로 잇는 symlink (claude·agents·codex) |
+| `dot_<tool>/symlink_skills` | `~/.<tool>/skills/` → `~/.skills/` | 지원 스킬 경로를 단일 출처로 잇는 symlink (claude·agents)       |
 | `dot_local/bin/`            | `~/.local/bin/`                    | 사용자 스크립트 (doctor, mattpocock 스킬 동기화)                  |
 
 ## chezmoi special 파일

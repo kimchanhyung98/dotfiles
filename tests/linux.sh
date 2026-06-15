@@ -83,7 +83,6 @@ SKILLS_TOPOLOGY_FAIL=0
 for target in \
     ".claude/skills" \
     ".agents/skills" \
-    ".codex/skills" \
     ".local/bin/mattpocock-skills-sync"; do
     if ! grep -Fxq "$target" <<< "$SKILLS_MANAGED_PATHS"; then
         echo "    FAIL: $target is not managed"

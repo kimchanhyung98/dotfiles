@@ -118,7 +118,6 @@ section "Skill Directories"
 check_path "Shared skills (~/.skills)" "$HOME/.skills"
 check "Claude skills -> ~/.skills" "[ -L '$HOME/.claude/skills' ] && [ -e '$HOME/.claude/skills' ]"
 check "Codex skills (~/.agents) -> ~/.skills" "[ -L '$HOME/.agents/skills' ] && [ -e '$HOME/.agents/skills' ]"
-check "Codex skills (~/.codex) -> ~/.skills" "[ -L '$HOME/.codex/skills' ] && [ -e '$HOME/.codex/skills' ]"
 
 # AGENTS.md
 section "AGENTS.md"
