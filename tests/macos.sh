@@ -148,7 +148,44 @@ else
     fail "skills cleanup script"
 fi
 
-# --- 1.5. Zsh 설정 회귀 검증 ---
+# --- 1.5. 공통 스킬 배포 경로 검증 ---
+section "Skills deployment topology"
+SKILLS_MANAGED_PATHS="$(cz managed --include=all 2>/dev/null || true)"
+SKILLS_TOPOLOGY_FAIL=0
+for target in \
+    ".claude/skills" \
+    ".agents/skills" \
+    ".codex/skills" \
+    ".local/bin/mattpocock-skills-sync"; do
+    if ! grep -Fxq "$target" <<< "$SKILLS_MANAGED_PATHS"; then
+        echo "    FAIL: $target is not managed"
+        SKILLS_TOPOLOGY_FAIL=$((SKILLS_TOPOLOGY_FAIL + 1))
+    fi
+done
+
+if [ "$SKILLS_TOPOLOGY_FAIL" -eq 0 ]; then
+    pass "shared skills source and tool symlinks are managed"
+else
+    fail "$SKILLS_TOPOLOGY_FAIL skills deployment path(s) missing"
+fi
+
+# --- 1.6. mattpocock 스킬 동기화 검증 ---
+section "mattpocock skills sync"
+MATTPOCOCK_SYNC_SOURCE="$REPO_DIR/home/dot_local/bin/executable_mattpocock-skills-sync"
+MATTPOCOCK_SCRIPT_SOURCE="$REPO_DIR/home/.chezmoiscripts/run_onchange_after_06-mattpocock-skills.sh.tmpl"
+rendered_mattpocock_script="$(mktemp -p "$TMPHOME")"
+mattpocock_script_err="$(mktemp -p "$TMPHOME")"
+if bash "$REPO_DIR/tests/mattpocock-skills-sync.sh" "$MATTPOCOCK_SYNC_SOURCE" \
+   && cz execute-template < "$MATTPOCOCK_SCRIPT_SOURCE" > "$rendered_mattpocock_script" 2>"$mattpocock_script_err" \
+   && bash -n "$rendered_mattpocock_script" \
+   && grep -q 'mattpocock-skills-sync' "$rendered_mattpocock_script"; then
+    pass "mattpocock skills sync installs and refreshes runtime skills"
+else
+    fail "mattpocock skills sync (stderr: $(cat "$mattpocock_script_err"))"
+fi
+rm -f "$rendered_mattpocock_script" "$mattpocock_script_err"
+
+# --- 1.7. Zsh 설정 회귀 검증 ---
 section "Zsh config regression"
 if bash "$REPO_DIR/tests/zsh-config.sh"; then
     pass "Zsh config regression checks"
