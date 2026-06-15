@@ -8,6 +8,7 @@
 | 스크립트                | 역할                          | 실행 조건       | 상세                                                                                                                                                                                                                                                                                                                 |
 |---------------------|-----------------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | skills-ssot-migrate | 기존 스킬 디렉토리 제거 | 최초 1회, 배포 전 | `run_once_before_`로 dotfiles 배포 전에 실행. Claude Code와 Codex의 skills 경로가 symlink 전환 이전의 실제 디렉토리면 삭제하여, dotfiles 배포 단계에서 `~/.skills` symlink로 교체될 수 있게 한다. 모든 경로가 이미 symlink면 아무 일도 하지 않음(멱등) |
+| mattpocock-skills | 외부 스킬 동기화 | 최초 적용 및 스크립트 변경 시, 배포 후 | `run_onchange_after_`로 dotfiles 배포 후 실행. `~/.local/bin/mattpocock-skills-sync`가 `mattpocock/skills` GitHub archive에서 선택한 스킬만 `~/.skills`로 동기화한다. 수동 재실행 시 관리 manifest 기준으로 기존 스킬을 교체하고 제외된 스킬은 제거한다. |
 
 ## macOS 스크립트 (darwin/)
 
@@ -97,7 +98,10 @@ chezmoi init --apply
 │   ~/.claude/settings.json
 │   ~/.codex/config.toml
 │   ~/.skills/* (공통 스킬 단일 출처), 지원 스킬 경로(~/.claude/skills, ~/.agents/skills, ~/.codex/skills) → ~/.skills symlink
-│   ~/.local/bin/dotfiles-doctor
+│   ~/.local/bin/dotfiles-doctor, ~/.local/bin/mattpocock-skills-sync
+│
+├─ mattpocock-skills (run_onchange_after, OS 공통)
+│   GitHub archive에서 선택한 스킬을 ~/.skills로 동기화
 │
 └─ 99 manual-install
     JetBrains Toolbox, Raycast (자동 설치 불가 항목 안내)
@@ -131,12 +135,16 @@ chezmoi init --apply
 ├─ 05 system-baseline
 │   시스템 기초 설정
 │
-└─ dotfiles 배포
-    ~/.zshrc, ~/.gitconfig, ~/.gitignore_global
-    ~/AGENTS.md
-    ~/.config/ghostty/config
-    ~/.claude/*, ~/.codex/*, ~/.agents/*
-    ~/.skills/* (공통 스킬 단일 출처), 지원 스킬 경로(~/.claude/skills, ~/.agents/skills, ~/.codex/skills) → ~/.skills symlink
+├─ dotfiles 배포
+│   ~/.zshrc, ~/.gitconfig, ~/.gitignore_global
+│   ~/AGENTS.md
+│   ~/.config/ghostty/config
+│   ~/.claude/*, ~/.codex/*, ~/.agents/*
+│   ~/.skills/* (공통 스킬 단일 출처), 지원 스킬 경로(~/.claude/skills, ~/.agents/skills, ~/.codex/skills) → ~/.skills symlink
+│   ~/.local/bin/mattpocock-skills-sync
+│
+└─ mattpocock-skills (run_onchange_after, OS 공통)
+    GitHub archive에서 선택한 스킬을 ~/.skills로 동기화
 ```
 
 ## Brewfile 패키지

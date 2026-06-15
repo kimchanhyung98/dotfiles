@@ -17,6 +17,7 @@ dotfiles/
     │
     ├── .chezmoiscripts/
     │   ├── run_once_before_00-skills-ssot-migrate.sh.tmpl   # OS 공통: 기존 스킬 디렉토리 → ~/.skills 이전
+    │   ├── run_onchange_after_06-mattpocock-skills.sh.tmpl  # OS 공통: mattpocock 스킬 런타임 동기화
     │   │
     │   ├── darwin/
     │   │   ├── run_once_before_01-prerequisites.sh.tmpl
@@ -60,9 +61,6 @@ dotfiles/
     │   │   ├── 60-tools.zsh
     │   │   ├── 70-aliases.zsh
     │   │   └── 80-secrets.zsh
-    ├── dot_skills/                    # 공통 스킬 단일 출처 (→ ~/.skills)
-    │   └── sample/SKILL.md
-    │
     ├── dot_claude/
     │   ├── settings.json.tmpl
     │   └── symlink_skills             # → ~/.skills
@@ -75,7 +73,8 @@ dotfiles/
     │   └── symlink_skills             # → ~/.skills
     │
     └── dot_local/bin/
-        └── executable_dotfiles-doctor
+        ├── executable_dotfiles-doctor
+        └── executable_mattpocock-skills-sync
 ```
 
 ## 배포 매핑
@@ -89,9 +88,8 @@ dotfiles/
 | `dot_config/zsh/`           | `~/.config/zsh/`                   | `.zshrc`에서 순차 로드하는 모듈형 Zsh 설정                     |
 | `dot_claude/`               | `~/.claude/`                       | Claude Code 설정                                    |
 | `dot_codex/`                | `~/.codex/`                        | Codex CLI 설정                                      |
-| `dot_skills/`               | `~/.skills/`                       | 공통 스킬 단일 출처 (Claude Code와 Codex가 symlink로 공유)     |
 | `dot_<tool>/symlink_skills` | `~/.<tool>/skills/` → `~/.skills/` | 지원 스킬 경로를 단일 출처로 잇는 symlink (claude·agents·codex) |
-| `dot_local/bin/`            | `~/.local/bin/`                    | 사용자 스크립트 (dotfiles-doctor)                        |
+| `dot_local/bin/`            | `~/.local/bin/`                    | 사용자 스크립트 (doctor, mattpocock 스킬 동기화)                  |
 
 ## chezmoi special 파일
 
