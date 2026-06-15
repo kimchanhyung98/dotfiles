@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+# Sync selected mattpocock/skills entries into the shared ~/.skills directory.
+# This runs on first apply and when this script changes. Re-run the sync command
+# directly when you want to refresh upstream skills.
+
+set -euo pipefail
+
+sync_script="$HOME/.local/bin/mattpocock-skills-sync"
+
+if [ ! -x "$sync_script" ]; then
+    echo "[mattpocock-skills] missing $sync_script" >&2
+    exit 1
+fi
+
+"$sync_script"
