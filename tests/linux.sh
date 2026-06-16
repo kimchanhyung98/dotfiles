@@ -105,7 +105,8 @@ mattpocock_script_err="$(mktemp)"
 if bash "$HOME/tests/mattpocock-skills-sync.sh" "$MATTPOCOCK_SYNC_SOURCE" \
    && chezmoi execute-template < "$MATTPOCOCK_SCRIPT_SOURCE" > "$rendered_mattpocock_script" 2>"$mattpocock_script_err" \
    && bash -n "$rendered_mattpocock_script" \
-   && grep -q 'mattpocock-skills-sync' "$rendered_mattpocock_script"; then
+   && grep -q 'mattpocock-skills-sync' "$rendered_mattpocock_script" \
+   && grep -q 'Sync helper hash:' "$rendered_mattpocock_script"; then
     pass "mattpocock skills sync installs and refreshes runtime skills"
 else
     fail "mattpocock skills sync (stderr: $(cat "$mattpocock_script_err"))"

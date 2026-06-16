@@ -177,7 +177,8 @@ mattpocock_script_err="$(mktemp -p "$TMPHOME")"
 if bash "$REPO_DIR/tests/mattpocock-skills-sync.sh" "$MATTPOCOCK_SYNC_SOURCE" \
    && cz execute-template < "$MATTPOCOCK_SCRIPT_SOURCE" > "$rendered_mattpocock_script" 2>"$mattpocock_script_err" \
    && bash -n "$rendered_mattpocock_script" \
-   && grep -q 'mattpocock-skills-sync' "$rendered_mattpocock_script"; then
+   && grep -q 'mattpocock-skills-sync' "$rendered_mattpocock_script" \
+   && grep -q 'Sync helper hash:' "$rendered_mattpocock_script"; then
     pass "mattpocock skills sync installs and refreshes runtime skills"
 else
     fail "mattpocock skills sync (stderr: $(cat "$mattpocock_script_err"))"
@@ -232,7 +233,11 @@ if ! command -v shellcheck &>/dev/null; then
     warn "shellcheck not installed, skipping (brew install shellcheck)"
 else
 SC_FAIL=0
-while IFS= read -r -d '' script; do
+for script in \
+    "$REPO_DIR"/home/.chezmoiscripts/*.sh.tmpl \
+    "$REPO_DIR"/home/.chezmoiscripts/darwin/*.sh.tmpl; do
+    [ -e "$script" ] || continue
+
     rendered=$(mktemp -p "$TMPHOME")
     if cz execute-template < "$script" > "$rendered" 2>/dev/null; then
         if ! shellcheck -s bash -S warning "$rendered" > /dev/null 2>&1; then
@@ -244,7 +249,7 @@ while IFS= read -r -d '' script; do
         echo "    SKIP: $(basename "$script") (template render failed)"
     fi
     rm -f "$rendered"
-done < <(find "$REPO_DIR/home/.chezmoiscripts" "$REPO_DIR/home/.chezmoiscripts/darwin" -maxdepth 1 -name '*.sh.tmpl' -type f -print0 2>/dev/null)
+done
 
 if [ "$SC_FAIL" -eq 0 ]; then
     pass "ShellCheck passed for all darwin scripts"
