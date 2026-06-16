@@ -1,6 +1,6 @@
 ---
 name: write-dot-skills
-description: Use when writing, creating, adding, drafting, updating, reviewing, renaming, cleaning up, or removing dotfiles-managed shared user skills in home/dot_skills or ~/.skills for Claude Code and Codex; triggers include dot_skills, dot skills, write skill, create skill, skill authoring, user/shared skill, SKILL.md, Claude/Codex skills, 스킬 작성, 스킬 생성, 스킬 만들기, 스킬 추가, 스킬 수정, 스킬 검토, 스킬 정리, 스킬 삭제, 사용자/공유 스킬, 닷스킬, dotfiles 스킬.
+description: Helps with writing, creating, adding, drafting, updating, reviewing, renaming, cleaning up, or removing dotfiles-managed shared user skills in home/dot_skills or ~/.skills for Claude Code and Codex; triggers include dot_skills, dot skills, write skill, create skill, skill authoring, user/shared skill, SKILL.md, Claude/Codex skills, 스킬 작성, 스킬 생성, 스킬 만들기, 스킬 추가, 스킬 수정, 스킬 검토, 스킬 정리, 스킬 삭제, 사용자/공유 스킬, 닷스킬, dotfiles 스킬.
 ---
 
 # Write Dot Skills
