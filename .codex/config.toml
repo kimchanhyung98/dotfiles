@@ -469,9 +469,6 @@ enabled = true
 [plugins."vercel@openai-curated"]
 enabled = true
 
-[plugins."cloudflare@openai-curated"]
-enabled = true
-
 ################################################################################
 # 모델 Provider
 ################################################################################

@@ -68,6 +68,41 @@ else
     fail "$TMPL_FAIL template(s) failed to render"
 fi
 
+# --- 1.1. Codex workspace permissions 검증 ---
+section "Codex workspace permissions"
+CODEX_CONFIG_SOURCE="$REPO_DIR/home/dot_codex/config.toml.tmpl"
+rendered_codex_config="$(mktemp -p "$TMPHOME")"
+codex_config_err="$(mktemp -p "$TMPHOME")"
+CODEX_PERMISSIONS_FAIL=0
+if cz execute-template < "$CODEX_CONFIG_SOURCE" > "$rendered_codex_config" 2>"$codex_config_err"; then
+    for rule in \
+        '".agents" = "write"' \
+        '".codex" = "write"' \
+        '".git" = "write"' \
+        '".hooks" = "write"' \
+        '".skills" = "write"' \
+        '".env" = "deny"'; do
+        if ! grep -Fq "$rule" "$rendered_codex_config"; then
+            echo "    FAIL: missing $rule"
+            CODEX_PERMISSIONS_FAIL=$((CODEX_PERMISSIONS_FAIL + 1))
+        fi
+    done
+    if grep -Fq 'cloudflare@openai-curated' "$rendered_codex_config"; then
+        echo "    FAIL: cloudflare plugin should not be enabled"
+        CODEX_PERMISSIONS_FAIL=$((CODEX_PERMISSIONS_FAIL + 1))
+    fi
+else
+    echo "    FAIL: render failed (stderr: $(cat "$codex_config_err"))"
+    CODEX_PERMISSIONS_FAIL=$((CODEX_PERMISSIONS_FAIL + 1))
+fi
+
+if [ "$CODEX_PERMISSIONS_FAIL" -eq 0 ]; then
+    pass "Codex config grants repo support paths without exposing secrets"
+else
+    fail "Codex workspace permissions regression"
+fi
+rm -f "$rendered_codex_config" "$codex_config_err"
+
 # --- 1.2. cmux 기본 자동화 설정 검증 ---
 section "cmux automation defaults"
 CMUX_SETTINGS_SOURCE="$REPO_DIR/home/dot_config/cmux/settings.json.tmpl"
