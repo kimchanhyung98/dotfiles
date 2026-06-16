@@ -146,6 +146,7 @@ $RECYCLE.BIN/
 .devin/*
 .goose/*
 .kilocode/*
+.opencode/*
 .qwen/*
 .roo/*
 .windsurf/*
@@ -181,6 +182,6 @@ $RECYCLE.BIN/
 agent-os/
 
 # etc
-.cmux
-.omx
+.cmux/
+.omx/
 .remember

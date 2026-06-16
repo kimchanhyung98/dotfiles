@@ -272,8 +272,11 @@ glob_scan_max_depth = 3
 
 [permissions.workspace.filesystem.":workspace_roots"]
 "." = "write"
-".git" = "write"
+".agents" = "write"
 ".codex" = "write"
+".git" = "write"
+".hooks" = "write"
+".skills" = "write"
 ".env" = "deny"
 ".env.prod*" = "deny"
 "**/.env" = "deny"
