@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-OWNER="mattpocock"
-REPO="skills"
-BRANCH="${MATTPOCOCK_SKILLS_BRANCH:-main}"
-ARCHIVE_URL="https://github.com/$OWNER/$REPO/archive/refs/heads/$BRANCH.tar.gz"
-TARGET_DIR="${TARGET_DIR:-$HOME/.skills}"
-STATE_DIR="${MATTPOCOCK_SKILLS_STATE_DIR:-$TARGET_DIR/.mattpocock-skills}"
-MANIFEST="$STATE_DIR/managed-skills.txt"
+repo_url="${MATTPOCOCK_SKILLS_REPO_URL:-https://github.com/mattpocock/skills.git}"
+target_dir="$HOME/.skills"
 
 SKILL_ROOTS=(
   "skills/engineering/diagnose"
@@ -25,146 +20,32 @@ SKILL_ROOTS=(
   "skills/productivity/write-a-skill"
 )
 
-require_command() {
-  if ! command -v "$1" >/dev/null 2>&1; then
-    echo "$1 is required" >&2
-    exit 1
-  fi
-}
-
-is_current_skill() {
-  local needle="$1"
-  local skill_name
-
-  for root in "${SKILL_ROOTS[@]}"; do
-    skill_name="${root##*/}"
-    if [[ "$skill_name" == "$needle" ]]; then
-      return 0
-    fi
-  done
-
-  return 1
-}
-
-is_previously_managed() {
-  local skill_name="$1"
-
-  if [[ -f "$MANIFEST" ]] && grep -Fxq "$skill_name" "$MANIFEST"; then
-    return 0
-  fi
-
-  if [[ -f "$TARGET_DIR/$skill_name/.mattpocock-skills-source" ]]; then
-    return 0
-  fi
-
-  return 1
-}
-
-require_command curl
-require_command tar
-require_command find
-
-CURL_RETRY_ARGS=(--retry 3 --retry-delay 2 --retry-max-time 60)
-if curl --help all 2>/dev/null | grep -q -- '--retry-all-errors'; then
-  CURL_RETRY_ARGS+=(--retry-all-errors)
-fi
-
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "$tmp_dir"' EXIT
 
-archive="$tmp_dir/$REPO-$BRANCH.tar.gz"
-if [[ -n "${MATTPOCOCK_SKILLS_ARCHIVE:-}" ]]; then
-  cp "$MATTPOCOCK_SKILLS_ARCHIVE" "$archive"
-else
-  curl -fsSL "${CURL_RETRY_ARGS[@]}" \
-    -H "User-Agent: dotfiles-mattpocock-skills-sync" \
-    "$ARCHIVE_URL" \
-    -o "$archive"
-fi
+source_dir="$tmp_dir/skills"
+git clone --quiet --depth 1 --branch main "$repo_url" "$source_dir"
 
-tar -xzf "$archive" -C "$tmp_dir"
-
-source_dir=""
-for candidate in "$tmp_dir"/*; do
-  if [[ -d "$candidate" ]]; then
-    if [[ -n "$source_dir" ]]; then
-      echo "Archive contains multiple root directories" >&2
-      exit 1
-    fi
-    source_dir="$candidate"
-  fi
-done
-
-if [[ -z "$source_dir" ]]; then
-  echo "Archive did not contain a root directory" >&2
-  exit 1
-fi
-
-if [[ ! -f "$source_dir/LICENSE" ]]; then
-  echo "Missing upstream LICENSE" >&2
-  exit 1
-fi
-
-mkdir -p "$TARGET_DIR" "$STATE_DIR"
-
-if [[ -f "$MANIFEST" ]]; then
-  while IFS= read -r old_skill; do
-    [[ -n "$old_skill" ]] || continue
-    if ! is_current_skill "$old_skill"; then
-      rm -rf "$TARGET_DIR/$old_skill"
-    fi
-  done < "$MANIFEST"
-fi
-
-downloaded=0
-managed_manifest="$tmp_dir/managed-skills.txt"
-: > "$managed_manifest"
+mkdir -p "$target_dir"
+rm -rf "$target_dir/.mattpocock-skills"
 
 for root in "${SKILL_ROOTS[@]}"; do
   skill_name="${root##*/}"
   source_skill_dir="$source_dir/$root"
-  target_skill_dir="$TARGET_DIR/$skill_name"
 
-  if [[ ! -d "$source_skill_dir" ]]; then
-    echo "Missing upstream skill directory $root" >&2
-    exit 1
-  fi
-
-  if [[ -e "$target_skill_dir" ]] \
-    && ! is_previously_managed "$skill_name" \
-    && [[ "${MATTPOCOCK_SKILLS_FORCE:-0}" != "1" ]]; then
-    echo "Refusing to overwrite unmanaged skill: $target_skill_dir" >&2
-    echo "Set MATTPOCOCK_SKILLS_FORCE=1 to replace it." >&2
-    exit 1
-  fi
-
-  rm -rf "$target_skill_dir"
-  mkdir -p "$target_skill_dir"
-  cp -R "$source_skill_dir/." "$target_skill_dir/"
-
-  if [[ ! -f "$target_skill_dir/SKILL.md" ]]; then
+  if [[ ! -f "$source_skill_dir/SKILL.md" ]]; then
     echo "Missing SKILL.md for $skill_name" >&2
     exit 1
   fi
-
-  skill_files="$(find "$target_skill_dir" -type f | wc -l | tr -d ' ')"
-  downloaded=$((downloaded + skill_files))
-
-  {
-    echo "repo=$OWNER/$REPO"
-    echo "branch=$BRANCH"
-    echo "root=$root"
-  } > "$target_skill_dir/.mattpocock-skills-source"
-
-  echo "$skill_name" >> "$managed_manifest"
 done
 
-cp "$source_dir/LICENSE" "$STATE_DIR/LICENSE"
-{
-  echo "repo=$OWNER/$REPO"
-  echo "branch=$BRANCH"
-  echo "archive=$ARCHIVE_URL"
-} > "$STATE_DIR/source.txt"
-mv "$managed_manifest" "$MANIFEST"
+for root in "${SKILL_ROOTS[@]}"; do
+  skill_name="${root##*/}"
+  source_skill_dir="$source_dir/$root"
+  target_skill_dir="$target_dir/$skill_name"
 
-echo "Synced ${#SKILL_ROOTS[@]} mattpocock skill(s), $downloaded upstream file(s) into $TARGET_DIR"
+  rm -rf "$target_skill_dir"
+  cp -R "$source_skill_dir" "$target_skill_dir"
+done
+
+echo "Synced ${#SKILL_ROOTS[@]} mattpocock skill(s) into $target_dir"

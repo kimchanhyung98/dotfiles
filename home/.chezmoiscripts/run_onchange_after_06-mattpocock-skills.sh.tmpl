@@ -3,6 +3,7 @@
 # Sync selected mattpocock/skills entries into the shared ~/.skills directory.
 # This runs on first apply and when this script changes. Re-run the sync command
 # directly when you want to refresh upstream skills.
+# Sync helper hash: {{ include "dot_local/bin/executable_mattpocock-skills-sync" | sha256sum }}
 
 set -euo pipefail
 
