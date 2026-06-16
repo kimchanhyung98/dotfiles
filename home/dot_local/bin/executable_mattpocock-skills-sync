@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_url="${MATTPOCOCK_SKILLS_REPO_URL:-https://github.com/mattpocock/skills.git}"
+target_dir="$HOME/.skills"
+
+SKILL_ROOTS=(
+  "skills/engineering/diagnose"
+  "skills/engineering/grill-with-docs"
+  "skills/engineering/improve-codebase-architecture"
+  "skills/engineering/prototype"
+  "skills/engineering/setup-matt-pocock-skills"
+  "skills/engineering/tdd"
+  "skills/engineering/to-issues"
+  "skills/engineering/to-prd"
+  "skills/engineering/triage"
+  "skills/engineering/zoom-out"
+  "skills/productivity/grill-me"
+  "skills/productivity/handoff"
+  "skills/productivity/write-a-skill"
+)
+
+tmp_dir="$(mktemp -d)"
+trap 'rm -rf "$tmp_dir"' EXIT
+
+source_dir="$tmp_dir/skills"
+git clone --quiet --depth 1 --branch main "$repo_url" "$source_dir"
+
+mkdir -p "$target_dir"
+rm -rf "$target_dir/.mattpocock-skills"
+
+for root in "${SKILL_ROOTS[@]}"; do
+  skill_name="${root##*/}"
+  source_skill_dir="$source_dir/$root"
+
+  if [[ ! -f "$source_skill_dir/SKILL.md" ]]; then
+    echo "Missing SKILL.md for $skill_name" >&2
+    exit 1
+  fi
+done
+
+for root in "${SKILL_ROOTS[@]}"; do
+  skill_name="${root##*/}"
+  source_skill_dir="$source_dir/$root"
+  target_skill_dir="$target_dir/$skill_name"
+
+  rm -rf "$target_skill_dir"
+  cp -R "$source_skill_dir" "$target_skill_dir"
+done
+
+echo "Synced ${#SKILL_ROOTS[@]} mattpocock skill(s) into $target_dir"

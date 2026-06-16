@@ -139,7 +139,53 @@ else
 fi
 rm -f "$rendered_app_script" "$app_script_err"
 
-# --- 1.5. Zsh 설정 회귀 검증 ---
+# --- 1.4. 공통 스킬 디렉토리 정리 검증 ---
+section "Skills cleanup"
+SKILLS_CLEANUP_SOURCE="$REPO_DIR/home/.chezmoiscripts/run_once_before_00-skills-ssot-migrate.sh.tmpl"
+if bash "$REPO_DIR/tests/skills-migrate.sh" "$SKILLS_CLEANUP_SOURCE"; then
+    pass "skills cleanup script removes legacy skills directories"
+else
+    fail "skills cleanup script"
+fi
+
+# --- 1.5. 공통 스킬 배포 경로 검증 ---
+section "Skills deployment topology"
+SKILLS_MANAGED_PATHS="$(cz managed --include=all 2>/dev/null || true)"
+SKILLS_TOPOLOGY_FAIL=0
+for target in \
+    ".claude/skills" \
+    ".agents/skills" \
+    ".local/bin/mattpocock-skills-sync"; do
+    if ! grep -Fxq "$target" <<< "$SKILLS_MANAGED_PATHS"; then
+        echo "    FAIL: $target is not managed"
+        SKILLS_TOPOLOGY_FAIL=$((SKILLS_TOPOLOGY_FAIL + 1))
+    fi
+done
+
+if [ "$SKILLS_TOPOLOGY_FAIL" -eq 0 ]; then
+    pass "shared skills source and tool symlinks are managed"
+else
+    fail "$SKILLS_TOPOLOGY_FAIL skills deployment path(s) missing"
+fi
+
+# --- 1.6. mattpocock 스킬 동기화 검증 ---
+section "mattpocock skills sync"
+MATTPOCOCK_SYNC_SOURCE="$REPO_DIR/home/dot_local/bin/executable_mattpocock-skills-sync"
+MATTPOCOCK_SCRIPT_SOURCE="$REPO_DIR/home/.chezmoiscripts/run_onchange_after_06-mattpocock-skills.sh.tmpl"
+rendered_mattpocock_script="$(mktemp -p "$TMPHOME")"
+mattpocock_script_err="$(mktemp -p "$TMPHOME")"
+if bash "$REPO_DIR/tests/mattpocock-skills-sync.sh" "$MATTPOCOCK_SYNC_SOURCE" \
+   && cz execute-template < "$MATTPOCOCK_SCRIPT_SOURCE" > "$rendered_mattpocock_script" 2>"$mattpocock_script_err" \
+   && bash -n "$rendered_mattpocock_script" \
+   && grep -q 'mattpocock-skills-sync' "$rendered_mattpocock_script" \
+   && grep -q 'Sync helper hash:' "$rendered_mattpocock_script"; then
+    pass "mattpocock skills sync installs and refreshes runtime skills"
+else
+    fail "mattpocock skills sync (stderr: $(cat "$mattpocock_script_err"))"
+fi
+rm -f "$rendered_mattpocock_script" "$mattpocock_script_err"
+
+# --- 1.7. Zsh 설정 회귀 검증 ---
 section "Zsh config regression"
 if bash "$REPO_DIR/tests/zsh-config.sh"; then
     pass "Zsh config regression checks"
@@ -187,7 +233,11 @@ if ! command -v shellcheck &>/dev/null; then
     warn "shellcheck not installed, skipping (brew install shellcheck)"
 else
 SC_FAIL=0
-while IFS= read -r -d '' script; do
+for script in \
+    "$REPO_DIR"/home/.chezmoiscripts/*.sh.tmpl \
+    "$REPO_DIR"/home/.chezmoiscripts/darwin/*.sh.tmpl; do
+    [ -e "$script" ] || continue
+
     rendered=$(mktemp -p "$TMPHOME")
     if cz execute-template < "$script" > "$rendered" 2>/dev/null; then
         if ! shellcheck -s bash -S warning "$rendered" > /dev/null 2>&1; then
@@ -199,7 +249,7 @@ while IFS= read -r -d '' script; do
         echo "    SKIP: $(basename "$script") (template render failed)"
     fi
     rm -f "$rendered"
-done < <(find "$REPO_DIR/home/.chezmoiscripts/darwin" -name '*.sh.tmpl' -type f -print0 2>/dev/null)
+done
 
 if [ "$SC_FAIL" -eq 0 ]; then
     pass "ShellCheck passed for all darwin scripts"

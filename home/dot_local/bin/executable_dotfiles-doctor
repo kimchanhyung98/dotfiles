@@ -102,7 +102,6 @@ section "AI CLI"
 check "claude" "command -v claude"
 check "codex" "command -v codex"
 check "codegraph" "command -v codegraph"
-check "opencode" "command -v opencode"
 check "ollama" "command -v ollama"
 check "antigravity (agy)" "command -v agy"
 check "hermes" "command -v hermes"
@@ -113,14 +112,12 @@ check "everything-claude-code" "claude plugin list 2>/dev/null | grep -q everyth
 check "claude-hud" "claude plugin list 2>/dev/null | grep -q claude-hud"
 check "claude-mem" "[ -d '$HOME/.claude-mem' ]"
 check "oh-my-codex" "command -v omx"
-check "oh-my-opencode" "command -v oh-my-opencode"
 
-# Skill Directories
+# Skill Directories (단일 출처 ~/.skills + 도구별 symlink)
 section "Skill Directories"
-check_path "Claude skills" "$HOME/.claude/skills"
-check_path "Codex skills" "$HOME/.agents/skills"
-check_path "Copilot skills" "$HOME/.copilot/skills"
-check_path "OpenCode skills" "$HOME/.config/opencode/skills"
+check_path "Shared skills (~/.skills)" "$HOME/.skills"
+check "Claude skills -> ~/.skills" "[ -L '$HOME/.claude/skills' ] && [ -e '$HOME/.claude/skills' ]"
+check "Codex skills (~/.agents) -> ~/.skills" "[ -L '$HOME/.agents/skills' ] && [ -e '$HOME/.agents/skills' ]"
 
 # AGENTS.md
 section "AGENTS.md"
@@ -141,10 +138,8 @@ check_path "~/.oh-my-zsh" "$HOME/.oh-my-zsh"
 # Config
 section "Config"
 check_path "ghostty" "$HOME/.config/ghostty/config"
-check_path "opencode" "$HOME/.config/opencode/opencode.json"
 check_path "claude" "$HOME/.claude/settings.json"
 check_path "codex" "$HOME/.codex/config.toml"
-check_path "copilot" "$HOME/.copilot/skills"
 
 # MCP
 section "MCP"
