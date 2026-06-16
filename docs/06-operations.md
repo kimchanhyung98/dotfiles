@@ -13,7 +13,7 @@
 | Package Managers | brew, zb, pipx, bun                                         | 패키지 관리자의 설치 여부 확인. zb는 zerobrew  |
 | AI CLI           | claude, codex, codegraph, hermes, ollama, antigravity(agy)  | AI 도구 CLI의 설치 여부 확인              |
 | AI 플러그인          | everything-claude-code, claude-hud, claude-mem, oh-my-codex | 각 AI 도구의 확장 기능 설치 상태 확인          |
-| 스킬 디렉토리          | `~/.skills` + 도구별 symlink 3개(claude·agents·codex)           | 단일 출처 존재 여부와 symlink·대상 존재 여부 확인 |
+| 스킬 디렉토리          | `~/.skills` + 도구별 symlink 2개(claude·agents)                 | 단일 출처 존재 여부와 symlink·대상 존재 여부 확인 |
 | AGENTS.md        | `~/AGENTS.md` 존재 여부                                         | 공통 에이전트 지침 파일 배포 상태 확인           |
 | claude-mem       | `~/.claude-mem/`, `settings.json`                           | claude-mem 디렉토리와 설정 파일 존재 여부 확인  |
 | Dotfiles         | ~/.zshrc, ~/.gitconfig, ~/.vimrc, ~/.oh-my-zsh              | 핵심 dotfiles의 배포 상태 확인            |

@@ -66,8 +66,7 @@ dotfiles/
     │   └── symlink_skills             # → ~/.skills
     │
     ├── dot_codex/
-    │   ├── config.toml.tmpl
-    │   └── symlink_skills             # → ~/.skills
+    │   └── config.toml.tmpl
     │
     ├── dot_agents/
     │   └── symlink_skills             # → ~/.skills

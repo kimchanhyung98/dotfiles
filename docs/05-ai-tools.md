@@ -36,9 +36,9 @@ Claude Code와 Codex가 단일 출처 `~/.skills`를 공유한다. 지원하는 
   스킬도
   symlink를 거쳐 `~/.skills`에 저장되어 공유된다.
 - **mattpocock/skills**: 공통 engineering/productivity 후보 스킬은 repo에 직접 포함하지 않는다.
-  `~/.local/bin/mattpocock-skills-sync`가 GitHub archive에서 선택한 스킬만 `~/.skills`로 동기화한다.
+  `~/.local/bin/mattpocock-skills-sync`가 upstream에서 선택한 스킬만 `~/.skills`로 동기화한다.
   `run_onchange_after_06-mattpocock-skills`가 최초 적용 및 스크립트 변경 시 실행한다.
-  upstream 갱신이 필요하면 `~/.local/bin/mattpocock-skills-sync` 또는 `task/download-mattpocock-skills.sh`를 재실행한다.
+  upstream 갱신이 필요하면 `~/.local/bin/mattpocock-skills-sync`를 재실행한다. 선택된 스킬 이름은 재실행마다 upstream 내용으로 교체된다.
   해당 런타임 동기화 경로는 `.chezmoiignore`에 명시해 `chezmoi verify`가 외부 갱신 결과를 drift로 보지 않게 한다.
 - **andrej-karpathy-skills**: 코딩 행동 지침 4대 원칙. Claude에서는 플러그인 마켓플레이스로 설치하고, Codex에서는 config.toml의 모델 지침으로 적용한다.
 
