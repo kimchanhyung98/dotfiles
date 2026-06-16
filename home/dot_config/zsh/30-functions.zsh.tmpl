@@ -1,8 +1,15 @@
 # 커스텀 쉘 함수
 
 {{ if eq .chezmoi.os "darwin" }}
-# zerobrew 래퍼 (zerobrew 우선, 실패 시 Homebrew 폴백)
-if command -v zb &>/dev/null; then
-    pkg_install() { zb install "$@" || \brew install "$@"; }
-fi
+# 패키지 설치 래퍼 (zerobrew 우선, 실패 시 Homebrew 폴백)
+pkg_install() {
+    if command -v zb &>/dev/null; then
+        zb install "$@" || { command -v brew &>/dev/null && \brew install "$@"; }
+    elif command -v brew &>/dev/null; then
+        \brew install "$@"
+    else
+        echo "pkg_install: brew or zb not found" >&2
+        return 127
+    fi
+}
 {{ end }}

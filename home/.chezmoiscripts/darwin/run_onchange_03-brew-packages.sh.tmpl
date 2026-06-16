@@ -17,11 +17,38 @@ echo "[brew-packages][start]"
 {{ $homebrewPrefix := .homebrewPrefix }}
 eval "$({{ $homebrewPrefix }}/bin/brew shellenv)"
 
-# Brewfile 기반 패키지 일괄 설치/동기화 (zerobrew 우선, 실패 시 Homebrew 폴백)
+# Brewfile 기반 패키지 일괄 설치/동기화 (zerobrew 우선, Homebrew 폴백)
+BREWFILE="{{ .chezmoi.sourceDir }}/Brewfile"
+
+run_homebrew_bundle() {
+    if grep -q 'brew "dopplerhq/cli/doppler"' "$BREWFILE"; then
+        DOPPLER_TAP_INFO="$(brew tap-info --json=v1 dopplerhq/cli 2>/dev/null || true)"
+        if ! printf '%s\n' "$DOPPLER_TAP_INFO" | grep -q '"trusted": true'; then
+            echo "[brew-packages][warning] dopplerhq/cli tap is not trusted; skipping doppler"
+            echo "[brew-packages][warning] Run 'brew trust --formula dopplerhq/cli/doppler' and re-run chezmoi apply to manage it"
+            if [ -n "${HOMEBREW_BUNDLE_BREW_SKIP:-}" ]; then
+                export HOMEBREW_BUNDLE_BREW_SKIP="$HOMEBREW_BUNDLE_BREW_SKIP dopplerhq/cli/doppler doppler"
+            else
+                export HOMEBREW_BUNDLE_BREW_SKIP="dopplerhq/cli/doppler doppler"
+            fi
+        fi
+    fi
+
+    if ! brew bundle --file="$BREWFILE"; then
+        echo "[brew-packages][error] brew bundle failed"
+        exit 1
+    fi
+}
+
 if command -v zb &>/dev/null; then
-    zb bundle install -f "{{ .chezmoi.sourceDir }}/Brewfile" || brew bundle --file="{{ .chezmoi.sourceDir }}/Brewfile" || true
+    echo "[brew-packages][zerobrew] bundle install"
+    if ! zb bundle install --auto-init -f "$BREWFILE"; then
+        echo "[brew-packages][warning] zerobrew bundle failed; falling back to Homebrew"
+        run_homebrew_bundle
+    fi
 else
-    brew bundle --file="{{ .chezmoi.sourceDir }}/Brewfile" || true
+    echo "[brew-packages][warning] zerobrew not found; using Homebrew"
+    run_homebrew_bundle
 fi
 
 # 핵심 패키지 사후 검증

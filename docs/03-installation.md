@@ -14,7 +14,7 @@
 
 | 순서 | 스크립트           | 역할                                           | 실행 조건             | 상세                                                                                                                                                                                                         |
 |:--:|----------------|----------------------------------------------|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 01 | prerequisites  | Xcode CLI, Homebrew, zerobrew                | 최초 1회, dotfiles 전 | Xcode Command Line Tools가 없으면 설치하고, Homebrew를 설치한 뒤 zerobrew(Rust 기반 Homebrew 대안 클라이언트)를 설치하여 `zb` 명령을 기본 패키지 관리자로 설정. Homebrew와 zerobrew 모두 공식 `curl \| bash` 방식으로 설치한다. Apple Silicon이면 Rosetta 2도 함께 설치 |
+| 01 | prerequisites  | Xcode CLI, Homebrew, zerobrew                | 최초 1회, dotfiles 전 | Xcode Command Line Tools가 없으면 설치하고, Homebrew를 설치한 뒤 zerobrew(Rust 기반 Homebrew 대안 클라이언트)를 설치하여 `zb` 명령을 기본 패키지 설치 경로로 준비한다. Homebrew와 zerobrew 모두 공식 `curl \| bash` 방식으로 설치한다. Apple Silicon이면 Rosetta 2도 함께 설치 |
 | 02 | macos-settings | Dock, Finder, Keyboard, Trackpad, Screenshot | 설정 변경 시           | defaults 명령으로 macOS 시스템 설정을 일괄 적용. `run_onchange_`이므로 스크립트 내용이 변경될 때만 재실행되어 불필요한 재적용을 방지                                                                                                                   |
 | 03 | brew-packages  | Brewfile 기반 패키지 설치                           | Brewfile 변경 시     | Brewfile의 체크섬을 감시하여 패키지 목록이 변경되면 `brew bundle`로 전체 패키지를 동기화. 새 패키지 추가, 기존 패키지 제거를 한 번에 처리                                                                                                                  |
 | 04 | cmux-settings  | cmux 외부 제어 기본 활성화                            | 설정 변경 시           | `~/.config/cmux/settings.json`을 배포하고 `defaults write com.cmuxterm.app socketControlMode -string automation`을 적용해 신규 macOS 시스템에서 cmux 외부 자동화 제어를 기본 활성화                                                     |
@@ -149,22 +149,22 @@ chezmoi init --apply
 
 ## Brewfile 패키지
 
-Brewfile은 `zb bundle`(zerobrew) 명령으로 동기화한다. zerobrew 실패 시 `brew bundle`로 폴백한다. 패키지 추가/제거는 Brewfile만 수정하면 다음
-`chezmoi apply`에서 자동 반영된다.
+Brewfile은 `zb bundle install -f Brewfile`(zerobrew)로 먼저 동기화한다. zerobrew가 처리하지 못하는 항목이 있거나 실패하면 `brew bundle`로 폴백한다.
+Doppler tap이 신뢰되지 않은 상태에서 Homebrew 폴백이 실행되면 `dopplerhq/cli/doppler`만 건너뛰며, 신뢰 여부는 사용자가 `brew trust --formula dopplerhq/cli/doppler`로 명시한다.
 AI 도구(Claude Code, Codex, Antigravity, Hermes, CodeGraph)는 설치 채널 정책에 따라 AI 스크립트에서 각 채널(curl/npm)로 관리하고, Brewfile은
 Homebrew 직접 관리
 대상만 유지한다.
 
 | 대주제    | 소주제         | 상세 패키지                                                                                                              |
 |--------|-------------|---------------------------------------------------------------------------------------------------------------------|
-| 시스템    | 기본 CLI      | bash, bat, zsh, curl, wget, git, git-lfs, gh, grep, jq, gnupg, pkg-config, shellcheck, terminal-notifier, tree, vim |
+| 시스템    | 기본 CLI      | bash, bat, zsh, curl, wget, git, git-lfs, gh, grep, jq, gnupg, pkgconf(pkg-config), shellcheck, terminal-notifier, tree, vim |
 | 시스템    | 개발 보조 CLI   | act, awscli, direnv, doppler, fswatch, fzf, ripgrep, tmux, watchman, zoxide                                         |
 | 런타임    | 언어 런타임      | dotnet, go, kotlin, node, openjdk, php, python, ruby, rust                                                          |
 | 런타임    | 패키지/가상환경    | composer, mise, npm, pipx, uv, xcodes, yarn                                                                         |
 | 데이터/도구 | 데이터/유틸      | sqlite                                                                                                              |
 | 터미널/앱  | 폰트          | font-d2coding                                                                                                       |
 | 터미널/앱  | 터미널         | cmux, ghostty                                                                                                       |
-| 터미널/앱  | 개발 앱 (cask) | docker, figma, flutter, gcloud-cli, github, iterm2, postman, proxyman, visual-studio-code                           |
+| 터미널/앱  | 개발 앱 (cask) | docker-desktop, figma, flutter, gcloud-cli, github, iterm2, postman, proxyman, visual-studio-code                   |
 | 터미널/앱  | 일반 앱 (cask) | appcleaner, google-chrome, iina, keka, rectangle, slack, stats                                                      |
 
 **AI CLI 설치 채널 (공식 문서 확인 기준)**

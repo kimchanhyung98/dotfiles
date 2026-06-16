@@ -185,7 +185,29 @@ else
 fi
 rm -f "$rendered_mattpocock_script" "$mattpocock_script_err"
 
-# --- 1.7. Zsh 설정 회귀 검증 ---
+# --- 1.7. Brew 패키지 동기화 검증 ---
+section "Brew package sync"
+BREWFILE_SOURCE="$REPO_DIR/home/Brewfile"
+BREW_SCRIPT_SOURCE="$REPO_DIR/home/.chezmoiscripts/darwin/run_onchange_03-brew-packages.sh.tmpl"
+rendered_brew_script="$(mktemp -p "$TMPHOME")"
+brew_script_err="$(mktemp -p "$TMPHOME")"
+if grep -q 'brew "pkgconf"' "$BREWFILE_SOURCE" \
+   && ! grep -q 'brew "pkg-config"' "$BREWFILE_SOURCE" \
+   && grep -q 'cask "docker-desktop"' "$BREWFILE_SOURCE" \
+   && cz execute-template < "$BREW_SCRIPT_SOURCE" > "$rendered_brew_script" 2>"$brew_script_err" \
+   && bash -n "$rendered_brew_script" \
+   && grep -q 'zb bundle install --auto-init -f "$BREWFILE"' "$rendered_brew_script" \
+   && grep -q 'brew bundle --file="$BREWFILE"' "$rendered_brew_script" \
+   && grep -q 'HOMEBREW_BUNDLE_BREW_SKIP' "$rendered_brew_script" \
+   && grep -q 'brew trust --formula dopplerhq/cli/doppler' "$rendered_brew_script" \
+   && grep -q 'falling back to Homebrew' "$rendered_brew_script"; then
+    pass "Brewfile uses current tokens and zerobrew-first bundle with Homebrew fallback"
+else
+    fail "Brew package sync regression (stderr: $(cat "$brew_script_err"))"
+fi
+rm -f "$rendered_brew_script" "$brew_script_err"
+
+# --- 1.8. Zsh 설정 회귀 검증 ---
 section "Zsh config regression"
 if bash "$REPO_DIR/tests/zsh-config.sh"; then
     pass "Zsh config regression checks"
