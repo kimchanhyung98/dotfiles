@@ -15,7 +15,9 @@ TMPDIR="$(mktemp -d)"
 trap 'rm -rf "$TMPDIR"' EXIT
 
 SKILL_ROOTS=(
-    "skills/engineering/diagnose"
+    "skills/engineering/codebase-design"
+    "skills/engineering/diagnosing-bugs"
+    "skills/engineering/domain-modeling"
     "skills/engineering/grill-with-docs"
     "skills/engineering/improve-codebase-architecture"
     "skills/engineering/prototype"
@@ -24,10 +26,10 @@ SKILL_ROOTS=(
     "skills/engineering/to-issues"
     "skills/engineering/to-prd"
     "skills/engineering/triage"
-    "skills/engineering/zoom-out"
     "skills/productivity/grill-me"
+    "skills/productivity/grilling"
     "skills/productivity/handoff"
-    "skills/productivity/write-a-skill"
+    "skills/productivity/writing-great-skills"
 )
 
 make_repo() {
@@ -48,11 +50,11 @@ make_repo() {
         printf '# %s\n\nversion=%s\n' "$skill_name" "$version" > "$repo/$skill_root/SKILL.md"
     done
 
-    mkdir -p "$repo/skills/engineering/diagnose/scripts"
+    mkdir -p "$repo/skills/engineering/diagnosing-bugs/scripts"
     printf '#!/bin/sh\n# version=%s\n' "$version" \
-        > "$repo/skills/engineering/diagnose/scripts/hitl-loop.template.sh"
+        > "$repo/skills/engineering/diagnosing-bugs/scripts/hitl-loop.template.sh"
     printf 'ADR format version=%s\n' "$version" \
-        > "$repo/skills/engineering/grill-with-docs/ADR-FORMAT.md"
+        > "$repo/skills/engineering/domain-modeling/ADR-FORMAT.md"
 
     git -C "$repo" add .
     git -C "$repo" \
@@ -70,26 +72,26 @@ HOME_DIR="$TMPDIR/home"
 HOME="$HOME_DIR" MATTPOCOCK_SKILLS_REPO_URL="file://$REPO_V1" bash "$SYNC_SCRIPT" >/dev/null
 TARGET_DIR="$HOME_DIR/.skills"
 
-[ -f "$TARGET_DIR/diagnose/SKILL.md" ] || fail "diagnose skill was not installed"
-grep -q 'version=v1' "$TARGET_DIR/diagnose/SKILL.md" || fail "initial skill content mismatch"
-[ -f "$TARGET_DIR/diagnose/scripts/hitl-loop.template.sh" ] || fail "nested companion file was not copied"
-grep -q 'version=v1' "$TARGET_DIR/diagnose/scripts/hitl-loop.template.sh" || \
+[ -f "$TARGET_DIR/diagnosing-bugs/SKILL.md" ] || fail "diagnosing-bugs skill was not installed"
+grep -q 'version=v1' "$TARGET_DIR/diagnosing-bugs/SKILL.md" || fail "initial skill content mismatch"
+[ -f "$TARGET_DIR/diagnosing-bugs/scripts/hitl-loop.template.sh" ] || fail "nested companion file was not copied"
+grep -q 'version=v1' "$TARGET_DIR/diagnosing-bugs/scripts/hitl-loop.template.sh" || \
     fail "nested companion file content mismatch"
-[ -f "$TARGET_DIR/grill-with-docs/ADR-FORMAT.md" ] || fail "sibling companion file was not copied"
-[ ! -e "$TARGET_DIR/diagnose/.mattpocock-skills-source" ] || fail "managed skill marker should not be written"
+[ -f "$TARGET_DIR/domain-modeling/ADR-FORMAT.md" ] || fail "sibling companion file was not copied"
+[ ! -e "$TARGET_DIR/diagnosing-bugs/.mattpocock-skills-source" ] || fail "managed skill marker should not be written"
 [ ! -e "$TARGET_DIR/.mattpocock-skills" ] || fail "runtime state directory should not be written"
 
-printf 'stale\n' > "$TARGET_DIR/diagnose/removed-on-refresh.md"
-printf 'stale\n' > "$TARGET_DIR/diagnose/scripts/removed-on-refresh.sh"
+printf 'stale\n' > "$TARGET_DIR/diagnosing-bugs/removed-on-refresh.md"
+printf 'stale\n' > "$TARGET_DIR/diagnosing-bugs/scripts/removed-on-refresh.sh"
 mkdir -p "$TARGET_DIR/.mattpocock-skills"
 
 HOME="$HOME_DIR" MATTPOCOCK_SKILLS_REPO_URL="file://$REPO_V2" bash "$SYNC_SCRIPT" >/dev/null
 
-grep -q 'version=v2' "$TARGET_DIR/diagnose/SKILL.md" || fail "rerun did not refresh skill content"
-grep -q 'version=v2' "$TARGET_DIR/diagnose/scripts/hitl-loop.template.sh" || \
+grep -q 'version=v2' "$TARGET_DIR/diagnosing-bugs/SKILL.md" || fail "rerun did not refresh skill content"
+grep -q 'version=v2' "$TARGET_DIR/diagnosing-bugs/scripts/hitl-loop.template.sh" || \
     fail "rerun did not refresh nested companion file"
-[ ! -e "$TARGET_DIR/diagnose/removed-on-refresh.md" ] || fail "rerun did not replace skill directory"
-[ ! -e "$TARGET_DIR/diagnose/scripts/removed-on-refresh.sh" ] || \
+[ ! -e "$TARGET_DIR/diagnosing-bugs/removed-on-refresh.md" ] || fail "rerun did not replace skill directory"
+[ ! -e "$TARGET_DIR/diagnosing-bugs/scripts/removed-on-refresh.sh" ] || \
     fail "rerun did not replace nested skill directory content"
 [ ! -e "$TARGET_DIR/.mattpocock-skills" ] || fail "stale runtime state directory was not removed"
 
