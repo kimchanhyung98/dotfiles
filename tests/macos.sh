@@ -242,7 +242,35 @@ else
 fi
 rm -f "$rendered_brew_script" "$brew_script_err"
 
-# --- 1.8. Zsh 설정 회귀 검증 ---
+# --- 1.8. tokscale launchd 통합 검증 ---
+section "tokscale launchd integration"
+TOKSCALE_SUBMIT_SOURCE="$REPO_DIR/home/dot_config/tokscale/executable_submit.sh.tmpl"
+TOKSCALE_PLIST_SOURCE="$REPO_DIR/home/Library/LaunchAgents/ai.tokscale.submit.plist.tmpl"
+TOKSCALE_LAUNCHD_SOURCE="$REPO_DIR/home/.chezmoiscripts/darwin/run_onchange_after_07-tokscale-launchd.sh.tmpl"
+rendered_tokscale_submit="$(mktemp -p "$TMPHOME")"
+rendered_tokscale_plist="$(mktemp -p "$TMPHOME")"
+rendered_tokscale_launchd="$(mktemp -p "$TMPHOME")"
+tokscale_err="$(mktemp -p "$TMPHOME")"
+if cz execute-template < "$TOKSCALE_SUBMIT_SOURCE" > "$rendered_tokscale_submit" 2>"$tokscale_err" \
+   && bash -n "$rendered_tokscale_submit" \
+   && grep -Fq 'default .chezmoi.hostname' "$TOKSCALE_SUBMIT_SOURCE" \
+   && grep -Fq 'export TZ="Asia/Seoul"' "$rendered_tokscale_submit" \
+   && grep -Fq 'bunx tokscale@latest submit </dev/null' "$rendered_tokscale_submit" \
+   && cz execute-template < "$TOKSCALE_PLIST_SOURCE" > "$rendered_tokscale_plist" 2>>"$tokscale_err" \
+   && plutil -lint "$rendered_tokscale_plist" >/dev/null 2>&1 \
+   && grep -Fq '<integer>14</integer>' "$rendered_tokscale_plist" \
+   && cz execute-template < "$TOKSCALE_LAUNCHD_SOURCE" > "$rendered_tokscale_launchd" 2>>"$tokscale_err" \
+   && bash -n "$rendered_tokscale_launchd" \
+   && grep -Fq 'launchctl bootstrap "gui/${uid}" "$plist"' "$rendered_tokscale_launchd" \
+   && [ "$(cz target-path "$TOKSCALE_SUBMIT_SOURCE" 2>/dev/null)" = "$TMPHOME/.config/tokscale/submit.sh" ] \
+   && [ "$(cz target-path "$TOKSCALE_PLIST_SOURCE" 2>/dev/null)" = "$TMPHOME/Library/LaunchAgents/ai.tokscale.submit.plist" ]; then
+    pass "tokscale submit wrapper and LaunchAgent are managed safely"
+else
+    fail "tokscale launchd integration regression (stderr: $(cat "$tokscale_err"))"
+fi
+rm -f "$rendered_tokscale_submit" "$rendered_tokscale_plist" "$rendered_tokscale_launchd" "$tokscale_err"
+
+# --- 1.9. Zsh 설정 회귀 검증 ---
 section "Zsh config regression"
 if bash "$REPO_DIR/tests/zsh-config.sh"; then
     pass "Zsh config regression checks"
