@@ -30,10 +30,14 @@
 {{-   end -}}
 {{- end -}}
 
-{{/* 대화형 터미널에서 이름/이메일 입력 프롬프트 (최초 1회) */}}
+{{/* 기기 이름 기본값 (호스트네임) — tokscale 등 식별용, 초기 설정 시 입력으로 덮어씀 */}}
+{{- $deviceName := $hostname -}}
+
+{{/* 대화형 터미널에서 이름/이메일/기기명 입력 프롬프트 (최초 1회) */}}
 {{- if stdinIsATTY -}}
 {{-   $name = promptStringOnce . "name" "Full name" -}}
 {{-   $email = promptStringOnce . "email" "Email address" -}}
+{{-   $deviceName = promptStringOnce . "deviceName" "Device name (tokscale 식별용)" $hostname -}}
 {{- end -}}
 
 # chezmoi 소스 디렉토리 경로
@@ -44,5 +48,6 @@ sourceDir = {{ .chezmoi.sourceDir | quote }}
     name = {{ $name | quote }}
     email = {{ $email | quote }}
     hostname = {{ $hostname | quote }}
+    deviceName = {{ $deviceName | quote }}
     isAppleSilicon = {{ $isAppleSilicon }}
     homebrewPrefix = {{ $homebrewPrefix | quote }}

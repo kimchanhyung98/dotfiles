@@ -1,0 +1,63 @@
+#!/bin/bash
+#
+# tokscale 자동 submit 래퍼 (launchd: ai.tokscale.submit 에서 호출)
+#
+# - launchd가 매일 14:00(KST) 발화 → 마지막 성공으로부터 4일 미만이면 skip
+# - 절전/종료로 14:00을 놓치면 launchd가 다음 기상 시 보정 실행
+{{- $deviceName := get . "deviceName" | default (get . "hostname") | default .chezmoi.hostname }}
+# - 기기명: {{ $deviceName }}
+
+export TZ="Asia/Seoul"
+# launchd는 로그인 셸 PATH를 상속하지 않으므로 명시한다 (bun/bunx 포함)
+export PATH="$HOME/.bun/bin:{{ .homebrewPrefix }}/bin:/usr/local/bin:/usr/bin:/bin"
+
+DEVICE_NAME="$(cat <<'TOKSCALE_DEVICE_NAME_EOF'
+{{ $deviceName }}
+TOKSCALE_DEVICE_NAME_EOF
+)"
+export TOKSCALE_DEVICE_NAME="$DEVICE_NAME"
+STATE_DIR="$HOME/.local/state/tokscale"
+STAMP="$STATE_DIR/last-submit-epoch"
+LOG="$HOME/Library/Logs/tokscale-submit.log"
+INTERVAL=$((4 * 24 * 60 * 60)) # 4일
+SLACK=7200                     # 경계 jitter 여유 2시간
+
+mkdir -p "$STATE_DIR" "$(dirname "$LOG")"
+
+log() {
+    printf '%s [%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S %Z')" "$DEVICE_NAME" "$1" >>"$LOG"
+}
+
+now="$(date +%s)"
+
+# 4일 게이트 (스탬프 없으면 즉시 허용)
+if [ -f "$STAMP" ]; then
+    last="$(cat "$STAMP" 2>/dev/null || echo 0)"
+    case "$last" in *[!0-9]* | '') last=0 ;; esac
+    elapsed=$((now - last))
+    if [ "$elapsed" -lt $((INTERVAL - SLACK)) ]; then
+        log "skip: 마지막 submit 후 $((elapsed / 3600))시간 경과 (4일 미만)"
+        exit 0
+    fi
+fi
+
+# 인증 확인 (login 1회 또는 env 토큰)
+if [ ! -f "$HOME/.config/tokscale/credentials.json" ] && [ -z "${TOKSCALE_API_TOKEN:-}" ]; then
+    log "skip: 인증 없음 — 'bunx tokscale@latest login' 1회 실행 필요"
+    exit 0
+fi
+
+# bunx 확인
+if ! command -v bunx >/dev/null 2>&1; then
+    log "skip: bunx 없음 — bun 설치 확인 필요"
+    exit 0
+fi
+
+log "submit 시작"
+if bunx tokscale@latest submit </dev/null >>"$LOG" 2>&1; then
+    printf '%s\n' "$now" >"$STAMP"
+    log "submit 성공"
+else
+    log "submit 실패 (다음 14:00 재시도)"
+fi
+exit 0

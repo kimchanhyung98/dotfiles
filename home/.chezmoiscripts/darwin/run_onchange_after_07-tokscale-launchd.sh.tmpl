@@ -1,0 +1,35 @@
+#!/bin/bash
+#
+# tokscale launchd LaunchAgent 등록/갱신 (4일마다 14:00 KST submit)
+#
+# plist hash: {{ include "Library/LaunchAgents/ai.tokscale.submit.plist.tmpl" | sha256sum }}
+# submit hash: {{ include "dot_config/tokscale/executable_submit.sh.tmpl" | sha256sum }}
+
+{{ if ne .chezmoi.os "darwin" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "[tokscale-launchd][start]"
+
+uid="$(id -u)"
+label="ai.tokscale.submit"
+plist="$HOME/Library/LaunchAgents/${label}.plist"
+
+if [ ! -f "$plist" ]; then
+    echo "[tokscale-launchd][warning] plist not found: $plist"
+    echo "[tokscale-launchd][done]"
+    exit 0
+fi
+
+# 기존 등록 해제 후 재등록 (멱등)
+launchctl bootout "gui/${uid}/${label}" 2>/dev/null || true
+if launchctl bootstrap "gui/${uid}" "$plist"; then
+    launchctl enable "gui/${uid}/${label}" 2>/dev/null || true
+    echo "[tokscale-launchd] (re)loaded ${label}"
+else
+    echo "[tokscale-launchd][warning] bootstrap failed for ${label}"
+fi
+
+echo "[tokscale-launchd][done]"
