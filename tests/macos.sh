@@ -263,7 +263,8 @@ if cz execute-template < "$TOKSCALE_SUBMIT_SOURCE" > "$rendered_tokscale_submit"
    && bash -n "$rendered_tokscale_launchd" \
    && grep -Fq 'launchctl bootstrap "gui/${uid}" "$plist"' "$rendered_tokscale_launchd" \
    && [ "$(cz target-path "$TOKSCALE_SUBMIT_SOURCE" 2>/dev/null)" = "$TMPHOME/.config/tokscale/submit.sh" ] \
-   && [ "$(cz target-path "$TOKSCALE_PLIST_SOURCE" 2>/dev/null)" = "$TMPHOME/Library/LaunchAgents/ai.tokscale.submit.plist" ]; then
+   && [ "$(cz target-path "$TOKSCALE_PLIST_SOURCE" 2>/dev/null)" = "$TMPHOME/Library/LaunchAgents/ai.tokscale.submit.plist" ] \
+   && [ "$(cz target-path "$TOKSCALE_LAUNCHD_SOURCE" 2>/dev/null)" = "$TMPHOME/.chezmoiscripts/darwin/07-tokscale-launchd.sh" ]; then
     pass "tokscale submit wrapper and LaunchAgent are managed safely"
 else
     fail "tokscale launchd integration regression (stderr: $(cat "$tokscale_err"))"

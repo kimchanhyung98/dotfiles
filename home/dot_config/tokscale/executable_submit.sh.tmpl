@@ -2,7 +2,7 @@
 #
 # tokscale 자동 submit 래퍼 (launchd: ai.tokscale.submit 에서 호출)
 #
-# - launchd가 매일 14:00(KST) 발화 → 마지막 성공으로부터 4일 미만이면 skip
+# - launchd가 매일 14:00에 발화(시스템 로컬 시각; 시스템 TZ=Asia/Seoul 전제로 KST 14:00) → 마지막 성공 후 4일 미만이면 skip
 # - 절전/종료로 14:00을 놓치면 launchd가 다음 기상 시 보정 실행
 {{- $deviceName := get . "deviceName" | default (get . "hostname") | default .chezmoi.hostname }}
 # - 기기명: {{ $deviceName }}
@@ -41,7 +41,8 @@ if [ -f "$STAMP" ]; then
     fi
 fi
 
-# 인증 확인 (login 1회 또는 env 토큰)
+# 인증 확인: launchd는 셸 프로필 env를 상속하지 않으므로 credentials.json(= tokscale login)이
+# 예약 실행의 신뢰 인증 경로다. TOKSCALE_API_TOKEN은 수동 실행/plist 주입 시에만 유효.
 if [ ! -f "$HOME/.config/tokscale/credentials.json" ] && [ -z "${TOKSCALE_API_TOKEN:-}" ]; then
     log "skip: 인증 없음 — 'bunx tokscale@latest login' 1회 실행 필요"
     exit 0
