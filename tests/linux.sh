@@ -54,7 +54,9 @@ for target in \
     "Brewfile" \
     ".config/cmux/settings.json" \
     ".config/rectangle/RectangleConfig.json" \
-    ".config/stats/Stats.plist"; do
+    ".config/stats/Stats.plist" \
+    ".config/tokscale/submit.sh" \
+    "Library/LaunchAgents/ai.tokscale.submit.plist"; do
     if printf '%s\n' "$MANAGED_PATHS" | grep -Fxq "$target"; then
         echo "    FAIL: $target is managed on Linux"
         IGNORE_FAIL=$((IGNORE_FAIL + 1))

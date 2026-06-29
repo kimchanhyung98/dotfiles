@@ -6,6 +6,8 @@ Brewfile
 .config/cmux/**
 .config/rectangle/**
 .config/stats/**
+.config/tokscale/**
+Library/LaunchAgents/**
 {{ end }}
 
 {{ if ne .chezmoi.os "linux" }}

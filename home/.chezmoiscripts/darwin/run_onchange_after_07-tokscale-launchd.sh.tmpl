@@ -1,0 +1,47 @@
+#!/bin/bash
+#
+# tokscale launchd LaunchAgent 등록/갱신 (4일마다 14:00 KST submit)
+#
+# plist hash: {{ include "Library/LaunchAgents/ai.tokscale.submit.plist.tmpl" | sha256sum }}
+# submit hash: {{ include "dot_config/tokscale/executable_submit.sh.tmpl" | sha256sum }}
+
+{{ if ne .chezmoi.os "darwin" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "[tokscale-launchd][start]"
+
+uid="$(id -u)"
+label="ai.tokscale.submit"
+plist="$HOME/Library/LaunchAgents/${label}.plist"
+wrapper="$HOME/.config/tokscale/submit.sh"
+
+if [ ! -f "$plist" ]; then
+    echo "[tokscale-launchd][warning] plist not found: $plist"
+    echo "[tokscale-launchd][done]"
+    exit 0
+fi
+
+# 교체 전 검증: 잘못된 plist/래퍼면 기존(정상) 잡을 내리기 전에 즉시 실패시킨다
+if ! plutil -lint "$plist" >/dev/null; then
+    echo "[tokscale-launchd][error] invalid plist: $plist" >&2
+    exit 1
+fi
+if [ ! -x "$wrapper" ]; then
+    echo "[tokscale-launchd][error] submit wrapper missing or not executable: $wrapper" >&2
+    exit 1
+fi
+
+# 기존 등록 해제 후 재등록 (멱등). bootstrap 실패는 예약 작업 부재를 뜻하므로 실패로 surface
+launchctl bootout "gui/${uid}/${label}" 2>/dev/null || true
+if launchctl bootstrap "gui/${uid}" "$plist"; then
+    launchctl enable "gui/${uid}/${label}" 2>/dev/null || true
+    echo "[tokscale-launchd] (re)loaded ${label}"
+else
+    echo "[tokscale-launchd][error] bootstrap failed for ${label}" >&2
+    exit 1
+fi
+
+echo "[tokscale-launchd][done]"
