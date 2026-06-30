@@ -108,11 +108,25 @@ section "cmux automation defaults"
 CMUX_SETTINGS_SOURCE="$REPO_DIR/home/dot_config/cmux/cmux.json.tmpl"
 rendered_cmux_settings="$(mktemp -p "$TMPHOME")"
 cmux_settings_err="$(mktemp -p "$TMPHOME")"
-if cz execute-template < "$CMUX_SETTINGS_SOURCE" > "$rendered_cmux_settings" 2>"$cmux_settings_err" \
-   && grep -q '"socketControlMode": "allowAll"' "$rendered_cmux_settings"; then
-    pass "cmux cmux.json enables allowAll socket control"
+cmux_jq_filter='
+  type == "object"
+  and .schemaVersion == 1
+  and (.automation | type == "object")
+  and .automation.socketControlMode == "allowAll"
+  and .automation.claudeCodeIntegration == true
+  and .automation.workspaceAutoNaming == true
+  and .automation.autoNamingAgent == "claude"
+  and (.terminal.agentHibernation | type == "object")
+  and .terminal.agentHibernation.enabled == true
+'
+if ! cz execute-template < "$CMUX_SETTINGS_SOURCE" > "$rendered_cmux_settings" 2>"$cmux_settings_err"; then
+    fail "cmux cmux.json did not render (stderr: $(cat "$cmux_settings_err"))"
+elif ! command -v jq &>/dev/null; then
+    fail "jq not installed, cannot validate cmux cmux.json structure"
+elif jq -e "$cmux_jq_filter" "$rendered_cmux_settings" >/dev/null; then
+    pass "cmux cmux.json renders valid automation defaults"
 else
-    fail "cmux cmux.json did not render socketControlMode=allowAll (stderr: $(cat "$cmux_settings_err"))"
+    fail "cmux cmux.json automation defaults are invalid"
 fi
 rm -f "$rendered_cmux_settings" "$cmux_settings_err"
 
