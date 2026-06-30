@@ -17,6 +17,8 @@ cursor-style-blink = false
 mouse-hide-while-typing = true
 
 # - 창 설정
+# cmux가 자체 세로 탭을 제공 → ghostty 네이티브 탭바 숨김 (중복 제거)
+window-show-tab-bar = never
 # 좌우 패딩
 window-padding-x = 8
 # 상하 패딩
@@ -27,8 +29,12 @@ window-padding-balance = true
 background-opacity = 0.8
 # 배경 블러 강도
 background-blur = 20
-# 비활성 split 패널 투명도
-unfocused-split-opacity = 0.7
+# 비활성 split 패널 투명도 (멀티 에이전트 패널 구분 강화)
+unfocused-split-opacity = 0.65
+# 비활성 split에 덧입히는 색 — Gruvbox 하드 다크로 더 어둡게 (테마 맞춤)
+unfocused-split-fill = #1d2021
+# split 구분선 색 — Gruvbox bg2
+split-divider-color = #504945
 # 탭/split 닫을 때 확인 다이얼로그 표시
 confirm-close-surface = true
 # 클립보드 붙여넣기 보호

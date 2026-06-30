@@ -105,27 +105,30 @@ rm -f "$rendered_codex_config" "$codex_config_err"
 
 # --- 1.2. cmux 기본 자동화 설정 검증 ---
 section "cmux automation defaults"
-CMUX_SETTINGS_SOURCE="$REPO_DIR/home/dot_config/cmux/settings.json.tmpl"
+CMUX_SETTINGS_SOURCE="$REPO_DIR/home/dot_config/cmux/cmux.json.tmpl"
 rendered_cmux_settings="$(mktemp -p "$TMPHOME")"
 cmux_settings_err="$(mktemp -p "$TMPHOME")"
-if cz execute-template < "$CMUX_SETTINGS_SOURCE" > "$rendered_cmux_settings" 2>"$cmux_settings_err" \
-   && grep -q '"socketControlMode": "automation"' "$rendered_cmux_settings"; then
-    pass "cmux settings.json enables automation mode"
+cmux_jq_filter='
+  type == "object"
+  and .schemaVersion == 1
+  and (.automation | type == "object")
+  and .automation.socketControlMode == "allowAll"
+  and .automation.claudeCodeIntegration == true
+  and .automation.workspaceAutoNaming == true
+  and .automation.autoNamingAgent == "claude"
+  and (.terminal.agentHibernation | type == "object")
+  and .terminal.agentHibernation.enabled == true
+'
+if ! cz execute-template < "$CMUX_SETTINGS_SOURCE" > "$rendered_cmux_settings" 2>"$cmux_settings_err"; then
+    fail "cmux cmux.json did not render (stderr: $(cat "$cmux_settings_err"))"
+elif ! command -v jq &>/dev/null; then
+    fail "jq not installed, cannot validate cmux cmux.json structure"
+elif jq -e "$cmux_jq_filter" "$rendered_cmux_settings" >/dev/null; then
+    pass "cmux cmux.json renders valid automation defaults"
 else
-    fail "cmux settings.json did not render socketControlMode=automation (stderr: $(cat "$cmux_settings_err"))"
+    fail "cmux cmux.json automation defaults are invalid"
 fi
 rm -f "$rendered_cmux_settings" "$cmux_settings_err"
-
-CMUX_SCRIPT_SOURCE="$REPO_DIR/home/.chezmoiscripts/darwin/run_onchange_after_04-cmux-settings.sh.tmpl"
-rendered_cmux_script="$(mktemp -p "$TMPHOME")"
-cmux_script_err="$(mktemp -p "$TMPHOME")"
-if cz execute-template < "$CMUX_SCRIPT_SOURCE" > "$rendered_cmux_script" 2>"$cmux_script_err" \
-   && grep -q 'defaults write com.cmuxterm.app socketControlMode -string automation' "$rendered_cmux_script"; then
-    pass "cmux darwin script sets automation mode in defaults"
-else
-    fail "cmux darwin script missing defaults-write for socketControlMode (stderr: $(cat "$cmux_script_err"))"
-fi
-rm -f "$rendered_cmux_script" "$cmux_script_err"
 
 # --- 1.3. macOS 앱 설정 자동 적용 검증 ---
 section "macOS app settings automation"

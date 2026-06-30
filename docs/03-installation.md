@@ -17,8 +17,9 @@
 | 01 | prerequisites  | Xcode CLI, Homebrew, zerobrew                | 최초 1회, dotfiles 전 | Xcode Command Line Tools가 없으면 설치하고, Homebrew를 설치한 뒤 zerobrew(Rust 기반 Homebrew 대안 클라이언트)를 설치하여 `zb` 명령을 기본 패키지 설치 경로로 준비한다. Homebrew와 zerobrew 모두 공식 `curl \| bash` 방식으로 설치한다. Apple Silicon이면 Rosetta 2도 함께 설치 |
 | 02 | macos-settings | Dock, Finder, Keyboard, Trackpad, Screenshot | 설정 변경 시           | defaults 명령으로 macOS 시스템 설정을 일괄 적용. `run_onchange_`이므로 스크립트 내용이 변경될 때만 재실행되어 불필요한 재적용을 방지                                                                                                                   |
 | 03 | brew-packages  | Brewfile 기반 패키지 설치                           | Brewfile 변경 시     | Brewfile의 체크섬을 감시하여 패키지 목록이 변경되면 `brew bundle`로 전체 패키지를 동기화. 새 패키지 추가, 기존 패키지 제거를 한 번에 처리                                                                                                                  |
-| 04 | cmux-settings  | cmux 외부 제어 기본 활성화                            | 설정 변경 시           | `~/.config/cmux/settings.json`을 배포하고 `defaults write com.cmuxterm.app socketControlMode -string automation`을 적용해 신규 macOS 시스템에서 cmux 외부 자동화 제어를 기본 활성화                                                     |
 | 05 | runtime        | Bun                                          | 최초 1회             | JavaScript/TypeScript 런타임으로 Bun을 설치. Node.js는 Brewfile에서 관리하고, Bun은 공식 설치 스크립트로 별도 설치                                                                                                                      |
+
+> cmux 외부 자동화 제어는 별도 스크립트 없이 `~/.config/cmux/cmux.json`(`automation.socketControlMode=allowAll`)을 선언적으로 배포하여 기본 활성화한다. cmux 0.64+는 이 파일을 정식 설정 경로로 읽으며, 과거 `defaults write com.cmuxterm.app socketControlMode` 방식은 폐기되었다.
 
 ### AI 스크립트 (darwin/)
 
@@ -74,10 +75,6 @@ chezmoi init --apply
 │   시스템 CLI, 런타임, 데이터/도구, 터미널/앱
 │   Brewfile 기반 전체 패키지 동기화 (zerobrew 우선, Homebrew 폴백)
 │
-├─ 04 cmux-settings
-│   ~/.config/cmux/settings.json + socketControlMode=automation
-│   cmux 외부 자동화 제어 기본 활성화
-│
 ├─ 05 runtime
 │   Bun (JavaScript/TypeScript 런타임)
 │
@@ -94,7 +91,7 @@ chezmoi init --apply
 ├─ dotfiles 배포
 │   ~/.zshrc, ~/.gitconfig, ~/.gitignore_global, ~/.vimrc
 │   ~/AGENTS.md (공통 에이전트 지침)
-│   ~/.config/cmux/settings.json, ~/.config/ghostty/config
+│   ~/.config/cmux/cmux.json, ~/.config/ghostty/config
 │   ~/.claude/settings.json
 │   ~/.codex/config.toml
 │   ~/.skills/* (공통 스킬 단일 출처), 지원 스킬 경로(~/.claude/skills, ~/.agents/skills) → ~/.skills symlink
