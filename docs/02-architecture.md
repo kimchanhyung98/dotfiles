@@ -23,7 +23,9 @@ dotfiles/
     │   │   ├── run_once_before_01-prerequisites.sh.tmpl
     │   │   ├── run_onchange_after_02-macos-settings.sh.tmpl
     │   │   ├── run_onchange_03-brew-packages.sh.tmpl
+    │   │   ├── run_onchange_after_05-app-settings.sh.tmpl
     │   │   ├── run_once_05-runtime.sh.tmpl
+    │   │   ├── run_onchange_after_07-tokscale-launchd.sh.tmpl
     │   │   ├── run_once_10-ai-core.sh.tmpl
     │   │   ├── run_once_11-ai-claude.sh.tmpl
     │   │   ├── run_once_12-ai-codex.sh.tmpl
@@ -50,6 +52,12 @@ dotfiles/
     │   │   └── cmux.json.tmpl
     │   ├── ghostty/
     │   │   └── config.tmpl
+    │   ├── rectangle/
+    │   │   └── RectangleConfig.json
+    │   ├── stats/
+    │   │   └── Stats.plist
+    │   ├── tokscale/
+    │   │   └── executable_submit.sh.tmpl
     │   ├── zsh/
     │   │   ├── 00-core.zsh
     │   │   ├── 10-env.zsh
@@ -70,6 +78,9 @@ dotfiles/
     ├── dot_agents/
     │   └── symlink_skills             # → ~/.skills
     │
+    ├── Library/LaunchAgents/
+    │   └── ai.tokscale.submit.plist.tmpl
+    │
     └── dot_local/bin/
         ├── executable_dotfiles-doctor
         └── executable_mattpocock-skills-sync
@@ -83,10 +94,14 @@ dotfiles/
 | `dot_config/bat/`           | `~/.config/bat/`                   | bat(cat 대체 뷰어) 설정                                 |
 | `dot_config/cmux/`          | `~/.config/cmux/`                  | cmux 설정 (`cmux.json`, `socketControlMode=allowAll` 자동화 기본값) |
 | `dot_config/ghostty/`       | `~/.config/ghostty/`               | Ghostty 터미널 설정                                    |
+| `dot_config/rectangle/`     | `~/.config/rectangle/`             | Rectangle 설정 원본. macOS app-settings 스크립트가 앱 import 경로로 복사 |
+| `dot_config/stats/`         | `~/.config/stats/`                 | Stats 설정 원본. app-settings 스크립트가 민감한 토큰을 보존하며 import |
+| `dot_config/tokscale/`      | `~/.config/tokscale/`              | tokscale submit 래퍼                                  |
 | `dot_config/zsh/`           | `~/.config/zsh/`                   | `.zshrc`에서 순차 로드하는 모듈형 Zsh 설정                     |
 | `dot_claude/`               | `~/.claude/`                       | Claude Code 설정                                    |
 | `dot_codex/`                | `~/.codex/`                        | Codex CLI 설정                                      |
 | `dot_<tool>/symlink_skills` | `~/.<tool>/skills/` → `~/.skills/` | 지원 스킬 경로를 단일 출처로 잇는 symlink (claude·agents)       |
+| `Library/LaunchAgents/`     | `~/Library/LaunchAgents/`          | macOS launchd 작업. 현재 tokscale 예약 submit 관리           |
 | `dot_local/bin/`            | `~/.local/bin/`                    | 사용자 스크립트 (doctor, mattpocock 스킬 동기화)                  |
 
 ## chezmoi special 파일

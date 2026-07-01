@@ -16,8 +16,10 @@
 |:--:|----------------|----------------------------------------------|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | 01 | prerequisites  | Xcode CLI, Homebrew, zerobrew                | 최초 1회, dotfiles 전 | Xcode Command Line Tools가 없으면 설치하고, Homebrew를 설치한 뒤 zerobrew(Rust 기반 Homebrew 대안 클라이언트)를 설치하여 `zb` 명령을 기본 패키지 설치 경로로 준비한다. Homebrew와 zerobrew 모두 공식 `curl \| bash` 방식으로 설치한다. Apple Silicon이면 Rosetta 2도 함께 설치 |
 | 02 | macos-settings | Dock, Finder, Keyboard, Trackpad, Screenshot | 설정 변경 시           | defaults 명령으로 macOS 시스템 설정을 일괄 적용. `run_onchange_`이므로 스크립트 내용이 변경될 때만 재실행되어 불필요한 재적용을 방지                                                                                                                   |
-| 03 | brew-packages  | Brewfile 기반 패키지 설치                           | Brewfile 변경 시     | Brewfile의 체크섬을 감시하여 패키지 목록이 변경되면 `brew bundle`로 전체 패키지를 동기화. 새 패키지 추가, 기존 패키지 제거를 한 번에 처리                                                                                                                  |
+| 03 | brew-packages  | Brewfile 기반 패키지 설치                           | Brewfile 변경 시     | Brewfile의 체크섬을 감시하여 패키지 목록이 변경되면 `zb bundle install --auto-init`을 먼저 실행하고, 실패 시 `brew bundle`로 폴백한다. 새 패키지 추가, 기존 패키지 제거를 한 번에 처리                                                                                                                  |
+| 05-after | app-settings  | Rectangle, Stats 설정 import                | 설정 변경 시, dotfiles 후 | Rectangle import 파일을 앱 지원 경로에 복사하고, Stats plist는 remote credential을 보존한 뒤 `defaults import`로 적용한다. |
 | 05 | runtime        | Bun                                          | 최초 1회             | JavaScript/TypeScript 런타임으로 Bun을 설치. Node.js는 Brewfile에서 관리하고, Bun은 공식 설치 스크립트로 별도 설치                                                                                                                      |
+| 07-after | tokscale-launchd | tokscale LaunchAgent 등록/갱신                 | 설정 변경 시, dotfiles 후 | `~/.config/tokscale/submit.sh`와 `~/Library/LaunchAgents/ai.tokscale.submit.plist`를 검증한 뒤 launchd에 재등록한다. 4일마다 14:00 KST submit을 실행한다. |
 
 > cmux 외부 자동화 제어는 별도 스크립트 없이 `~/.config/cmux/cmux.json`(`automation.socketControlMode=allowAll`)을 선언적으로 배포하여 기본 활성화한다. cmux 0.64+는 이 파일을 정식 설정 경로로 읽으며, 과거 `defaults write com.cmuxterm.app socketControlMode` 방식은 폐기되었다.
 
@@ -43,7 +45,7 @@
 
 | 순서 | 스크립트             | 역할                                                         | 실행 조건             | 상세                                                                       |
 |:--:|------------------|------------------------------------------------------------|-------------------|--------------------------------------------------------------------------|
-| 01 | install-packages | curl, git, vim, zsh, ghostty                               | 최초 1회, dotfiles 전 | 패키지 관리자를 자동 감지(apt-get → dnf → yum)하여 기초 도구를 설치. 이미 설치된 패키지는 건너뜀         |
+| 01 | install-packages | curl, git, vim, zsh, bat, zoxide                           | 최초 1회, dotfiles 전 | 패키지 관리자를 자동 감지(apt-get → dnf → yum)하여 기초 도구를 설치. Ghostty는 표준 저장소 패키지로 설치하지 않고 수동 설치 안내만 출력한다. 이미 설치된 패키지는 건너뜀         |
 | 02 | shell-baseline   | 기본 셸, 로케일, 타임존                                             | 설정 변경 시           | zsh를 기본 셸로 전환하고 히스토리, 키바인딩 기본값을 설정. 로케일과 타임존 정책도 함께 적용                   |
 | 03 | git-baseline     | Git 사용자 설정, SSH 기초                                         | 설정 변경 시           | 템플릿 변수(name, email)로 Git 사용자 정보를 설정하고 SSH 키 생성 기초 환경을 구성                 |
 | 04 | ai-tools         | claude, codex, codegraph, antigravity, hermes, oh-my-codex | 최초 1회             | macOS와 동일한 AI 도구를 Linux용 구성으로 설치. Hermes는 자체 의존성을 함께 준비하므로 설치 시간이 길 수 있음 |
@@ -75,8 +77,14 @@ chezmoi init --apply
 │   시스템 CLI, 런타임, 데이터/도구, 터미널/앱
 │   Brewfile 기반 전체 패키지 동기화 (zerobrew 우선, Homebrew 폴백)
 │
+├─ 05 app-settings (after)
+│   Rectangle import 파일 stage, Stats plist import(토큰 보존)
+│
 ├─ 05 runtime
 │   Bun (JavaScript/TypeScript 런타임)
+│
+├─ 07 tokscale-launchd (after)
+│   submit 래퍼와 LaunchAgent plist 검증 후 launchd 등록/갱신
 │
 ├─ 10 ai-core
 │   Claude Code, Codex CLI, Antigravity CLI, Hermes Agent, CodeGraph
@@ -92,6 +100,8 @@ chezmoi init --apply
 │   ~/.zshrc, ~/.gitconfig, ~/.gitignore_global, ~/.vimrc
 │   ~/AGENTS.md (공통 에이전트 지침)
 │   ~/.config/cmux/cmux.json, ~/.config/ghostty/config
+│   ~/.config/rectangle/RectangleConfig.json, ~/.config/stats/Stats.plist
+│   ~/.config/tokscale/submit.sh, ~/Library/LaunchAgents/ai.tokscale.submit.plist
 │   ~/.claude/settings.json
 │   ~/.codex/config.toml
 │   ~/.skills/* (공통 스킬 단일 출처), 지원 스킬 경로(~/.claude/skills, ~/.agents/skills) → ~/.skills symlink
@@ -101,7 +111,7 @@ chezmoi init --apply
 │   mattpocock/skills에서 선택한 스킬을 ~/.skills로 동기화
 │
 └─ 99 manual-install
-    JetBrains Toolbox, Raycast (자동 설치 불가 항목 안내)
+    JetBrains Toolbox, Raycast, tokscale 최초 로그인 안내
 ```
 
 ### Linux
@@ -113,8 +123,8 @@ chezmoi init --apply
 │   기존 실제 skills 디렉토리를 삭제해 symlink 교체 준비
 │
 ├─ 01 install-packages
-│   curl, git, vim, zsh, ghostty
-│   패키지 관리자 자동 감지 (apt-get → dnf → yum)
+│   curl, git, vim, zsh, bat, zoxide
+│   패키지 관리자 자동 감지 (apt-get → dnf → yum), Ghostty는 수동 설치 안내
 │
 ├─ .chezmoiexternal.toml
 │   Oh My Zsh, zsh-autosuggestions, zsh-syntax-highlighting

@@ -106,11 +106,12 @@ check "ollama" "command -v ollama"
 check "antigravity (agy)" "command -v agy"
 check "hermes" "command -v hermes"
 
-# AI Plugins
-section "AI Plugins"
-check "everything-claude-code" "claude plugin list 2>/dev/null | grep -q everything-claude-code"
-check "claude-hud" "claude plugin list 2>/dev/null | grep -q claude-hud"
-check "claude-mem" "[ -d '$HOME/.claude-mem' ]"
+# AI Extensions
+section "AI Extensions"
+CLAUDE_SETTINGS="$HOME/.claude/settings.json"
+check "Claude enabledPlugins config" "[ -f \"$CLAUDE_SETTINGS\" ] && grep -q '\"enabledPlugins\"' \"$CLAUDE_SETTINGS\""
+check "Claude Codex plugin config" "[ -f \"$CLAUDE_SETTINGS\" ] && grep -q '\"codex@openai-codex\": true' \"$CLAUDE_SETTINGS\" && grep -q '\"openai-codex\"' \"$CLAUDE_SETTINGS\""
+check "Claude remember plugin config" "[ -f \"$CLAUDE_SETTINGS\" ] && grep -q '\"remember@claude-plugins-official\": true' \"$CLAUDE_SETTINGS\""
 check "oh-my-codex" "command -v omx"
 
 # Skill Directories (단일 출처 ~/.skills + 도구별 symlink)
@@ -122,11 +123,6 @@ check "Codex skills (~/.agents) -> ~/.skills" "[ -L '$HOME/.agents/skills' ] && 
 # AGENTS.md
 section "AGENTS.md"
 check_path "~/AGENTS.md" "$HOME/AGENTS.md"
-
-# claude-mem
-section "claude-mem"
-check_path "~/.claude-mem/" "$HOME/.claude-mem"
-check_path "settings.json" "$HOME/.claude-mem/settings.json"
 
 # Dotfiles
 section "Dotfiles"

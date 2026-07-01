@@ -9,7 +9,7 @@
 ## 모듈화 기준
 
 - 코어 설치(10)에서 AI CLI 4종과 CodeGraph를 설치하고, 프로바이더별 확장 스크립트(11~12)에서 MCP, 플러그인을 독립 관리한다.
-- 서비스별 설정 파일(`settings.json`, `config.toml` 등)과 실행 스크립트(`ai-claude.sh`, `ai-codex.sh` 등)를 분리한다.
+- 서비스별 설정 파일(`settings.json`, `config.toml` 등)과 chezmoi 실행 스크립트(`run_once_11-ai-claude.sh.tmpl`, `run_once_12-ai-codex.sh.tmpl` 등)를 분리한다.
 - 인증, 프로필, 권한, 확장(플러그인/스킬) 항목을 독립적으로 관리하여, 하나의 변경이 다른 항목에 영향을 주지 않는다.
 - AI 설정 변경이 단일 모듈에 국한되도록 구성하여, 변경 범위를 예측할 수 있다.
 
@@ -40,7 +40,7 @@ Claude Code와 Codex가 단일 출처 `~/.skills`를 공유한다. 지원하는 
   `run_onchange_after_06-mattpocock-skills`가 최초 적용 및 스크립트 변경 시 실행한다.
   upstream 갱신이 필요하면 `~/.local/bin/mattpocock-skills-sync`를 재실행한다. 선택된 스킬 이름은 재실행마다 upstream 내용으로 교체된다.
   해당 런타임 동기화 경로는 `.chezmoiignore`에 명시해 `chezmoi verify`가 외부 갱신 결과를 drift로 보지 않게 한다.
-- **andrej-karpathy-skills**: 코딩 행동 지침 4대 원칙. Claude에서는 플러그인 마켓플레이스로 설치하고, Codex에서는 config.toml의 모델 지침으로 적용한다.
+- **andrej-karpathy-skills 기반 4원칙**: 홈 루트 `AGENTS.md`, `CLAUDE.md`, Codex `config.toml`의 `developer_instructions`에 텍스트 지침으로 반영한다.
 
 ## AGENTS.md
 
@@ -50,23 +50,23 @@ Claude Code와 Codex가 단일 출처 `~/.skills`를 공유한다. 지원하는 
 |-------|---------------|-------|-----------------------|
 | 홈 루트  | `~/AGENTS.md` | Codex | 프로젝트(홈 디렉토리) 수준 공통 지침 |
 
-**계층 우선순위**: 하위 경로의 AGENTS.md가 상위를 override한다. Codex가 실제로 따르는 탐색 순서:
+**계층 우선순위**: 하위 경로의 AGENTS.md가 상위를 override한다. 이 repo가 관리하는 Codex 지침 경로:
 
 | 우선순위 | 범위      | 경로 예시                | 역할                          |
 |:----:|---------|----------------------|-----------------------------|
 |  1   | 하위 디렉토리 | `src/api/AGENTS.md`  | 특정 도메인 전용 지침 (최우선 override) |
 |  2   | 저장소 루트  | `./AGENTS.md`        | 프로젝트 공통 지침                  |
 |  3   | 사용자 홈   | `~/AGENTS.md`        | 사용자 전역 기본 지침                |
-|  4   | 도구 글로벌  | `~/.codex/AGENTS.md` | 도구 전용 글로벌 지침 (Codex만 해당)    |
+|  4   | Codex config | `~/.codex/config.toml`의 `developer_instructions` | Codex 전용 기본 지침 |
 
 **포함 내용**:
 
 | 항목                    | 출처                                 | 상세                               |
 |-----------------------|------------------------------------|----------------------------------|
-| Think Before Coding   | andrej-karpathy-skills (CLAUDE.md) | 코드를 작성하기 전에 전체 맥락을 이해하고 계획을 수립   |
-| Simplicity First      | andrej-karpathy-skills (CLAUDE.md) | 가장 단순한 해결책을 우선 선택하고 불필요한 복잡성을 회피 |
-| Surgical Changes      | andrej-karpathy-skills (CLAUDE.md) | 변경 범위를 최소화하고 관련 없는 코드를 수정하지 않음   |
-| Goal-Driven Execution | andrej-karpathy-skills (CLAUDE.md) | 사용자의 목표에 집중하여 불필요한 확장을 방지        |
+| Think Before Coding   | `AGENTS.md.tmpl`, `CLAUDE.md`, Codex `developer_instructions` | 코드를 작성하기 전에 전체 맥락을 이해하고 계획을 수립   |
+| Simplicity First      | `AGENTS.md.tmpl`, `CLAUDE.md`, Codex `developer_instructions` | 가장 단순한 해결책을 우선 선택하고 불필요한 복잡성을 회피 |
+| Surgical Changes      | `AGENTS.md.tmpl`, `CLAUDE.md`, Codex `developer_instructions` | 변경 범위를 최소화하고 관련 없는 코드를 수정하지 않음   |
+| Goal-Driven Execution | `AGENTS.md.tmpl`, `CLAUDE.md`, Codex `developer_instructions` | 사용자의 목표에 집중하여 불필요한 확장을 방지        |
 | 도구 공통 운영 규칙           | 프로젝트 공통 정의                         | 각 AI 도구에서 공유하는 작업 규칙과 출력 형식      |
 
 ## Claude Code
@@ -96,21 +96,19 @@ Claude Code와 Codex가 단일 출처 `~/.skills`를 공유한다. 지원하는 
 
 **플러그인**
 
-Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록된다. 플러그인 전용 `plugins.json`/`hud.json` 파일은 사용하지 않으며, MCP는
-`~/.claude.json`(사용자)과 `.mcp.json`(프로젝트)으로 관리한다.
+Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록된다. 플러그인 전용 `plugins.json`/`hud.json` 파일은 사용하지 않으며, Codex 연동은
+`extraKnownMarketplaces.openai-codex`와 `codex@openai-codex`로 선언한다.
 
-| 플러그인                   | 역할       | 설치 방식       | 상세                                                                                                                                     |
-|------------------------|----------|-------------|----------------------------------------------------------------------------------------------------------------------------------------|
-| claude-hud             | 상태 표시줄   | 플러그인 마켓플레이스 | 컨텍스트 사용량, 현재 모델, Git 상태, 활성 도구, 에이전트, 진행률을 터미널 하단에 실시간 표시. 기본 statusline으로 설정. 설정은 자동 생성됨 (`~/.claude/plugins/claude-hud/config.json`) |
-| andrej-karpathy-skills | 코딩 행동 지침 | 플러그인 마켓플레이스 | Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution 4대 원칙을 Claude Code 세션에 자동 주입하여 코드 품질 기준선 유지             |
+| 상태 | 플러그인 |
+|---|---|
+| 활성 | `code-review`, `code-simplifier`, `codex@openai-codex`, `context7`, `hookify`, `playwright`, `pr-review-toolkit`, `ralph-loop`, `remember`, `security-guidance`, `vercel` |
+| 비활성 | LSP, 서비스 연동, 실험 기능 등 나머지 official plugin 항목 |
 
 **MCP 서버**
 
-| 서버                  | 역할             | 상세                                                                                              |
-|---------------------|----------------|-------------------------------------------------------------------------------------------------|
-| context7            | 라이브러리 공식 문서 조회 | resolve-library-id로 라이브러리를 식별한 뒤 get-library-docs로 공식 문서와 코드 예제를 검색. 외부 라이브러리 사용 시 최신 공식 패턴을 참조 |
-| sequential-thinking | 체계적 다단계 분석     | 복잡한 문제를 구조화된 사고 단계로 분해하여 분석. 디버깅, 아키텍처 설계, 코드 리뷰 등 다단계 추론이 필요한 작업에 활용                           |
-| codegraph           | 코드 그래프 인텔리전스   | 로컬 knowledge graph를 통해 explore, search, callers, callees, impact, node, files, status를 조회한다     |
+| 서버        | 역할           | 상세                                                                                  |
+|-----------|--------------|-------------------------------------------------------------------------------------|
+| codegraph | 코드 그래프 인텔리전스 | `run_once_11-ai-claude.sh.tmpl`이 `claude mcp add-json codegraph --scope user`로 등록한다. |
 
 ## Hermes
 

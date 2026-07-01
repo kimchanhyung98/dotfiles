@@ -1,254 +1,115 @@
-# Chezmoi Dotfiles Testing Plan
+# Chezmoi Dotfiles Testing
 
-> Makefile `check` 타겟과 GitHub Actions workflow(`test-dotfiles.yml`)는 구현 완료되었다. 이 문서는 테스트 전략과 구현 설계를 기술한다.
+이 문서는 현재 구현된 테스트 경로를 설명한다. 전체 dotfiles 적용 CI(`test-dotfiles.yml`)는 현재 저장소에 없으며, GitHub Actions는 브랜치명과 PR 제목 검증만 수행한다.
 
-## 배경
+## 대상 범위
 
-- chezmoi로 관리되는 dotfiles의 정상 동작을 검증하기 위한 테스트 전략
-- macOS와 Linux 환경 모두 지원 필요
-- 템플릿 27개(설정 10개, 스크립트 17개: 공통 2, darwin 10, linux 5)를 대상으로 함
+- 템플릿 29개
+  - 배포 템플릿 12개: `home/.chezmoi.toml.tmpl`, zsh/git/AI/cmux/ghostty/tokscale/LaunchAgent 등
+  - 실행 스크립트 17개: 공통 2개, darwin 10개, linux 5개
+- 테스트 스크립트
+  - `tests/macos.sh`
+  - `tests/linux.sh`
+  - `tests/zsh-config.sh`
+  - `tests/skills-migrate.sh`
+  - `tests/mattpocock-skills-sync.sh`
 
----
+## 로컬 테스트
 
-## 1. 로컬 테스트 (`make check`)
+`make check`가 현재 유일한 전체 검증 진입점이다.
 
-Makefile의 `check` 타겟을 구현하여, macOS/Linux 테스트를 모두 수행한다.
-
-```
+```text
 make check
-├── check-macos   (읽기 전용, 로컬에서 직접 실행)
-└── check-linux   (Docker Ubuntu 컨테이너)
+├── [macOS host] tests/macos.sh
+└── tests/Dockerfile build → tests/linux.sh
 ```
 
-### 1.1 macOS 로컬 테스트 (읽기 전용)
+macOS가 아닌 호스트에서는 `tests/macos.sh`를 건너뛰고 Docker 기반 Linux 테스트만 실행한다. Docker CLI가 없거나 Docker daemon이 실행 중이 아니면 `make check`는 실패한다.
 
-로컬 유저 설정에 **절대 영향을 주지 않는** 읽기 전용 명령어만 사용한다.
-
-| 단계           | 명령어                                 | 설명                            |
-|--------------|-------------------------------------|-------------------------------|
-| 템플릿 검증       | `chezmoi execute-template`          | 모든 `.tmpl` 파일을 순회하며 렌더링 확인    |
-| Zsh 설정 회귀 검증 | `tests/zsh-config.sh`               | LANG 폴백, fzf 바인딩 순서 등 회귀 테스트  |
-| Diff 확인      | `chezmoi diff`                      | 현재 상태와 source의 차이를 출력 (변경 없음) |
-| Dry-run      | `chezmoi apply --dry-run --verbose` | 적용 시뮬레이션만 수행 (실제 변경 없음)       |
-| 상태 검증        | `chezmoi verify`                    | 배포된 파일이 source와 일치하는지 확인      |
-| 진단           | `chezmoi doctor`                    | 환경 진단                         |
-| ShellCheck   | `shellcheck`                        | 공통+darwin 스크립트 정적 분석          |
-
-> 템플릿 검증은 `find home -name '*.tmpl' | while read f; do chezmoi execute-template < "$f"; done` 등의 방식으로 전체 파일을 순회해야 한다. (
-`-exec`에서는 쉘 리다이렉션(`<`)을 직접 사용할 수 없으므로 파이프라인 또는 `sh -c` 래퍼를 사용한다.)
-
-**안전성 보장:**
-
-- `chezmoi execute-template`: stdout 출력만, 파일 시스템 변경 없음
-- `chezmoi diff`: 읽기 전용 비교
-- `chezmoi apply --dry-run`: `-n` 플래그로 실제 적용 차단
-- `chezmoi verify`: 파일 비교만 수행, 변경 없음 (exit code로 일치/불일치 판별)
-- `chezmoi doctor`: 진단만 수행
-- `chezmoi apply`, `chezmoi init --apply` 등 **쓰기 명령어는 사용하지 않는다**
-
-**주의: ShellCheck + chezmoi 템플릿**
-
-`.chezmoiscripts/` 하위 스크립트는 `.sh.tmpl` 형식이므로, 템플릿 구문(`{{ }}`)이 ShellCheck와 충돌할 수 있다.
-
-- **방법 A (권장)**: `chezmoi execute-template`로 렌더링 후 ShellCheck 실행 — 템플릿 구문이 완전히 제거되어 정확한 분석 가능
-- 방법 B: `.shellcheckrc`로 관련 경고 예외 처리 — 간편하지만 실제 문제도 예외 처리될 수 있음
-
-### 1.2 Linux Docker 테스트
-
-`ubuntu:24.04` 컨테이너에서 격리된 환경으로 테스트한다.
-
-**이미지:** `ubuntu:24.04` (가장 일반적인 서버 환경)
-
-**컨테이너 내 실행 순서:**
-
-| 단계                     | 설명                                                                   |
-|------------------------|----------------------------------------------------------------------|
-| 1. 기본 패키지 설치           | curl, git, zsh 등                                                     |
-| 2. 비root 사용자 생성        | `testuser` (sudo NOPASSWD:ALL — 스크립트가 sudo를 직접 호출하므로 필수)             |
-| 3. chezmoi 설치          | `get.chezmoi.io` 스크립트                                                |
-| 4. 버전 확인               | `chezmoi --version` (디버깅용 기록)                                        |
-| 5. 비대화형 설정 주입          | chezmoi config에 테스트용 데이터 사전 생성 (아래 참고)                               |
-| 6. source directory 복사 | `home/` → chezmoi source path, `tests/` → 테스트 스크립트 디렉토리              |
-| 7. 템플릿 검증              | `chezmoi execute-template` (전체 순회)                                   |
-| 7.5. Zsh 설정 회귀 검증      | `tests/zsh-config.sh` (LANG 폴백, fzf 바인딩 순서)                          |
-| 8. 진단                  | `chezmoi doctor --no-network`                                        |
-| 9. Dry-run 적용          | `chezmoi apply --dry-run --verbose`                                  |
-| 10. 실제 적용              | `chezmoi apply --force --verbose 2>&1 \| tee /tmp/chezmoi-apply.log` |
-| 11. 배포 검증              | `chezmoi managed`로 전체 관리 대상 목록 확인 + `chezmoi verify`로 상태 일치 검증       |
-| 12. ShellCheck         | 공통+linux 스크립트 정적 분석                                                  |
-
-**비대화형 설정 주입:**
-
-`.chezmoi.toml.tmpl`은 `stdinIsATTY` 체크로 대화형/비대화형을 구분한다. CI/Docker 환경에서는 TTY가 없으므로 프롬프트를 건너뛰지만, 기본값(`YOUR_NAME`,
-`YOUR_EMAIL`)이 사용된다. 의미 있는 테스트를 위해 `chezmoi init` 전에 config를 사전 생성한다:
+Docker 설정 경로 권한 문제가 있는 환경에서는 다음처럼 임시 Docker config를 지정한다.
 
 ```sh
-mkdir -p ~/.config/chezmoi
-cat > ~/.config/chezmoi/chezmoi.toml << 'EOF'
-[data]
-    name = "Test User"
-    email = "test@example.com"
-EOF
+DOCKER_CONFIG=/private/tmp/dotfiles-docker-config make check
 ```
 
-이렇게 하면 `promptStringOnce`가 이미 저장된 값을 사용하여, 프롬프트 없이 올바른 데이터로 초기화된다.
+## macOS 테스트
 
-**로그 기록:**
+`tests/macos.sh`는 임시 HOME을 만들고 `chezmoi init --source "$REPO_DIR/home"`으로 격리된 source를 사용한다. 실제 사용자 HOME에는 적용하지 않는다.
 
-`chezmoi apply` 실행 시 `--verbose` 출력을 로그 파일로 저장한다. 실패 시 로그를 통해 어떤 단계에서 문제가 발생했는지 추적할 수 있다.
+엄격 실패 항목:
 
-```sh
-chezmoi apply --force --verbose 2>&1 | tee /tmp/chezmoi-apply.log
-```
+| 영역 | 검증 내용 |
+|---|---|
+| 템플릿 | `chezmoi cat`으로 관리 파일 템플릿 렌더링 |
+| Codex | `home/dot_codex/config.toml.tmpl` 권한 deny/write 규칙과 cloudflare plugin 비활성 상태 |
+| cmux | `cmux.json` JSON 구조와 automation 기본값 |
+| App settings | Rectangle JSON, Stats plist, app-settings 스크립트 |
+| Skills | legacy skills cleanup, `.claude/skills`/`.agents/skills` symlink topology |
+| mattpocock skills | 선택된 upstream skill 동기화와 stale runtime state 제거 |
+| Brew | `pkgconf`, `docker-desktop`, zerobrew 우선 및 Homebrew 폴백 |
+| tokscale | submit wrapper, LaunchAgent plist, launchd bootstrap 스크립트 target path |
+| Zsh | LANG 폴백과 fzf 바인딩 순서 회귀 검증 |
+| ShellCheck | shellcheck가 설치된 경우 공통+darwin 렌더링 스크립트 lint |
 
-CI 환경에서는 이 로그 파일을 artifact로 업로드하여 실패 원인 분석에 활용한다.
+관찰 항목:
 
-**외부 의존성 (네트워크 필요):**
+- `chezmoi diff`
+- `chezmoi apply --dry-run --verbose`
+- `chezmoi verify`
+- `chezmoi doctor`
 
-`.chezmoiexternal.toml`에 정의된 외부 리소스(oh-my-zsh, zsh 플러그인 등)는 `chezmoi apply` 시 GitHub에서 다운로드된다. Docker/CI 환경에서 네트워크 접근이
-필수이며, GitHub rate limiting이나 네트워크 장애 시 apply가 실패할 수 있다. `schedule` 트리거(주 1회)가 이런 외부 의존성 깨짐을 감지하는 역할을 한다.
+임시 HOME에서는 아직 실제 적용 전 차이가 있을 수 있으므로, 위 항목은 일부 non-zero 결과를 warning으로 보고 테스트 실패로 보지 않는다.
 
-**macOS와의 차이점:**
+## Linux Docker 테스트
 
-- Docker 컨테이너이므로 **실제 적용(`chezmoi apply`)까지 테스트 가능**
-- 매 실행마다 클린 환경이 보장됨
-- 스크립트 실행(`run_once_before_01`, `run_onchange_02`, `run_onchange_03`, `run_once_04`, `run_onchange_05`)도 안전하게 검증 가능
+`tests/Dockerfile`은 `ubuntu:24.04` 기반으로 비root `testuser`를 만들고, `home/`을 chezmoi source directory로 복사한 뒤 `tests/linux.sh`를 실행한다.
 
-### 1.3 Makefile `check` 타겟 구조
+컨테이너 사전 설치 항목:
 
-Makefile의 `check` 타겟은 macOS에서 실행 시 로컬 macOS 테스트(`tests/macos.sh`)를 먼저 수행하고, Docker로 Linux 테스트(`tests/linux.sh`)를 실행한다.
+- curl, git, vim, zsh, sudo, ca-certificates, locales
+- shellcheck, zoxide, bat
+- nodejs, npm
+- chezmoi
 
-```
-make check
-├── [macOS] 템플릿 렌더링 검증 (모든 .tmpl 순회)
-├── [macOS] Zsh 설정 회귀 검증 (LANG 폴백, fzf 바인딩 순서)
-├── [macOS] chezmoi diff
-├── [macOS] chezmoi apply --dry-run --verbose
-├── [macOS] chezmoi verify
-├── [macOS] chezmoi doctor
-├── [macOS] ShellCheck (공통+darwin 스크립트, 렌더링 후 실행)
-├── [Linux] Docker Ubuntu 컨테이너 빌드 & 실행
-│   ├── 템플릿 검증
-│   ├── Zsh 설정 회귀 검증
-│   ├── chezmoi doctor
-│   ├── chezmoi apply (실제 적용, 로그 기록)
-│   ├── chezmoi managed + chezmoi verify (전체 파일 검증)
-│   └── ShellCheck (공통+linux 스크립트, 렌더링 후 실행)
-└── 결과 요약 출력
-```
+`tests/linux.sh`의 주요 검증:
 
-> macOS에서 `make check` 실행 시 macOS + Linux(Docker) 모두 테스트.
-> Linux에서 실행 시 Linux 테스트만 수행 (macOS 단계 스킵).
+| 단계 | 검증 내용 |
+|---|---|
+| chezmoi version | 실행 가능 여부와 버전 출력 |
+| 템플릿 | `chezmoi cat`으로 관리 파일 렌더링 |
+| OS ignore | macOS-only 파일(Rectangle, Stats, cmux, tokscale, LaunchAgent 등)이 Linux에서 관리되지 않는지 확인 |
+| Skills | cleanup, symlink topology, mattpocock sync |
+| Zsh | `tests/zsh-config.sh` |
+| Doctor | `chezmoi doctor --no-network` error 여부 |
+| Apply | dry-run 후 `chezmoi apply --force --verbose` 실제 적용 |
+| Verify | `chezmoi managed` 목록과 `chezmoi verify` |
+| ShellCheck | 공통+linux 렌더링 스크립트 lint |
 
----
+## Git Hooks와 GitHub Checks
 
-## 2. CI/CD (GitHub Actions)
+| 위치 | 시점 | 동작 |
+|---|---|---|
+| `.husky/pre-commit` | `git commit` 전 | `make check` 실행 |
+| `.husky/commit-msg` | `git commit` 전 | `.husky/validate-commit.cjs`로 conventional commit 형식 검증 |
+| `.husky/pre-push` | `git push` 전 | `.husky/validate-branch.cjs`로 브랜치명 검증 |
+| `.github/workflows/branch-name-check.yml` | PR 생성/수정 | PR head branch 형식 검증 |
+| `.github/workflows/pr-title-check.yml` | PR 생성/수정/label 변경 | `amannn/action-semantic-pull-request@v6`로 PR 제목 검증 |
 
-`test-dotfiles.yml` 워크플로우로 PR 및 main 브랜치 변경 시 자동 검증을 수행한다.
+현재 GitHub Actions에는 macOS/Linux dotfiles 적용 테스트 workflow가 없다. PR에서 전체 적용 검증이 필요하면 로컬 `make check` 결과를 기준으로 판단한다.
 
-### Workflow 구조
+## 로컬 vs 자동 검증
 
-```
-test-dotfiles.yml
-├── validate (ubuntu-latest)
-│   ├── 모든 .tmpl 파일 렌더링 검증
-│   ├── chezmoi doctor
-│   └── ShellCheck 정적 분석
-├── test-macos (matrix: 3개)
-│   ├── macos-15       (Sequoia, ARM64)
-│   ├── macos-15-intel (Sequoia, Intel)
-│   ├── macos-26       (Tahoe, ARM64)
-│   └── 각 runner에서:
-│       ├── chezmoi --version (버전 기록)
-│       ├── 비대화형 설정 주입 (chezmoi config 사전 생성)
-│       ├── chezmoi init --source "$GITHUB_WORKSPACE/home" (source 경로 명시)
-│       ├── chezmoi apply --force --keep-going --verbose (실제 적용, 로그 기록)
-│       ├── chezmoi managed (전체 관리 대상 목록 확인)
-│       ├── chezmoi verify (전체 파일 상태 검증)
-│       └── 실패 시 로그 artifact 업로드
-└── test-linux (ubuntu-latest)
-    ├── chezmoi --version (버전 기록)
-    ├── 비대화형 설정 주입 (chezmoi config 사전 생성)
-    ├── 의존성 설치 (zsh, git, nodejs, npm)
-    ├── chezmoi init --source "$GITHUB_WORKSPACE/home" (source 경로 명시)
-    ├── chezmoi apply --force --keep-going --verbose (실제 적용, 로그 기록)
-    ├── chezmoi managed (전체 관리 대상 목록 확인)
-    ├── chezmoi verify (전체 파일 상태 검증)
-    └── 실패 시 로그 artifact 업로드
-```
+| 테스트 항목 | 로컬 `make check` | Husky | GitHub Actions |
+|---|:---:|:---:|:---:|
+| macOS 템플릿/설정 회귀 | O(macOS host) | pre-commit | - |
+| Linux Docker 적용 검증 | O | pre-commit | - |
+| ShellCheck | O | pre-commit | - |
+| 커밋 메시지 | - | commit-msg | - |
+| 브랜치명 | - | pre-push | O(PR) |
+| PR 제목 | - | - | O(PR) |
 
-### 트리거 조건
+## 향후 고려사항
 
-| 이벤트               | 목적                               |
-|-------------------|----------------------------------|
-| `push` (main)     | 메인 브랜치 변경 시 전체 검증                |
-| `pull_request`    | PR 머지 전 검증                       |
-| `schedule` (주 1회) | 외부 의존성 깨짐 감지 (Oh My Zsh, 플러그인 등) |
-
-### Job 의존성
-
-- `validate`는 독립 실행 (빠른 피드백)
-- `test-macos`와 `test-linux`는 `validate` 성공 후 실행
-
-### macOS Runner 매트릭스 (as of 2026-02-18)
-
-| Runner           | macOS 버전   | 아키텍처                  | 상태                 | 비용                       |
-|------------------|------------|-----------------------|--------------------|--------------------------|
-| `macos-15`       | Sequoia 15 | ARM64 (Apple Silicon) | GA, `macos-latest` | 무료                       |
-| `macos-15-intel` | Sequoia 15 | Intel x64             | GA                 | 무료                       |
-| `macos-26`       | Tahoe 26   | ARM64 (Apple Silicon) | Beta               | 무료                       |
-| `macos-26-large` | Tahoe 26   | Intel x64             | Beta               | **유료** (Team/Enterprise) |
-
-> 현재 무료 3개(`macos-15`, `macos-15-intel`, `macos-26`)로 운영 중이다. `macos-26-large`는 유료 플랜 필요로 미포함.
-> `macos-15-intel`은 2027년 8월까지만 제공되며, GitHub Actions의 마지막 Intel 이미지다. (as of 2026-02-18)
-
----
-
-## 3. 로컬 vs CI 테스트 범위 비교
-
-| 테스트 항목                  | 로컬 macOS | 로컬 Linux (Docker) | CI macOS | CI Linux |
-|-------------------------|:--------:|:-----------------:|:--------:|:--------:|
-| 템플릿 렌더링                 |    O     |         O         |    O     |    O     |
-| ShellCheck              |    O     |         O         |    O     |    O     |
-| chezmoi doctor          |    O     |         O         |    O     |    O     |
-| chezmoi diff            |    O     |         -         |    -     |    -     |
-| chezmoi apply (dry-run) |    O     |         O         |    -     |    -     |
-| chezmoi apply (실제 적용)   |  **X**   |         O         |    O     |    O     |
-| chezmoi verify          |    O     |         O         |    O     |    O     |
-| 스크립트 실행                 |  **X**   |         O         |    O     |    O     |
-| 전체 파일 배포 검증             |  **X**   |         O         |    O     |    O     |
-| 클린 환경 보장                |  **X**   |         O         |    O     |    O     |
-
----
-
-## 4. 향후 고려사항
-
-### Bats (Bash Automated Testing System)
-
-- 쉘 스크립트의 동작을 단위 테스트할 수 있는 프레임워크
-- `dotfiles-doctor`의 각 검증 항목을 Bats 테스트로 전환 가능
-- 참고: [shunk031/dotfiles](https://github.com/shunk031/dotfiles) - Bats + kcov(coverage)를 활용한 사례
-
-### 추가 Linux 배포판
-
-현재는 `ubuntu:24.04`만 테스트하지만, 필요 시 확장 가능:
-
-| 이미지               | 패키지 매니저 | 비고                   |
-|-------------------|---------|----------------------|
-| `debian:bookworm` | apt-get | 안정성 테스트              |
-| `alpine:latest`   | apk     | 최소 환경 (musl libc 주의) |
-| `fedora:latest`   | dnf     | RPM 기반 테스트           |
-
----
-
-## 참고 자료
-
-- [chezmoi: verify command](https://www.chezmoi.io/reference/commands/verify/)
-- [chezmoi: Containers and VMs](https://www.chezmoi.io/user-guide/machines/containers-and-vms/)
-- [chezmoi: docker command](https://www.chezmoi.io/reference/commands/docker/)
-- [chezmoi: Testing (Developer Guide)](https://www.chezmoi.io/developer-guide/testing/)
-- [GitHub Actions runners reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
-- [macOS 15 Intel runner (macos-15-intel)](https://github.com/actions/runner-images/issues/13045)
-- [macOS 26 Intel runner (macos-26-large)](https://github.com/actions/runner-images/issues/13637)
-- [shunk031/dotfiles](https://github.com/shunk031/dotfiles) - Bats + Docker + GitHub Actions 사례
-- [felipecrs/dotfiles](https://github.com/felipecrs/dotfiles) - Docker + chezmoi one-shot 사례
+- GitHub Actions에 전체 dotfiles 적용 workflow를 추가할 경우, 이 문서의 CI 섹션을 새 workflow 파일명과 job 구조에 맞춰 갱신한다.
+- macOS runner 검증을 추가할 경우 비용과 runner 제공 기간을 별도 확인한다.
+- `dotfiles-doctor` 항목이 늘어나면 별도 테스트로 전환해 문서와 진단 스크립트의 drift를 줄인다.
