@@ -68,25 +68,42 @@ else
     fail "$TMPL_FAIL template(s) failed to render"
 fi
 
-# --- 1.1. Codex workspace permissions 검증 ---
-section "Codex workspace permissions"
+# --- 1.1. Codex 설정 검증 ---
+section "Codex config"
 CODEX_CONFIG_SOURCE="$REPO_DIR/home/dot_codex/config.toml.tmpl"
 rendered_codex_config="$(mktemp -p "$TMPHOME")"
 codex_config_err="$(mktemp -p "$TMPHOME")"
 CODEX_PERMISSIONS_FAIL=0
 if cz execute-template < "$CODEX_CONFIG_SOURCE" > "$rendered_codex_config" 2>"$codex_config_err"; then
     for rule in \
+        'model = "gpt-5.6-sol"' \
+        'plan_mode_reasoning_effort = "ultra"' \
+        'max_threads = 12' \
+        'max_depth = 2' \
+        'glob_scan_max_depth = 4' \
         '".agents" = "write"' \
         '".codex" = "write"' \
+        '".claude" = "write"' \
         '".git" = "write"' \
+        '".github" = "write"' \
         '".hooks" = "write"' \
         '".skills" = "write"' \
-        '".env" = "deny"'; do
-        if ! grep -Fq "$rule" "$rendered_codex_config"; then
+        '".env" = "deny"' \
+        '"**/*.tfstate" = "deny"' \
+        '"**/.azure/**" = "deny"' \
+        '"**/.docker/config.json" = "deny"' \
+        '"**/application_default_credentials.json" = "deny"' \
+        'allow_local_binding = false' \
+        'default_tools_approval_mode = "writes"'; do
+        if ! grep -Fxq "$rule" "$rendered_codex_config"; then
             echo "    FAIL: missing $rule"
             CODEX_PERMISSIONS_FAIL=$((CODEX_PERMISSIONS_FAIL + 1))
         fi
     done
+    if grep -Fxq 'sandbox_mode = "danger-full-access"' "$rendered_codex_config"; then
+        echo "    FAIL: danger-full-access must not override the workspace permissions profile"
+        CODEX_PERMISSIONS_FAIL=$((CODEX_PERMISSIONS_FAIL + 1))
+    fi
     if grep -Fq 'cloudflare@openai-curated' "$rendered_codex_config"; then
         echo "    FAIL: cloudflare plugin should not be enabled"
         CODEX_PERMISSIONS_FAIL=$((CODEX_PERMISSIONS_FAIL + 1))
@@ -97,9 +114,9 @@ else
 fi
 
 if [ "$CODEX_PERMISSIONS_FAIL" -eq 0 ]; then
-    pass "Codex config grants repo support paths without exposing secrets"
+    pass "Codex config matches the project defaults without exposing secrets"
 else
-    fail "Codex workspace permissions regression"
+    fail "Codex config regression"
 fi
 rm -f "$rendered_codex_config" "$codex_config_err"
 

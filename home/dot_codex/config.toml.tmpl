@@ -11,12 +11,12 @@
 ################################################################################
 # 핵심 모델 선택
 ################################################################################
-# Codex가 사용할 기본 모델입니다. 대부분의 사용자에게 권장하는 예시는 "gpt-5.5"입니다.
-model = "gpt-5.5"
+# Codex가 사용할 기본 모델입니다. 대부분의 사용자에게 권장하는 예시는 "gpt-5.6"입니다.
+model = "gpt-5.6-sol"
 # 지원 모델의 커뮤니케이션 스타일입니다. 허용값: none | friendly | pragmatic
 #personality = "pragmatic"
 # /review에서 사용할 선택적 모델 override입니다. 기본값: unset(현재 세션 모델 사용).
-#review_model = "gpt-5.5"
+#review_model = "gpt-5.6"
 # [model_providers]에서 선택할 provider id입니다. 기본값: "openai".
 #model_provider = "openai"
 # --oss 세션의 기본 OSS provider입니다. 설정하지 않으면 Codex가 물어봅니다. 기본값: unset.
@@ -35,10 +35,10 @@ model = "gpt-5.5"
 ################################################################################
 # 추론 및 응답 상세도
 ################################################################################
-# 추론 강도: minimal | low | medium | high | xhigh
+# 추론 강도: minimal | low | medium | high | xhigh | max | ultra (모델별 지원 범위가 다름)
 model_reasoning_effort = "xhigh"
-# Codex가 plan mode로 실행될 때의 선택적 override입니다: none | minimal | low | medium | high | xhigh
-#plan_mode_reasoning_effort = "xhigh"
+# Codex가 plan mode로 실행될 때의 선택적 override입니다: none | minimal | low | medium | high | xhigh | max | ultra
+plan_mode_reasoning_effort = "ultra"
 # reasoning summary 설정: auto | concise | detailed | none
 model_reasoning_summary = "auto"
 # GPT-5 계열(Responses API)의 텍스트 상세도: low | medium | high
@@ -94,7 +94,8 @@ allow_login_shell = false
 # - read-only(기본값)
 # - workspace-write
 # - danger-full-access(sandbox 없음, 매우 위험)
-sandbox_mode = "danger-full-access"
+# default_permissions가 아래의 사용자 정의 workspace profile을 선택하므로 비활성화합니다.
+#sandbox_mode = "danger-full-access"
 # 기본으로 적용할 named permissions profile입니다. 내장값:
 # :read-only | :workspace | :danger-full-access
 # "workspace" 같은 사용자 정의 이름은 [permissions.workspace]를 함께 정의할 때만 사용하세요.
@@ -104,7 +105,7 @@ default_permissions = "workspace"
 # 인증 및 로그인
 ################################################################################
 # CLI 로그인 자격 증명을 저장할 위치입니다: file(기본값) | keyring | auto
-#cli_auth_credentials_store = "file"
+cli_auth_credentials_store = "file"
 # ChatGPT 인증 흐름의 Base URL입니다(OpenAI API가 아닙니다).
 #chatgpt_base_url = "https://chatgpt.com/backend-api/"
 # 내장 OpenAI provider의 선택적 Base URL override입니다.
@@ -115,7 +116,7 @@ default_permissions = "workspace"
 # 허용값: chatgpt | api
 #forced_login_method = "chatgpt"
 # MCP OAuth 자격 증명의 선호 저장소입니다: auto(기본값) | file | keyring
-#mcp_oauth_credentials_store = "auto"
+mcp_oauth_credentials_store = "auto"
 # MCP OAuth callback의 선택적 고정 포트입니다: 1-65535. 기본값: unset.
 #mcp_oauth_callback_port = 4321
 # MCP OAuth login의 선택적 redirect URI override입니다(예: 원격 devbox ingress).
@@ -126,9 +127,9 @@ default_permissions = "workspace"
 # 프로젝트 문서 제어
 ################################################################################
 # 첫 turn 지침에 포함할 AGENTS.md 최대 바이트 수입니다. 기본값: 32768
-#project_doc_max_bytes = 32768
+project_doc_max_bytes = 32768
 # 디렉터리 단계에서 AGENTS.md가 없을 때 순서대로 시도할 fallback 파일명입니다. 기본값: []
-#project_doc_fallback_filenames = []
+project_doc_fallback_filenames = []
 # 상위 디렉터리에서 프로젝트 루트를 찾을 때 사용할 marker 파일명입니다. 기본값: [".git"]
 #project_root_markers = [".git"]
 
@@ -136,21 +137,21 @@ default_permissions = "workspace"
 # 히스토리 및 파일 열기
 ################################################################################
 # 클릭 가능한 citation에 사용할 URI scheme입니다: vscode(기본값) | vscode-insiders | windsurf | cursor | none
-#file_opener = "vscode"
+file_opener = "vscode"
 
 ################################################################################
 # UI, 알림, 기타
 ################################################################################
 # 내부 reasoning event 출력을 숨깁니다. 기본값: false
-#hide_agent_reasoning = false
+hide_agent_reasoning = false
 # 사용할 수 있을 때 raw reasoning content를 표시합니다. 기본값: false
-#show_raw_agent_reasoning = false
+show_raw_agent_reasoning = false
 # TUI의 burst-paste 감지를 끕니다. 기본값: false
-#disable_paste_burst = false
+disable_paste_burst = false
 # Windows onboarding 확인 여부를 기록합니다(Windows 전용). 기본값: false
-#windows_wsl_setup_acknowledged = false
+windows_wsl_setup_acknowledged = false
 # 시작 시 업데이트를 확인합니다. 기본값: true
-#check_for_update_on_startup = true
+check_for_update_on_startup = true
 
 ################################################################################
 # 웹 검색
@@ -168,11 +169,11 @@ web_search = "live"
 ################################################################################
 # Agents(멀티 에이전트 역할 및 제한)
 ################################################################################
-#[agents]
+[agents]
 # 동시에 열 수 있는 agent thread 최대 개수입니다. 기본값: 6
-#max_threads = 6
+max_threads = 12
 # 중첩 spawn 최대 깊이입니다. 루트 세션은 depth 0에서 시작합니다. 기본값: 1
-#max_depth = 1
+max_depth = 2
 # spawn_agents_on_csv job의 worker별 기본 timeout입니다. 설정하지 않으면 도구 기본값은 1800초입니다.
 #job_max_runtime_seconds = 1800
 #[agents.reviewer]
@@ -211,13 +212,13 @@ inherit = "all"
 # KEY/SECRET/TOKEN을 포함하는 변수명의 기본 제외 규칙을 건너뜁니다(대소문자 무시). 기본값: false
 ignore_default_excludes = false
 # 제거할 대소문자 무시 glob pattern입니다(예: "AWS**", "AZURE**"). 기본값: []
-#exclude = []
+exclude = []
 # 명시적 key/value override입니다(항상 우선). 기본값: {}
-#set = {}
+set = {}
 # whitelist입니다. 비어 있지 않으면 일치하는 변수만 유지합니다. 기본값: []
-#include_only = []
+include_only = []
 # 실험적 기능: 사용자 shell profile을 통해 실행합니다. 기본값: false
-#experimental_use_profile = false
+experimental_use_profile = false
 
 ################################################################################
 # Sandboxed networking 설정
@@ -271,16 +272,18 @@ ignore_default_excludes = false
 
 [permissions.workspace]
 extends = ":workspace"
-description = "Autonomous workspace write with secret read denials and public network"
+description = "Workspace write with secret read denials and public network access"
 
 [permissions.workspace.filesystem]
-glob_scan_max_depth = 3
+glob_scan_max_depth = 4
 
 [permissions.workspace.filesystem.":workspace_roots"]
 "." = "write"
 ".agents" = "write"
 ".codex" = "write"
+".claude" = "write"
 ".git" = "write"
+".github" = "write"
 ".hooks" = "write"
 ".skills" = "write"
 ".env" = "deny"
@@ -296,10 +299,15 @@ glob_scan_max_depth = 3
 "**/*.jks" = "deny"
 "**/*.keystore" = "deny"
 "**/*.tfvars" = "deny"
+"**/*.tfstate" = "deny"
+"**/*.tfstate.*" = "deny"
 "**/id_rsa*" = "deny"
 "**/id_ed25519*" = "deny"
 "**/.ssh/**" = "deny"
 "**/.aws/**" = "deny"
+"**/.azure/**" = "deny"
+"**/.docker/config.json" = "deny"
+"**/application_default_credentials.json" = "deny"
 "**/credentials.json" = "deny"
 "**/.netrc" = "deny"
 "**/.npmrc" = "deny"
@@ -309,10 +317,13 @@ glob_scan_max_depth = 3
 
 [permissions.workspace.network]
 enabled = true
-allow_local_binding = true
+allow_local_binding = false
 
 [permissions.workspace.network.domains]
 "*" = "allow"
+"localhost" = "allow"
+"127.0.0.1" = "allow"
+"::1" = "allow"
 
 ################################################################################
 # 히스토리(테이블)
@@ -339,16 +350,16 @@ animations = true
 # welcome screen의 onboarding tooltip을 표시합니다. 기본값: true
 show_tooltips = true
 # alternate screen 사용을 제어합니다(auto는 Zellij에서 scrollback 보존을 위해 건너뜁니다).
-#alternate_screen = "auto"
+alternate_screen = "auto"
 # footer status-line item ID의 순서 있는 목록입니다. 설정하지 않으면 Codex는 다음을 사용합니다:
 # ["model-with-reasoning", "context-remaining", "current-dir"].
 # footer를 숨기려면 []로 설정하세요.
-#status_line = ["model", "context-remaining", "git-branch"]
+status_line = ["model-with-reasoning", "context-remaining", "git-branch", "current-dir"]
 # terminal window/tab title item ID의 순서 있는 목록입니다. 설정하지 않으면 Codex는 다음을 사용합니다:
 # ["spinner", "project"]. title을 비우려면 []로 설정하세요.
 # 사용 가능한 ID에는 app-name, project, spinner, status, thread, git-branch, model,
 # task-progress가 포함됩니다.
-#terminal_title = ["spinner", "project"]
+terminal_title = ["spinner", "project"]
 # syntax highlighting theme입니다(kebab-case). TUI에서 /theme으로 미리 보고 저장할 수 있습니다.
 # 사용자 지정 .tmTheme 파일은 $CODEX_HOME/themes 아래에 추가할 수도 있습니다.
 #theme = "catppuccin-mocha"
@@ -370,7 +381,7 @@ enabled = true
 [feedback]
 enabled = false
 # 제품 내 notice입니다. 대부분 Codex가 자동으로 설정합니다.
-#[notice]
+[notice]
 #hide_full_access_warning = true
 #hide_world_writable_warning = true
 #hide_rate_limit_model_nudge = true
@@ -384,7 +395,7 @@ enabled = false
 [features]
 # 기본값을 쓰려면 이 테이블을 비워 두세요. 명시적으로 켜거나 끄려면 boolean을 설정하세요.
 #shell_tool = true
-#apps = false
+#apps = true
 hooks = true
 #codex_git_commit = false
 #unified_exec = true
@@ -396,6 +407,13 @@ fast_mode = true
 #enable_request_compression = true
 #skill_mcp_dependency_install = true
 #prevent_idle_sleep = false
+
+# Code mode namespace는 개발 중인 기능이며 기본적으로 비활성화합니다.
+code_mode_only = false
+code_mode_host = false
+
+[features.code_mode]
+enabled = false
 
 ################################################################################
 # Memories(테이블)
@@ -534,12 +552,14 @@ enabled = true
 # 앱 / 커넥터
 ################################################################################
 # 선택적 app별 제어입니다.
-#[apps]
+[apps]
 # [_default]는 app별 override가 없을 때 모든 app에 적용됩니다.
-#[apps._default]
-#enabled = true
-#destructive_enabled = true
-#open_world_enabled = true
+[apps._default]
+enabled = true
+destructive_enabled = false
+open_world_enabled = true
+approvals_reviewer = "auto_review"
+default_tools_approval_mode = "writes"
 #
 #[apps.google_drive]
 #enabled = false
@@ -587,7 +607,7 @@ enabled = true
 ################################################################################
 # 프로젝트(trust level)
 ################################################################################
-#[projects]
+[projects]
 # 특정 worktree를 trusted 또는 untrusted로 표시합니다.
 #[projects."/absolute/path/to/project"]
 #trust_level = "trusted" # 또는 "untrusted"
@@ -595,7 +615,7 @@ enabled = true
 ################################################################################
 # 도구
 ################################################################################
-#[tools]
+[tools]
 #view_image = true
 
 ################################################################################
@@ -630,9 +650,9 @@ enabled = true
 ################################################################################
 # Windows
 ################################################################################
-#[windows]
+[windows]
 # Native Windows sandbox mode입니다(Windows 전용): unelevated | elevated
-#sandbox = "unelevated"
+sandbox = "unelevated"
 
 # MCP servers
 [mcp_servers.openai_developer_docs]
