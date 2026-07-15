@@ -61,6 +61,26 @@ make_repo() {
         -c user.name='dotfiles tests' \
         -c user.email='dotfiles-tests@example.invalid' \
         commit -m "fixtures $version" >/dev/null
+
+    git -C "$repo" tag v1.0.1
+
+    # Simulate the incompatible upstream main branch: the pinned release still
+    # contains the names selected by the production sync script.
+    rm -rf \
+        "$repo/skills/engineering/to-issues" \
+        "$repo/skills/engineering/to-prd"
+    mkdir -p \
+        "$repo/skills/engineering/to-tickets" \
+        "$repo/skills/engineering/to-spec"
+    printf '# to-tickets\n\nversion=%s-main\n' "$version" \
+        > "$repo/skills/engineering/to-tickets/SKILL.md"
+    printf '# to-spec\n\nversion=%s-main\n' "$version" \
+        > "$repo/skills/engineering/to-spec/SKILL.md"
+    git -C "$repo" add -A
+    git -C "$repo" \
+        -c user.name='dotfiles tests' \
+        -c user.email='dotfiles-tests@example.invalid' \
+        commit -m "fixtures incompatible main $version" >/dev/null
 }
 
 REPO_V1="$TMPDIR/repo-v1"

@@ -2,6 +2,7 @@
 set -euo pipefail
 
 repo_url="${MATTPOCOCK_SKILLS_REPO_URL:-https://github.com/mattpocock/skills.git}"
+repo_ref="v1.0.1"
 target_dir="$HOME/.skills"
 
 SKILL_ROOTS=(
@@ -26,7 +27,10 @@ tmp_dir="$(mktemp -d)"
 trap 'rm -rf "$tmp_dir"' EXIT
 
 source_dir="$tmp_dir/skills"
-git clone --quiet --depth 1 --branch main "$repo_url" "$source_dir"
+git init --quiet "$source_dir"
+git -C "$source_dir" remote add origin "$repo_url"
+git -C "$source_dir" fetch --quiet --depth 1 origin "refs/tags/$repo_ref"
+git -C "$source_dir" checkout --quiet --detach FETCH_HEAD
 
 mkdir -p "$target_dir"
 rm -rf "$target_dir/.mattpocock-skills"
@@ -50,4 +54,4 @@ for root in "${SKILL_ROOTS[@]}"; do
   cp -R "$source_skill_dir" "$target_skill_dir"
 done
 
-echo "Synced ${#SKILL_ROOTS[@]} mattpocock skill(s) into $target_dir"
+echo "Synced ${#SKILL_ROOTS[@]} mattpocock skill(s) from $repo_ref into $target_dir"
