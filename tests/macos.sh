@@ -40,6 +40,7 @@ cat > "$TMPHOME/.config/chezmoi/chezmoi.toml" << 'EOF'
 [data]
     name = "Test User"
     email = "test@example.com"
+    deviceName = "test-device"
 EOF
 
 # 격리된 환경에서 chezmoi 실행하는 래퍼 함수
@@ -48,8 +49,158 @@ cz() {
 }
 
 # 프로젝트 소스로 chezmoi 초기화
-if ! cz init --source "$REPO_DIR/home" 2>&1; then
+if ! cz init --no-tty --source "$REPO_DIR/home" 2>&1; then
     fail "chezmoi init failed"
+fi
+
+# --- 0.1. 최초 config의 macOS command fallback 검증 ---
+section "Initial config command fallbacks"
+CONFIG_TEST_HOME="$TMPHOME/config-test-home"
+CONFIG_TEST_BIN="$CONFIG_TEST_HOME/fakebin"
+CHEZMOI_BIN="$(command -v chezmoi)"
+mkdir -p "$CONFIG_TEST_BIN" "$CONFIG_TEST_HOME/.config"
+cat > "$CONFIG_TEST_BIN/scutil" <<'EOF'
+#!/bin/sh
+exit 1
+EOF
+cat > "$CONFIG_TEST_BIN/brew" <<'EOF'
+#!/bin/sh
+if [ "$1" = "--prefix" ]; then
+    printf '%s\n' '/test/homebrew'
+    exit 0
+fi
+exit 1
+EOF
+chmod +x "$CONFIG_TEST_BIN/scutil" "$CONFIG_TEST_BIN/brew"
+
+if HOME="$CONFIG_TEST_HOME" \
+   XDG_CONFIG_HOME="$CONFIG_TEST_HOME/.config" \
+   PATH="$CONFIG_TEST_BIN:$PATH" \
+   REPO_DIR="$REPO_DIR" \
+   CHEZMOI_BIN="$CHEZMOI_BIN" \
+   /usr/bin/expect -c '
+       log_user 0
+       set timeout 20
+       spawn env HOME=$env(HOME) XDG_CONFIG_HOME=$env(XDG_CONFIG_HOME) PATH=$env(PATH) \
+           $env(CHEZMOI_BIN) init --source $env(REPO_DIR)/home
+       expect "Full name?"
+       expect -re {> }
+       send "Test User\r"
+       expect "Email address?"
+       expect -re {> }
+       send "test@example.com\r"
+       expect "Device name"
+       expect -re {> }
+       send "test-device\r"
+       expect eof
+       set result [wait]
+       exit [lindex $result 3]
+   ' \
+   && grep -Fq 'name = "Test User"' \
+       "$CONFIG_TEST_HOME/.config/chezmoi/chezmoi.toml" \
+   && grep -Fq 'email = "test@example.com"' \
+       "$CONFIG_TEST_HOME/.config/chezmoi/chezmoi.toml" \
+   && grep -Fq 'deviceName = "test-device"' \
+       "$CONFIG_TEST_HOME/.config/chezmoi/chezmoi.toml" \
+   && grep -Fq 'homebrewPrefix = "/test/homebrew"' \
+       "$CONFIG_TEST_HOME/.config/chezmoi/chezmoi.toml" \
+   && grep -Eq '^    hostname = "[^"]+"$' \
+       "$CONFIG_TEST_HOME/.config/chezmoi/chezmoi.toml"; then
+    pass "initial config falls back from scutil and uses brew --prefix"
+else
+    fail "initial config command fallbacks"
+fi
+
+# --- 0.2. 최초 config의 필수 대화형 입력 검증 ---
+section "Required initial config input"
+HEADLESS_HOME="$TMPHOME/headless-home"
+HEADLESS_LOG="$TMPHOME/headless-init.log"
+mkdir -p "$HEADLESS_HOME/.config"
+
+if HOME="$HEADLESS_HOME" \
+   XDG_CONFIG_HOME="$HEADLESS_HOME/.config" \
+   "$CHEZMOI_BIN" init --no-tty --source "$REPO_DIR/home" >"$HEADLESS_LOG" 2>&1; then
+    fail "initial config accepted non-interactive input"
+elif grep -Fq 'Initial configuration requires an interactive terminal' "$HEADLESS_LOG" \
+   && ! grep -Eq 'YOUR_NAME|YOUR_EMAIL' "$REPO_DIR/home/.chezmoi.toml.tmpl"; then
+    pass "initial config requires interactive name, email, and device input"
+else
+    fail "initial config did not explain its interactive input requirement"
+fi
+
+# --- 0.3. bootstrap 입력 경로 검증 ---
+section "Bootstrap input contract"
+BOOTSTRAP_HOME="$TMPHOME/bootstrap-home"
+BOOTSTRAP_BIN="$BOOTSTRAP_HOME/fakebin"
+BOOTSTRAP_INVOKED="$BOOTSTRAP_HOME/chezmoi-invoked"
+BOOTSTRAP_ARGS="$BOOTSTRAP_HOME/chezmoi-args"
+BOOTSTRAP_LOG="$BOOTSTRAP_HOME/install.log"
+mkdir -p "$BOOTSTRAP_BIN"
+cat > "$BOOTSTRAP_BIN/chezmoi" <<'EOF'
+#!/bin/bash
+set -eu
+
+: "${BOOTSTRAP_INVOKED:?}"
+: "${BOOTSTRAP_ARGS:?}"
+printf 'invoked\n' > "$BOOTSTRAP_INVOKED"
+
+if [ ! -t 0 ]; then
+    echo "chezmoi stdin is not a terminal" >&2
+    exit 1
+fi
+
+printf '%s\n' "$*" > "$BOOTSTRAP_ARGS"
+EOF
+chmod +x "$BOOTSTRAP_BIN/chezmoi"
+
+if HOME="$BOOTSTRAP_HOME" \
+   PATH="$BOOTSTRAP_BIN:$PATH" \
+   BOOTSTRAP_INVOKED="$BOOTSTRAP_INVOKED" \
+   BOOTSTRAP_ARGS="$BOOTSTRAP_ARGS" \
+   /usr/bin/perl -MPOSIX=setsid -e '
+       $pid = fork();
+       defined $pid or die "fork: $!\n";
+       if ($pid) {
+           waitpid($pid, 0);
+           exit($? >> 8);
+       }
+       setsid() >= 0 or die "setsid: $!\n";
+       open(STDIN, "<", "/dev/null") or die "stdin: $!\n";
+       exec { $ARGV[0] } @ARGV or die "exec: $!\n";
+   ' /bin/bash "$REPO_DIR/install.sh" >"$BOOTSTRAP_LOG" 2>&1; then
+    fail "installer accepted a session without a controlling terminal"
+elif [ -e "$BOOTSTRAP_INVOKED" ]; then
+    fail "installer invoked chezmoi without a controlling terminal"
+elif grep -Fq 'This installer requires an interactive terminal' "$BOOTSTRAP_LOG"; then
+    pass "installer blocks sessions without a controlling terminal"
+else
+    fail "installer did not explain its terminal requirement"
+fi
+
+rm -f "$BOOTSTRAP_INVOKED" "$BOOTSTRAP_ARGS"
+if BOOTSTRAP_HOME="$BOOTSTRAP_HOME" \
+   BOOTSTRAP_BIN="$BOOTSTRAP_BIN" \
+   BOOTSTRAP_INVOKED="$BOOTSTRAP_INVOKED" \
+   BOOTSTRAP_ARGS="$BOOTSTRAP_ARGS" \
+   INSTALL_SCRIPT="$REPO_DIR/install.sh" \
+   /usr/bin/expect -c '
+       log_user 0
+       set timeout 20
+       set child_path "$env(BOOTSTRAP_BIN):$env(PATH)"
+       set command [format {cat "%s" | /bin/bash} $env(INSTALL_SCRIPT)]
+       spawn env HOME=$env(BOOTSTRAP_HOME) PATH=$child_path \
+           BOOTSTRAP_INVOKED=$env(BOOTSTRAP_INVOKED) \
+           BOOTSTRAP_ARGS=$env(BOOTSTRAP_ARGS) \
+           /bin/sh -c $command
+       expect eof
+       set result [wait]
+       exit [lindex $result 3]
+   ' \
+   && [ -f "$BOOTSTRAP_INVOKED" ] \
+   && [ "$(cat "$BOOTSTRAP_ARGS")" = "init --apply kimchanhyung98" ]; then
+    pass "piped installer gives chezmoi the controlling terminal"
+else
+    fail "piped installer input path"
 fi
 
 # --- 1. 템플릿 렌더링 검증 ---

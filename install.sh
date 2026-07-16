@@ -5,7 +5,6 @@
 #
 
 set -eufo pipefail
-trap 'echo "[install][error] Installation interrupted. Please re-run the script." >&2' EXIT
 
 # 출력 색상 정의
 RED='\033[0;31m'
@@ -24,6 +23,14 @@ echo_warn() {
 echo_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
+
+# curl | bash로 실행해도 chezmoi 프롬프트는 제어 터미널에서 입력받는다.
+if ! { exec 3</dev/tty; } 2>/dev/null; then
+    echo_error "This installer requires an interactive terminal."
+    exit 1
+fi
+
+trap 'echo "[install][error] Installation interrupted. Please re-run the script." >&2' EXIT
 
 # 지원 OS 확인 (macOS, Linux만 지원)
 OS="$(uname -s)"
@@ -47,7 +54,9 @@ fi
 
 # dotfiles 초기화 및 적용
 echo_info "Applying dotfiles with chezmoi..."
-chezmoi init --apply kimchanhyung98
+echo_info "Name, email, and device name are required."
+chezmoi init --apply kimchanhyung98 <&3
+exec 3>&-
 
 echo_info "Dotfiles installation complete!"
 echo_info "Please restart your terminal to apply changes."

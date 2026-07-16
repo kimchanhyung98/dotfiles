@@ -1,9 +1,13 @@
 {{/* chezmoi 설정 템플릿 */}}
 {{/* macOS (Intel & Apple Silicon) 및 Linux 지원 */}}
 
-{{/* 사용자 기본값 (초기 설정 시 대화형 프롬프트로 덮어씀) */}}
-{{- $name := "YOUR_NAME" -}}
-{{- $email := "YOUR_EMAIL" -}}
+{{/* 최초 설정에는 이름, 이메일, 기기명을 직접 입력해야 한다. */}}
+{{- $hasRequiredData := and (hasKey . "name") (hasKey . "email") (hasKey . "deviceName") -}}
+{{- if and (not stdinIsATTY) (not $hasRequiredData) -}}
+{{-   fail "Initial configuration requires an interactive terminal to enter name, email, and device name" -}}
+{{- end -}}
+{{- $name := "" -}}
+{{- $email := "" -}}
 
 {{/* macOS 아키텍처 감지 (Apple Silicon 여부) */}}
 {{- $isAppleSilicon := false -}}
@@ -13,31 +17,44 @@
 {{-   end -}}
 {{- end -}}
 
-{{/* Homebrew 설치 경로 (Apple Silicon: /opt/homebrew, Intel: /usr/local) */}}
+{{/* Homebrew 설치 경로 (설치되어 있으면 brew --prefix, 아니면 아키텍처 기본값) */}}
 {{- $homebrewPrefix := "/usr/local" -}}
 {{- if $isAppleSilicon -}}
 {{-   $homebrewPrefix = "/opt/homebrew" -}}
+{{- end -}}
+{{- if and (eq .chezmoi.os "darwin") (lookPath "brew") -}}
+{{-   $detectedPrefix := output "/bin/sh" "-c" "brew --prefix 2>/dev/null || true" | trim -}}
+{{-   if $detectedPrefix -}}
+{{-     $homebrewPrefix = $detectedPrefix -}}
+{{-   end -}}
 {{- end -}}
 
 {{/* macOS에서 안정적인 호스트네임 가져오기 (scutil 사용) */}}
 {{- $hostname := .chezmoi.hostname -}}
 {{- if eq .chezmoi.os "darwin" -}}
 {{-   if lookPath "scutil" -}}
-{{-     $scutilHost := output "scutil" "--get" "LocalHostName" | trim -}}
+{{-     $scutilHost := output "/bin/sh" "-c" "scutil --get LocalHostName 2>/dev/null || true" | trim -}}
 {{-     if $scutilHost -}}
 {{-       $hostname = $scutilHost -}}
 {{-     end -}}
 {{-   end -}}
 {{- end -}}
 
-{{/* 기기 이름 기본값 (호스트네임) — tokscale 등 식별용, 초기 설정 시 입력으로 덮어씀 */}}
-{{- $deviceName := $hostname -}}
+{{/* 기기 이름 — tokscale 등 식별용 */}}
+{{- $deviceName := "" -}}
 
-{{/* 대화형 터미널에서 이름/이메일/기기명 입력 프롬프트 (최초 1회) */}}
-{{- if stdinIsATTY -}}
-{{-   $name = promptStringOnce . "name" "Full name" -}}
-{{-   $email = promptStringOnce . "email" "Email address" -}}
-{{-   $deviceName = promptStringOnce . "deviceName" "Device name (tokscale 식별용)" $hostname -}}
+{{/* 이름/이메일/기기명 입력 프롬프트 (최초 1회) */}}
+{{- $name = promptStringOnce . "name" "Full name" | trim -}}
+{{- if eq $name "" -}}
+{{-   fail "Full name is required" -}}
+{{- end -}}
+{{- $email = promptStringOnce . "email" "Email address" | trim -}}
+{{- if eq $email "" -}}
+{{-   fail "Email address is required" -}}
+{{- end -}}
+{{- $deviceName = promptStringOnce . "deviceName" "Device name (tokscale 식별용)" | trim -}}
+{{- if eq $deviceName "" -}}
+{{-   fail "Device name is required" -}}
 {{- end -}}
 
 # chezmoi 소스 디렉토리 경로
