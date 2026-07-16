@@ -3,164 +3,109 @@
 > **실행 조건 표기**: `최초 1회`는 chezmoi `run_once_` 스크립트로, 최초 적용 시 1회 실행되며 스크립트 내용(템플릿 렌더 결과)이 바뀌면 다음 `chezmoi apply`에서 다시
 > 실행된다(각 설치 블록은 `command -v` 가드로 멱등성을 보장). `설정 변경 시`는 `run_onchange_`로, 내용이 변경될 때만 재실행된다.
 
+## 최초 설치 입력 계약
+
+`chezmoi init --apply kimchanhyung98` 또는 repository의 `install.sh`를 대화형 터미널에서 실행한다. bootstrap script를 `curl | bash`로 실행해도 `install.sh`가 `/dev/tty`를 chezmoi 입력으로 연결한다.
+
+최초 config에는 다음 세 값을 모두 직접 입력해야 한다.
+
+- 이름(`name`)
+- 이메일(`email`)
+- 기기명(`deviceName`)
+
+기본값과 placeholder는 없다. 제어 터미널이 없거나 공백을 포함해 값이 비어 있으면 config 생성과 apply 전에 실패한다. 이미 세 값이 저장된 config는 이후 `--init`에서 재사용한다.
+
+script phase는 파일명의 `before_`/`after_`가 우선한다. 번호는 같은 phase 안의 읽기 순서를 나타낼 뿐, `after_02`가 일반 `run_once_10`보다 먼저 실행된다는 뜻은 아니다.
+
 ## OS 공통 스크립트
 
 | 스크립트                | 역할                          | 실행 조건       | 상세                                                                                                                                                                                                                                                                                                                 |
 |---------------------|-----------------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | skills-ssot-migrate | 기존 스킬 디렉토리 제거 | 최초 1회, 배포 전 | `run_once_before_`로 dotfiles 배포 전에 실행. Claude Code와 Codex의 skills 경로가 symlink 전환 이전의 실제 디렉토리면 삭제하여, dotfiles 배포 단계에서 `~/.skills` symlink로 교체될 수 있게 한다. 모든 경로가 이미 symlink면 아무 일도 하지 않음(멱등) |
-| mattpocock-skills | 외부 스킬 동기화 | 최초 적용 및 스크립트 변경 시, 배포 후 | `run_onchange_after_`로 dotfiles 배포 후 실행. `~/.local/bin/mattpocock-skills-sync`가 `mattpocock/skills`에서 선택한 스킬만 `~/.skills`로 동기화한다. 수동 재실행 시 선택 목록에 포함된 동명 스킬 디렉토리는 upstream 내용으로 교체하고, 선택 목록 밖의 사용자 스킬은 건드리지 않는다. |
+| mattpocock-skills | 외부 스킬 동기화 | 최초 적용 및 스크립트 변경 시, 배포 후 | `run_onchange_after_`로 dotfiles 배포 후 실행. helper가 pinned `v1.0.1`에서 선택한 15개 스킬만 `~/.skills`로 동기화한다. 수동 재실행 시 선택 목록의 동명 디렉토리는 같은 snapshot으로 교체하고, 선택 목록 밖 사용자 스킬은 건드리지 않는다. |
 
 ## macOS 스크립트 (darwin/)
 
-| 순서 | 스크립트           | 역할                                           | 실행 조건             | 상세                                                                                                                                                                                                         |
-|:--:|----------------|----------------------------------------------|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 01 | prerequisites  | Xcode CLI, Homebrew, zerobrew                | 최초 1회, dotfiles 전 | Xcode Command Line Tools가 없으면 설치하고, Homebrew를 설치한 뒤 zerobrew(Rust 기반 Homebrew 대안 클라이언트)를 설치하여 `zb` 명령을 기본 패키지 설치 경로로 준비한다. Homebrew와 zerobrew 모두 공식 `curl \| bash` 방식으로 설치한다. Apple Silicon이면 Rosetta 2도 함께 설치 |
-| 02 | macos-settings | Dock, Finder, Keyboard, Trackpad, Screenshot | 설정 변경 시           | defaults 명령으로 macOS 시스템 설정을 일괄 적용. `run_onchange_`이므로 스크립트 내용이 변경될 때만 재실행되어 불필요한 재적용을 방지                                                                                                                   |
-| 03 | brew-packages  | Brewfile 기반 패키지 설치                           | Brewfile 변경 시     | Brewfile의 체크섬을 감시하여 패키지 목록이 변경되면 `zb bundle install --auto-init`을 먼저 실행하고, 실패 시 `brew bundle`로 폴백한다. 새 패키지 추가, 기존 패키지 제거를 한 번에 처리                                                                                                                  |
-| 05-after | app-settings  | Rectangle, Stats 설정 import                | 설정 변경 시, dotfiles 후 | Rectangle import 파일을 앱 지원 경로에 복사하고, Stats plist는 remote credential을 보존한 뒤 `defaults import`로 적용한다. |
-| 05 | runtime        | Bun                                          | 최초 1회             | JavaScript/TypeScript 런타임으로 Bun을 설치. Node.js는 Brewfile에서 관리하고, Bun은 공식 설치 스크립트로 별도 설치                                                                                                                      |
-| 07-after | tokscale-launchd | tokscale LaunchAgent 등록/갱신                 | 설정 변경 시, dotfiles 후 | `~/.config/tokscale/submit.sh`와 `~/Library/LaunchAgents/ai.tokscale.submit.plist`를 검증한 뒤 launchd에 재등록한다. 4일마다 14:00 KST submit을 실행한다. |
+| 순서 | 스크립트 | phase | 역할 | 실행 조건 | 상세 |
+|:--:|---|---|---|---|---|
+| 01 | prerequisites | before | Xcode CLI, Homebrew, zerobrew | 최초 1회 | Xcode Command Line Tools와 Homebrew를 준비하고 zerobrew installer를 실행한다. Apple Silicon이면 Rosetta 2도 설치한다. |
+| 02 | macos-settings | after | Dock, Finder, Keyboard, Trackpad, Screenshot | 설정 변경 시 | managed target 배포 뒤 `defaults` 명령으로 macOS 설정을 적용한다. |
+| 03 | brew-packages | regular | Brewfile 기반 패키지 설치·upgrade | Brewfile 변경 시 | `zb bundle install --auto-init`을 먼저 실행하고 실패 시 `brew bundle`로 폴백한다. Brewfile에서 빠진 package를 자동 삭제하지는 않는다. |
+| 05 | app-settings | after | Rectangle, Stats 설정 import | 설정 변경 시 | Rectangle import 파일을 앱 지원 경로에 복사하고, Stats plist는 remote credential을 보존한 뒤 import한다. |
+| 05 | runtime | regular | Bun | 최초 1회 | Node.js는 Brewfile에서 관리하고 Bun은 공식 installer로 별도 설치한다. |
+| 07 | tokscale-launchd | after | tokscale LaunchAgent 등록·갱신 | 설정 변경 시 | wrapper와 plist를 검증한 뒤 launchd에 재등록한다. 시스템 timezone이 Asia/Seoul인 머신에서 로컬 14:00에 발화하고, 마지막 성공 후 4일 미만이면 건너뛴다. |
 
 > cmux 외부 자동화 제어는 별도 스크립트 없이 `~/.config/cmux/cmux.json`(`automation.socketControlMode=allowAll`)을 선언적으로 배포하여 기본 활성화한다. cmux 0.64+는 이 파일을 정식 설정 경로로 읽으며, 과거 `defaults write com.cmuxterm.app socketControlMode` 방식은 폐기되었다.
 
 ### AI 스크립트 (darwin/)
 
-| 순서 | 스크립트      | 역할                                                               | 실행 조건 | 상세                                                                                                                                 |
-|:--:|-----------|------------------------------------------------------------------|-------|------------------------------------------------------------------------------------------------------------------------------------|
-| 10 | ai-core   | Claude Code, Codex CLI, Antigravity CLI, Hermes Agent, CodeGraph | 최초 1회 | AI CLI 도구 4종과 CodeGraph 설치. Claude Code·Antigravity·Hermes는 공식 설치 스크립트(curl), Codex·CodeGraph는 npm. 확장 환경 구성은 개별 스크립트(11~12)에서 처리  |
-| 11 | ai-claude | SuperClaude, CodeGraph MCP                                       | 최초 1회 | SuperClaude 프레임워크(pipx). CodeGraph MCP를 등록하고, 플러그인·MCP는 settings.json·claude.json에서 선언적 관리                                         |
-| 12 | ai-codex  | oh-my-codex, 프로필 초기화                                             | 최초 1회 | oh-my-codex(npm), 프로필 초기화. Codex 스킬은 ~/.agents/skills → ~/.skills symlink로 공유. CodeGraph MCP는 config.toml에서 선언적 관리 |
+| 순서 | 스크립트 | phase | 역할 | 실행 조건 | 상세 |
+|:--:|---|---|---|---|---|
+| 10 | ai-core | regular | Claude Code, Codex CLI, Antigravity CLI, Hermes Agent, CodeGraph | 최초 1회 | AI CLI 4종과 CodeGraph를 설치한다. Claude Code·Antigravity·Hermes는 remote installer, Codex·CodeGraph는 npm을 사용한다. |
+| 11 | ai-claude | regular | SuperClaude, CodeGraph MCP | 최초 1회 | SuperClaude를 설치하고 Claude CLI 명령으로 사용자 범위 CodeGraph MCP를 `~/.claude.json`에 등록한다. 이 runtime 파일은 chezmoi가 직접 소유하지 않는다. |
+| 12 | ai-codex | regular | oh-my-codex, 프로필 초기화 | 최초 1회 | oh-my-codex를 설치하고 초기화한다. 스킬은 symlink로 공유하며 CodeGraph MCP는 `config.toml`에서 관리한다. |
 
-| 순서 | 스크립트           | 역할          | 실행 조건             |
-|:--:|----------------|-------------|-------------------|
-| 99 | manual-install | 수동 설치 안내 출력 | 최초 1회, dotfiles 후 |
+| 순서 | 스크립트 | phase | 역할 | 실행 조건 |
+|:--:|---|---|---|---|
+| 99 | manual-install | after | 수동 설치 안내 출력 | 최초 1회 |
 
 **AI 스크립트 설계 원칙**:
 
 - 코어 설치(10)와 프로바이더별 확장 설치(11~12)를 분리하여 책임 경계를 명확히 유지
-- 각 프로바이더가 MCP 서버, 플러그인을 독립적으로 관리하여 한 도구의 실패가 다른 도구에 영향을 주지 않음
+- Claude/Codex 확장 설정은 분리하지만, core installer의 일부 실패는 현재 warning으로 계속 진행한다. 설치 완료 여부는 `dotfiles-doctor`로 별도 확인
 - 스킬은 단일 출처 `~/.skills`에 두고 Claude Code와 Codex의 글로벌 skills 경로를 symlink로 연결하여 공유 (상세는 05-ai-tools.md 참고)
 
 ### Linux 스크립트 (linux/)
 
-| 순서 | 스크립트             | 역할                                                         | 실행 조건             | 상세                                                                       |
-|:--:|------------------|------------------------------------------------------------|-------------------|--------------------------------------------------------------------------|
-| 01 | install-packages | curl, git, vim, zsh, bat, zoxide                           | 최초 1회, dotfiles 전 | 패키지 관리자를 자동 감지(apt-get → dnf → yum)하여 기초 도구를 설치. Ghostty는 표준 저장소 패키지로 설치하지 않고 수동 설치 안내만 출력한다. 이미 설치된 패키지는 건너뜀         |
-| 02 | shell-baseline   | 기본 셸, 로케일, 타임존                                             | 설정 변경 시           | zsh를 기본 셸로 전환하고 히스토리, 키바인딩 기본값을 설정. 로케일과 타임존 정책도 함께 적용                   |
-| 03 | git-baseline     | Git 사용자 설정, SSH 기초                                         | 설정 변경 시           | 템플릿 변수(name, email)로 Git 사용자 정보를 설정하고 SSH 키 생성 기초 환경을 구성                 |
-| 04 | ai-tools         | claude, codex, codegraph, antigravity, hermes, oh-my-codex | 최초 1회             | macOS와 동일한 AI 도구를 Linux용 구성으로 설치. Hermes는 자체 의존성을 함께 준비하므로 설치 시간이 길 수 있음 |
-| 05 | system-baseline  | 시스템 기초 설정                                                  | 설정 변경 시           | 기본 에디터, 시스템 경로, 기초 보안 설정 등 OS 수준 기본값 적용                                  |
+| 순서 | 스크립트 | phase | 역할 | 실행 조건 | 상세 |
+|:--:|---|---|---|---|---|
+| 01 | install-packages | before | curl, git, vim, zsh, bat, zoxide | 최초 1회 | apt-get → dnf → yum 순서로 패키지 관리자를 감지한다. Ghostty는 수동 설치 안내만 출력한다. |
+| 02 | shell-baseline | regular | 기본 셸, 로케일, 타임존 | 설정 변경 시 | zsh 기본 셸, en_US.UTF-8, Asia/Seoul 설정을 시도한다. |
+| 03 | git-baseline | regular | Git 사용자 설정, SSH 기초 | 설정 변경 시 | managed `.gitconfig`을 확인하고 SSH 디렉토리·GitHub known_hosts·키 생성 안내를 준비한다. |
+| 04 | ai-tools | regular | claude, codex, codegraph, antigravity, hermes, oh-my-codex | 최초 1회 | npm이 이미 있어야 실행된다. 현재 Linux prerequisite는 Node/npm을 설치하지 않으므로 깨끗한 머신에서는 별도 준비가 필요하다. |
+| 05 | system-baseline | regular | 시스템 기초 설정 | 설정 변경 시 | `~/.profile`에 기본 editor와 `~/.local/bin` PATH를 중복 없이 추가한다. |
 
-## 설치 흐름
+## 설치 phase
 
 ### macOS
 
+```text
+1. before scripts
+   - skills-ssot-migrate
+   - macOS prerequisites
+
+2. managed targets + regular scripts(application order)
+   - dotfiles와 external archive 배포
+   - brew-packages, runtime, ai-core, ai-claude, ai-codex
+
+3. after scripts
+   - macos-settings, app-settings
+   - mattpocock-skills
+   - tokscale-launchd, manual-install
 ```
-chezmoi init --apply
-│
-├─ skills-ssot-migrate (run_once_before, OS 공통)
-│   기존 실제 skills 디렉토리를 삭제해 symlink 교체 준비
-│
-├─ 01 prerequisites
-│   Xcode CLI Tools → Homebrew → zerobrew → Rosetta 2 (Apple Silicon)
-│   시스템 패키지 관리 기반 구성. Homebrew와 zerobrew 모두 공식 curl | bash 방식으로 설치
-│
-├─ .chezmoiexternal.toml
-│   Oh My Zsh, zsh-autosuggestions, zsh-syntax-highlighting
-│   외부 Git 리소스를 선언적으로 다운로드. 168시간(1주) 주기로 자동 갱신
-│
-├─ 02 macos-settings
-│   Dock, Finder, Keyboard, Trackpad, Screenshot
-│   defaults 명령 기반 시스템 UI/입력 설정 일괄 적용
-│
-├─ 03 brew-packages
-│   시스템 CLI, 런타임, 데이터/도구, 터미널/앱
-│   Brewfile 기반 전체 패키지 동기화 (zerobrew 우선, Homebrew 폴백)
-│
-├─ 05 app-settings (after)
-│   Rectangle import 파일 stage, Stats plist import(토큰 보존)
-│
-├─ 05 runtime
-│   Bun (JavaScript/TypeScript 런타임)
-│
-├─ 07 tokscale-launchd (after)
-│   submit 래퍼와 LaunchAgent plist 검증 후 launchd 등록/갱신
-│
-├─ 10 ai-core
-│   Claude Code, Codex CLI, Antigravity CLI, Hermes Agent, CodeGraph
-│   Claude Code·Antigravity·Hermes(curl 스크립트), Codex·CodeGraph(npm) 설치
-│
-├─ 11 ai-claude
-│   SuperClaude (플러그인·MCP는 설정 파일로 관리)
-│
-├─ 12 ai-codex
-│   oh-my-codex → 프로필 초기화 (스킬은 ~/.skills 공유, CodeGraph MCP는 config.toml로 관리)
-│
-├─ dotfiles 배포
-│   ~/.zshrc, ~/.gitconfig, ~/.gitignore_global, ~/.vimrc
-│   ~/AGENTS.md (공통 에이전트 지침)
-│   ~/.config/cmux/cmux.json, ~/.config/ghostty/config
-│   ~/.config/rectangle/RectangleConfig.json, ~/.config/stats/Stats.plist
-│   ~/.config/tokscale/submit.sh, ~/Library/LaunchAgents/ai.tokscale.submit.plist
-│   ~/.claude/settings.json
-│   ~/.codex/config.toml
-│   ~/.skills/* (공통 스킬 단일 출처), 지원 스킬 경로(~/.claude/skills, ~/.agents/skills) → ~/.skills symlink
-│   ~/.local/bin/dotfiles-doctor, ~/.local/bin/mattpocock-skills-sync
-│
-├─ mattpocock-skills (run_onchange_after, OS 공통)
-│   mattpocock/skills에서 선택한 스킬을 ~/.skills로 동기화
-│
-└─ 99 manual-install
-    JetBrains Toolbox, Raycast, tokscale 최초 로그인 안내
-```
+
+`app-settings`와 `tokscale-launchd`는 앞 phase에서 배포된 target을 사용한다. external의 `168h`는 예약 주기가 아니라 chezmoi command가 상태를 읽을 때 refresh 여부를 판단하는 cache 최소 age다.
 
 ### Linux
 
-```
-chezmoi init --apply
-│
-├─ skills-ssot-migrate (run_once_before, OS 공통)
-│   기존 실제 skills 디렉토리를 삭제해 symlink 교체 준비
-│
-├─ 01 install-packages
-│   curl, git, vim, zsh, bat, zoxide
-│   패키지 관리자 자동 감지 (apt-get → dnf → yum), Ghostty는 수동 설치 안내
-│
-├─ .chezmoiexternal.toml
-│   Oh My Zsh, zsh-autosuggestions, zsh-syntax-highlighting
-│
-├─ 02 shell-baseline
-│   기본 셸 zsh 전환, 히스토리, 키바인딩, 로케일, 타임존
-│
-├─ 03 git-baseline
-│   Git 사용자 설정, SSH 기초 설정
-│
-├─ 04 ai-tools
-│   claude, codex, codegraph, antigravity, hermes,
-│   oh-my-codex
-│
-├─ 05 system-baseline
-│   시스템 기초 설정
-│
-├─ dotfiles 배포
-│   ~/.zshrc, ~/.gitconfig, ~/.gitignore_global
-│   ~/AGENTS.md
-│   ~/.config/ghostty/config
-│   ~/.claude/*, ~/.codex/*, ~/.agents/*
-│   ~/.skills/* (공통 스킬 단일 출처), 지원 스킬 경로(~/.claude/skills, ~/.agents/skills) → ~/.skills symlink
-│   ~/.local/bin/mattpocock-skills-sync
-│
-└─ mattpocock-skills (run_onchange_after, OS 공통)
-    mattpocock/skills에서 선택한 스킬을 ~/.skills로 동기화
+```text
+1. before scripts
+   - skills-ssot-migrate
+   - install-packages
+
+2. managed targets + regular scripts(application order)
+   - 공통/Linux dotfiles와 external archive 배포
+   - shell-baseline, git-baseline, ai-tools, system-baseline
+
+3. after scripts
+   - mattpocock-skills
 ```
 
 ## Brewfile 패키지
 
-Brewfile은 `zb bundle install -f Brewfile`(zerobrew)로 먼저 동기화한다. zerobrew가 처리하지 못하는 항목이 있거나 실패하면 `brew bundle`로 폴백한다.
+Brewfile은 `zb bundle install --auto-init -f Brewfile`로 먼저 처리한다. zerobrew가 실패하면 `brew bundle --file=Brewfile`로 폴백한다. 두 경로 모두 package 설치·upgrade를 담당하며, Brewfile에서 빠진 package 제거는 별도 cleanup 명령 없이는 수행하지 않는다.
 Doppler tap이 신뢰되지 않은 상태에서 Homebrew 폴백이 실행되면 `dopplerhq/cli/doppler`만 건너뛰며, 신뢰 여부는 사용자가 `brew trust --formula dopplerhq/cli/doppler`로 명시한다.
-AI 도구(Claude Code, Codex, Antigravity, Hermes, CodeGraph)는 설치 채널 정책에 따라 AI 스크립트에서 각 채널(curl/npm)로 관리하고, Brewfile은
-Homebrew 직접 관리
-대상만 유지한다.
+AI 도구(Claude Code, Codex, Antigravity, Hermes, CodeGraph)는 설치 채널 정책에 따라 AI 스크립트에서 각 채널(curl/npm)로 관리한다. Brewfile은 Homebrew가 직접 관리하는 대상만 유지한다.
 
 | 대주제    | 소주제         | 상세 패키지                                                                                                              |
 |--------|-------------|---------------------------------------------------------------------------------------------------------------------|
@@ -186,8 +131,7 @@ Homebrew 직접 관리
 
 ## 외부 리소스
 
-`.chezmoiexternal.toml`로 선언적 관리한다. `chezmoi apply` 실행 시 갱신 주기가 지난 리소스는 자동으로 최신 버전을 다운로드한다. Git 아카이브 형태로 가져오므로 `.git`
-디렉토리 없이 파일만 배포된다.
+`.chezmoiexternal.toml`로 선언적 관리한다. chezmoi command가 해당 상태를 읽을 때 cache age가 갱신 주기를 넘으면 다시 다운로드할 수 있다. `refreshPeriod` 자체가 주기적으로 실행되는 scheduler는 아니다. Git 아카이브 형태로 가져오므로 `.git` 디렉토리 없이 파일만 배포된다.
 
 | 리소스                     | 대상 경로                     | 역할                                      | 갱신 주기     | 가져오기 방식 |
 |-------------------------|---------------------------|-----------------------------------------|-----------|---------|

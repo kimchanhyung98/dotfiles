@@ -34,12 +34,15 @@ DOCKER_CONFIG=/private/tmp/dotfiles-docker-config make check
 
 ## macOS 테스트
 
-`tests/macos.sh`는 임시 HOME을 만들고 `chezmoi init --source "$REPO_DIR/home"`으로 격리된 source를 사용한다. 실제 사용자 HOME에는 적용하지 않는다.
+`tests/macos.sh`는 세 값이 저장된 임시 config로 기본 source를 `--no-tty` 초기화한다. 별도의 빈 HOME에서는 pseudo-TTY로 최초 name/email/deviceName prompt를 입력하고, 제어 터미널 없는 최초 init이 실패하는지도 검증한다. 모든 대상은 임시 HOME이며 실제 사용자 HOME에는 적용하지 않는다.
+
+bootstrap 회귀 테스트는 macOS 기본 `/usr/bin/expect`로 대화형 pipe를 만들고, `/usr/bin/perl`의 별도 session으로 제어 터미널 없는 실행을 재현한다.
 
 엄격 실패 항목:
 
 | 영역 | 검증 내용 |
 |---|---|
+| Bootstrap | 최초 세 값의 필수 입력, headless 차단, pipe 실행의 제어 터미널 전달 |
 | 템플릿 | `chezmoi cat`으로 관리 파일 템플릿 렌더링 |
 | Codex | `home/dot_codex/config.toml.tmpl` 권한 deny/write 규칙과 cloudflare plugin 비활성 상태 |
 | cmux | `cmux.json` JSON 구조와 automation 기본값 |
@@ -50,6 +53,8 @@ DOCKER_CONFIG=/private/tmp/dotfiles-docker-config make check
 | tokscale | submit wrapper, LaunchAgent plist, launchd bootstrap 스크립트 target path |
 | Zsh | LANG 폴백과 fzf 바인딩 순서 회귀 검증 |
 | ShellCheck | shellcheck가 설치된 경우 공통+darwin 렌더링 스크립트 lint |
+
+2026-07-16의 bootstrap 변경 commit `804ddbc` 기준 실행 결과는 21 passed, 0 failed다.
 
 관찰 항목:
 

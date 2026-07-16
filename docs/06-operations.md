@@ -4,6 +4,8 @@
 
 설치 완료 후 헬스체크 스크립트. `~/.local/bin/dotfiles-doctor`로 배포되어 `dotfiles-doctor` 명령으로 실행한다. 각 항목의 설치 여부를 확인하고 누락된 항목을 보고한다.
 
+현재 doctor는 OS별 필수/선택 항목을 구분하지 않고 누락 항목을 모두 failure로 계산한다. 따라서 Linux나 일부 도구를 의도적으로 설치하지 않은 머신에서는 non-zero가 “dotfiles 전체 실패”가 아니라 선택 도구 누락을 뜻할 수 있다.
+
 | 검사 카테고리          | 대상                                                          | 검사 내용                            |
 |------------------|-------------------------------------------------------------|----------------------------------|
 | System           | macOS/Linux 버전, 아키텍처                                        | OS 버전과 아키텍처 정보를 표시하여 환경 식별       |
@@ -32,23 +34,41 @@
 | Pkg Managers   | composer, mise, npm, pipx, uv, xcodes, yarn                                                              |
 | Runtime        | Bun                                                                                                      |
 | AI Core        | Claude Code, Codex CLI, Antigravity CLI, Hermes Agent, CodeGraph                                         |
-| Claude         | SuperClaude, Claude official plugin toggles, CodeGraph MCP, 공통 AGENTS/CLAUDE 지침                            |
+| Claude         | SuperClaude, Claude official plugin toggles, CodeGraph MCP, repository `CLAUDE.md` 지침                          |
 | Codex          | oh-my-codex, CodeGraph MCP, 스킬 ~/.skills 공유                                                              |
 | Skills         | 단일 출처 `~/.skills` (Claude·Codex가 symlink 공유). 사용자 스킬·oh-my-codex 스킬을 한 곳에서 관리                            |
 | Apps           | ghostty, docker, iterm2, chrome, rectangle, slack, figma 등                                               |
 | Shell          | Oh My Zsh + autosuggestions + syntax-highlighting                                                        |
 | Linux          | curl, git, vim, zsh, bat, zoxide, Ghostty 수동 설치 안내, 셸/Git baseline, claude, codex, codegraph, antigravity, hermes, oh-my-codex |
 
+## 현재 update 계약
+
+- 최초 config 생성은 대화형 전용이며 name/email/deviceName을 모두 입력해야 한다.
+- 다른 컴퓨터의 원격 변경을 가져오는 동작은 현재 수동 `chezmoi update`다. launchd/systemd 기반 dotfiles update timer는 없다.
+- 평상시 update에는 `--init`을 붙이지 않는다. `.chezmoi.toml.tmpl`의 data key를 다시 생성해야 할 때만 대화형 터미널에서 `--init`을 사용한다.
+- `chezmoi update`는 source pull 뒤 managed target을 apply하지만, source가 바뀌지 않은 `run_once_`/`run_onchange_` package와 OS 설정 drift를 지속 복구하지는 않는다.
+- external의 `refreshPeriod = "168h"`는 scheduler가 아니다. chezmoi command가 external 상태를 읽는 시점에 cache age를 판단한다.
+
+수동 update 전후에는 다음 순서로 확인한다.
+
+```sh
+chezmoi diff
+chezmoi update
+chezmoi verify
+```
+
+source repository가 dirty하거나 target diff가 의도하지 않은 변경이면 먼저 내용을 검토하고 `--force`로 덮어쓰지 않는다.
+
 ## 운영 체크리스트
 
 | 항목                  | 확인 포인트                                                                                   |
 |---------------------|------------------------------------------------------------------------------------------|
 | 템플릿 데이터 키 일관성       | `.chezmoi.toml.tmpl`에 정의된 변수가 모든 `.tmpl` 파일에서 동일한 이름으로 참조되는지 확인                          |
-| 스크립트 번호 체계 일관성      | 공통(run_once_before_00), darwin/(01~05, 10~12, 99), linux/(01~05) 번호가 중복 없이 순서대로 유지되는지 확인 |
-| 외부 리소스 선언 파일 최신화    | `.chezmoiexternal.toml`의 URL, 브랜치, 해시가 최신 원격 저장소와 일치하는지 확인                               |
+| 스크립트 phase·번호 일관성      | `before`/regular/`after` phase를 먼저 확인하고, 같은 phase 안에서 번호와 책임이 충돌하지 않는지 확인 |
+| 외부 리소스 선언 검토          | rolling URL은 채널과 마지막 검증일을, pinned dependency는 exact ref와 upgrade 근거를 확인 |
 | AI 모듈 경계 준수         | 설치 스크립트는 바이너리 설치만, 설정 파일은 사용자 설정만 담당하는 분리 원칙이 유지되는지 확인                                   |
 | 스킬 디렉토리 동기화 상태      | 도구별 글로벌 스킬 경로 2개(claude·agents)가 symlink로 존재하고 대상이 존재하는지 확인 (`dotfiles-doctor`)    |
-| AGENTS.md 공통 지침 최신화 | `~/AGENTS.md`, `CLAUDE.md`, `~/.codex/config.toml`의 `developer_instructions`가 4대 원칙과 공통 규칙을 반영하는지 확인 |
+| 에이전트 공통 지침 최신화 | `~/AGENTS.md`, repository의 `CLAUDE.md → AGENTS.md`, `~/.codex/config.toml`의 `developer_instructions`가 4대 원칙을 반영하는지 확인 |
 | 플러그인 버전 호환성         | Claude Code, Codex의 플러그인이 현재 도구 버전과 호환되는지 확인                                             |
 | Linux 기초 설정 누락 여부   | macOS에 추가된 AI 도구가 Linux ai-tools 스크립트에도 반영되어 있는지 확인                                      |
 | 진단 스크립트 검사 대상 최신화   | dotfiles-doctor가 새로 추가된 도구, 설정 파일, 스킬 경로를 검사 대상에 포함하는지 확인                                |
@@ -62,6 +82,7 @@
 - 스킬 추가 시 지원 도구별 글로벌/프로젝트 경로를 함께 명시한다.
 - 경로와 설정 파일명은 실제 도구 공식 문서 또는 저장소 기준으로 검증 후 기재한다.
 - 검증 스냅샷의 커밋 해시와 기준일을 함께 갱신한다.
+- 운영 문서 목차와 source of truth는 [docs/README.md](README.md)를 기준으로 유지한다.
 
 ## 참고
 

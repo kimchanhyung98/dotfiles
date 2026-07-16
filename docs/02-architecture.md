@@ -16,7 +16,7 @@ dotfiles/
     ├── .chezmoiremove
     │
     ├── .chezmoiscripts/
-    │   ├── run_once_before_00-skills-ssot-migrate.sh.tmpl   # OS 공통: 기존 스킬 디렉토리 → ~/.skills 이전
+    │   ├── run_once_before_00-skills-ssot-migrate.sh.tmpl   # OS 공통: legacy 스킬 디렉토리 삭제 후 symlink 전환
     │   ├── run_onchange_after_06-mattpocock-skills.sh.tmpl  # OS 공통: mattpocock 스킬 런타임 동기화
     │   │
     │   ├── darwin/
@@ -111,20 +111,23 @@ dotfiles/
 | `.chezmoiroot`          | source root 경로 고정 (`home`) | chezmoi가 `home/` 디렉토리를 소스 루트로 인식하게 하여, 저장소 루트의 docs/, install.sh 등이 홈 디렉토리에 배포되지 않도록 격리                              |
 | `.chezmoiversion`       | 최소 chezmoi 실행 버전 고정        | 이 dotfiles가 요구하는 chezmoi 최소 버전을 명시하여, 이전 버전의 호환성 문제를 사전 차단                                                           |
 | `.chezmoiignore`        | OS별·런타임 경로 제외              | 템플릿 조건문으로 현재 OS에 해당하지 않는 설정 파일을 배포 대상에서 제외. 저장소 메타 파일(README, LICENSE 등)과 Claude Code 런타임 데이터(`.claude.json`)도 공통 제외 |
-| `.chezmoiexternal.toml` | 외부 리소스 선언적 동기화             | Oh My Zsh, zsh 플러그인 등 외부 Git 저장소를 선언하여 `chezmoi apply` 시 자동 다운로드/갱신. 갱신 주기를 리소스별로 개별 설정                              |
-| `.chezmoiremove`        | 더 이상 필요 없는 파일 제거 대상 관리     | dotfiles에서 관리를 중단한 파일을 나열하여 다음 apply 시 자동 삭제. 설정 파일 이름이 변경되었거나 도구를 제거한 경우 잔여 파일 정리에 활용                               |
+| `.chezmoiexternal.toml` | 외부 리소스 선언적 동기화             | Oh My Zsh, zsh 플러그인 등을 선언한다. chezmoi가 상태를 읽을 때 cache age가 `refreshPeriod`를 넘으면 다시 받을 수 있으며, 자체 예약 작업은 아니다. |
+| `.chezmoiremove`        | 제거 상태를 지속 관리                 | 나열된 target이 없는 상태를 매 apply에서 유지한다. 일회성 삭제 기록이 아니라 계속 제거할 경로에만 사용한다. |
 
 ## 템플릿 변수
 
 `.chezmoi.toml.tmpl`에서 감지 또는 입력받아 모든 `.tmpl` 파일에서 참조한다. 최초 `chezmoi init` 실행 시 대화형으로 수집되며, 이후
 `~/.config/chezmoi/chezmoi.toml`에 저장되어 재사용된다.
 
-**사용자 입력 (최초 1회)**
+**사용자 입력 (최초 1회, 모두 필수)**
 
-| 변수    | 용도          | 사용처                     |
-|-------|-------------|-------------------------|
-| name  | Git 사용자 이름  | `.gitconfig`, 커밋 서명     |
-| email | Git 사용자 이메일 | `.gitconfig`, SSH 키 코멘트 |
+| 변수 | 용도 | 사용처 |
+|---|---|---|
+| `name` | Git 사용자 이름 | `.gitconfig` |
+| `email` | Git 사용자 이메일 | `.gitconfig`, SSH 키 생성 안내 |
+| `deviceName` | 머신 식별 이름 | tokscale submit 식별자 |
+
+새 config는 대화형 터미널에서만 만들 수 있고 공백만 입력한 값도 거부한다. 이미 세 값이 저장된 config는 이후 비대화형 `--init`에서도 재사용한다.
 
 **자동 감지**
 
@@ -133,5 +136,5 @@ dotfiles/
 | `.chezmoi.os`    | `darwin`     | `darwin`          | `linux` | OS 분기                      | chezmoi 내장                                             |
 | `.chezmoi.arch`  | `amd64`      | `arm64`           | 다양      | 아키텍처 분기                    | chezmoi 내장                                             |
 | `isAppleSilicon` | `false`      | `true`            | `false` | Rosetta 설치, Homebrew 경로 분기 | `arch == arm64 && os == darwin`                        |
-| `homebrewPrefix` | `/usr/local` | `/opt/homebrew`   | -       | brew shellenv 경로           | `isAppleSilicon` 기반                                    |
-| `hostname`       | scutil 기반    | scutil 기반         | 시스템 기본  | 머신 식별                      | macOS: `scutil --get LocalHostName`, Linux: `hostname` |
+| `homebrewPrefix` | `/usr/local` | `/opt/homebrew`   | `/usr/local`(미사용) | brew shellenv 경로 | macOS에서 설치된 `brew`가 있으면 `brew --prefix`, 없으면 아키텍처 기본값 |
+| `hostname`       | scutil/fallback | scutil/fallback | chezmoi 기본값 | 머신 식별 | macOS에서 `scutil --get LocalHostName` 성공값을 쓰고, 실패하면 `.chezmoi.hostname` |
