@@ -63,7 +63,18 @@ echo_info "Starting dotfiles installation..."
 # chezmoi 설치 (dotfile 관리 도구)
 if ! command -v chezmoi &>/dev/null; then
     echo_info "Installing chezmoi..."
-    sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+    installer=$(mktemp)
+    if ! curl -fsLS https://get.chezmoi.io -o "$installer"; then
+        rm -f "$installer"
+        echo_error "Failed to download the chezmoi installer."
+        exit 1
+    fi
+    if ! sh "$installer" -b "$HOME/.local/bin"; then
+        rm -f "$installer"
+        echo_error "Failed to install chezmoi."
+        exit 1
+    fi
+    rm -f "$installer"
     export PATH="$HOME/.local/bin:$PATH"
 else
     echo_info "chezmoi is already installed."

@@ -20,30 +20,39 @@ eval "$({{ $homebrewPrefix }}/bin/brew shellenv)"
 # Brewfile 기반 패키지 일괄 설치/동기화 (zerobrew 우선, Homebrew 폴백)
 BREWFILE="{{ .chezmoi.sourceDir }}/Brewfile"
 
-run_homebrew_bundle() {
-    if grep -q 'brew "dopplerhq/cli/doppler"' "$BREWFILE"; then
-        DOPPLER_TAP_INFO="$(brew tap-info --json=v1 dopplerhq/cli 2>/dev/null || true)"
-        if ! printf '%s\n' "$DOPPLER_TAP_INFO" | grep -q '"trusted": true'; then
-            echo "[brew-packages][warning] dopplerhq/cli tap is not trusted; skipping doppler"
-            echo "[brew-packages][warning] Run 'brew trust --formula dopplerhq/cli/doppler' and re-run chezmoi apply to manage it"
-            if [ -n "${HOMEBREW_BUNDLE_BREW_SKIP:-}" ]; then
-                export HOMEBREW_BUNDLE_BREW_SKIP="$HOMEBREW_BUNDLE_BREW_SKIP dopplerhq/cli/doppler doppler"
-            else
-                export HOMEBREW_BUNDLE_BREW_SKIP="dopplerhq/cli/doppler doppler"
-            fi
-        fi
+ensure_zb_available() {
+    local candidate_dir
+    if command -v zb &>/dev/null; then
+        return 0
     fi
+    for candidate in "$HOME/.local/bin/zb" "/opt/zerobrew/bin/zb" "/usr/local/zerobrew/bin/zb"; do
+        if [ -x "$candidate" ]; then
+            candidate_dir="$(dirname "$candidate")"
+            export PATH="$candidate_dir:$PATH"
+            return 0
+        fi
+    done
+    return 1
+}
 
+run_homebrew_bundle() {
     if ! brew bundle --file="$BREWFILE"; then
         echo "[brew-packages][error] brew bundle failed"
         exit 1
     fi
 }
 
-if command -v zb &>/dev/null; then
+bundle_is_satisfied() {
+    brew bundle check --file="$BREWFILE" >/dev/null
+}
+
+if ensure_zb_available; then
     echo "[brew-packages][zerobrew] bundle install"
     if ! zb bundle install --auto-init -f "$BREWFILE"; then
         echo "[brew-packages][warning] zerobrew bundle failed; falling back to Homebrew"
+        run_homebrew_bundle
+    elif ! bundle_is_satisfied; then
+        echo "[brew-packages][warning] zerobrew completed but Brewfile is not fully satisfied; falling back to Homebrew"
         run_homebrew_bundle
     fi
 else
@@ -51,11 +60,9 @@ else
     run_homebrew_bundle
 fi
 
-# 핵심 패키지 사후 검증
-for cmd in git node npm; do
-    if ! command -v "$cmd" &>/dev/null; then
-        echo "[brew-packages][error] $cmd not found after brew bundle — downstream scripts may fail"
-    fi
-done
+if ! bundle_is_satisfied; then
+    echo "[brew-packages][error] Brewfile is not fully satisfied after synchronization" >&2
+    exit 1
+fi
 
 echo "[brew-packages][done]"

@@ -15,8 +15,15 @@ echo "[prerequisites][start]"
 if ! xcode-select -p &>/dev/null; then
     echo "[prerequisites][xcode-cli] installing"
     xcode-select --install
-    echo "[prerequisites][xcode-cli] waiting"
-    until xcode-select -p &>/dev/null; do
+    echo "[prerequisites][xcode-cli] waiting (up to 10 minutes)"
+    attempt=0
+    while ! xcode-select -p &>/dev/null; do
+        attempt=$((attempt + 1))
+        if [ "$attempt" -ge 120 ]; then
+            echo "[prerequisites][error] Xcode Command Line Tools installation timed out" >&2
+            echo "[prerequisites][manual] complete the installer, then re-run chezmoi apply" >&2
+            exit 1
+        fi
         sleep 5
     done
 else
@@ -92,12 +99,32 @@ mkdir -p "$SSH_DIR"
 chmod 700 "$SSH_DIR"
 if command -v ssh-keyscan &>/dev/null; then
     if ! ssh-keygen -F github.com -f "$KNOWN_HOSTS" >/dev/null 2>&1; then
-        echo "[prerequisites][github-ssh] adding host keys"
-        if ssh-keyscan -t ed25519,ecdsa,rsa github.com >> "$KNOWN_HOSTS" 2>/dev/null; then
+        echo "[prerequisites][github-ssh] fetching and verifying host keys"
+        scanned_keys=$(mktemp)
+        verified_keys=$(mktemp)
+        if ssh-keyscan -T 10 -t ed25519,ecdsa,rsa github.com >"$scanned_keys" 2>/dev/null; then
+            while IFS= read -r key_line; do
+                [ -n "$key_line" ] || continue
+                fingerprint="$(printf '%s\n' "$key_line" | ssh-keygen -E sha256 -lf - 2>/dev/null | awk '{print $2}' || true)"
+                case "$fingerprint" in
+                    SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU | \
+                    SHA256:p2QAMXNIC1TJYWeIOttrVc98/R1BUFWu3/LiyKgUfQM | \
+                    SHA256:uNiVztksCsDhcc0u9e8BujQXVUpKZIDTMczCvj3tD2s)
+                        printf '%s\n' "$key_line" >>"$verified_keys"
+                        ;;
+                    *)
+                        echo "[prerequisites][warning] rejected unrecognized GitHub host key: ${fingerprint:-unknown}" >&2
+                        ;;
+                esac
+            done <"$scanned_keys"
+        fi
+        if [ -s "$verified_keys" ]; then
+            cat "$verified_keys" >>"$KNOWN_HOSTS"
             chmod 600 "$KNOWN_HOSTS"
         else
-            echo "[prerequisites][warning] Failed to fetch GitHub host keys; continuing."
+            echo "[prerequisites][warning] Failed to fetch verified GitHub host keys; continuing."
         fi
+        rm -f "$scanned_keys" "$verified_keys"
     else
         echo "[prerequisites][github-ssh] already registered"
     fi

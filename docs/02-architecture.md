@@ -112,14 +112,14 @@ dotfiles/
 | `dot_copilot/`              | `~/.copilot/`                      | Copilot CLI 사용자 MCP 설정                           |
 | `dot_<tool>/symlink_skills` | `~/.<tool>/skills/` → `~/.skills/` | 지원 스킬 경로를 단일 출처로 잇는 symlink (claude·agents)       |
 | `Library/LaunchAgents/`     | `~/Library/LaunchAgents/`          | tokscale 3일·dotfiles 매월 1·16일 calendar schedule    |
-| `dot_local/bin/`            | `~/.local/bin/`                    | 사용자 스크립트 (doctor, dotfiles update, mattpocock 스킬 동기화) |
+| `dot_local/bin/`            | `~/.local/bin/`                    | doctor, 프로젝트 clone/Doppler, 유지보수, 스킬 동기화 command |
 
 ## chezmoi special 파일
 
 | 파일                      | 역할                         | 상세                                                                                                                   |
 |-------------------------|----------------------------|----------------------------------------------------------------------------------------------------------------------|
 | `.chezmoiroot`          | source root 경로 고정 (`home`) | chezmoi가 `home/` 디렉토리를 소스 루트로 인식하게 하여, 저장소 루트의 docs/, install.sh 등이 홈 디렉토리에 배포되지 않도록 격리                              |
-| `.chezmoiversion`       | 최소 chezmoi 실행 버전 고정        | 이 dotfiles가 요구하는 chezmoi 최소 버전을 명시하여, 이전 버전의 호환성 문제를 사전 차단                                                           |
+| `.chezmoiversion`       | 최소 chezmoi 실행 버전 선언        | source state를 읽을 때 chezmoi 자체가 버전을 검사하고, 요구 버전보다 오래된 실행 파일이면 중단한다. `install.sh`는 이 검사를 중복 구현하지 않는다.                         |
 | `.chezmoiignore`        | OS별·런타임 경로 제외              | 템플릿 조건문으로 현재 OS에 해당하지 않는 설정 파일을 배포 대상에서 제외. 저장소 메타 파일(README, LICENSE 등)과 Claude Code 런타임 데이터(`.claude.json`)도 공통 제외 |
 | `.chezmoiexternal.toml` | 외부 리소스 선언적 동기화             | Oh My Zsh, zsh 플러그인 등을 선언한다. chezmoi가 상태를 읽을 때 cache age가 `refreshPeriod`를 넘으면 다시 받을 수 있으며, 자체 예약 작업은 아니다. |
 | `.chezmoiremove`        | 제거 상태를 지속 관리                 | 나열된 target이 없는 상태를 매 apply에서 유지한다. 일회성 삭제 기록이 아니라 계속 제거할 경로에만 사용한다. |
