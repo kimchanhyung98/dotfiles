@@ -4,7 +4,7 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 
 ## 범위
 
-- macOS 중심 환경에 시스템, Claude, Codex, Antigravity, Hermes, CodeGraph 스택을 통합한다.
+- macOS 중심 환경에 시스템 도구와 AI CLI를 통합한다. Claude와 Codex가 필수 baseline이고 Copilot, Antigravity, Hermes, CodeGraph 등은 선택 도구다.
 - Linux는 Ubuntu 24.04를 검증 기준선으로 두고 기초 셸/패키지/AI 최소 구성을 유지한다. apt/dnf/yum 기반 다른 배포판은 best effort다.
 - 지정된 저장소 6개를 실제 원격 기준으로 검증하고, 유지 가능한 항목만 선별 적용한다.
 - 저장소 원본 전체를 복제하지 않고 유지 가능한 구성만 채택한다.

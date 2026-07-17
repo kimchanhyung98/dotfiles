@@ -4,10 +4,6 @@
 # Gemini CLI 제거 (dotfiles 관리 중단)
 .gemini/settings.json
 
-# Copilot CLI 제거 (dotfiles 관리 중단)
-.copilot/mcp-config.json
-.copilot/skills
-
 # OpenCode 제거 (dotfiles 관리 중단)
 .config/opencode/opencode.json
 .config/opencode/oh-my-opencode.jsonc

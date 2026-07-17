@@ -75,6 +75,9 @@ dotfiles/
     ├── dot_codex/
     │   └── config.toml.tmpl
     │
+    ├── dot_copilot/
+    │   └── mcp-config.json.tmpl
+    │
     ├── dot_agents/
     │   └── symlink_skills             # → ~/.skills
     │
@@ -100,6 +103,7 @@ dotfiles/
 | `dot_config/zsh/`           | `~/.config/zsh/`                   | `.zshrc`에서 순차 로드하는 모듈형 Zsh 설정                     |
 | `dot_claude/`               | `~/.claude/`                       | Claude Code 설정                                    |
 | `dot_codex/`                | `~/.codex/`                        | Codex CLI 설정                                      |
+| `dot_copilot/`              | `~/.copilot/`                      | Copilot CLI 사용자 MCP 설정                           |
 | `dot_<tool>/symlink_skills` | `~/.<tool>/skills/` → `~/.skills/` | 지원 스킬 경로를 단일 출처로 잇는 symlink (claude·agents)       |
 | `Library/LaunchAgents/`     | `~/Library/LaunchAgents/`          | macOS launchd 작업. 현재 tokscale 예약 submit 관리           |
 | `dot_local/bin/`            | `~/.local/bin/`                    | 사용자 스크립트 (doctor, mattpocock 스킬 동기화)                  |

@@ -101,6 +101,20 @@ else
     echo "[ai-tools][oh-my-codex] already installed"
 fi
 
+# GitHub Copilot CLI (optional; Claude and Codex are the required AI CLIs)
+if ! command -v copilot &>/dev/null; then
+    echo "[ai-tools][copilot] installing"
+    installer=$(mktemp)
+    if curl -fsSL https://gh.io/copilot-install -o "$installer"; then
+        PREFIX="$HOME/.local" sh "$installer" || echo "[ai-tools][warning] Copilot CLI installation failed"
+    else
+        echo "[ai-tools][warning] Copilot CLI download failed"
+    fi
+    rm -f "$installer"
+else
+    echo "[ai-tools][copilot] already installed"
+fi
+
 # Antigravity CLI
 # - Google Antigravity 터미널 AI 에이전트 (바이너리: agy)
 if ! command -v agy &>/dev/null; then

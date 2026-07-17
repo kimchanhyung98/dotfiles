@@ -1,10 +1,8 @@
 # 운영
 
-## dotfiles-doctor
+## `dotfiles-doctor`
 
-설치 완료 후 헬스체크 스크립트. `~/.local/bin/dotfiles-doctor`로 배포되어 `dotfiles-doctor` 명령으로 실행한다. 각 항목의 설치 여부를 확인하고 누락된 항목을 보고한다.
-
-현재 doctor는 OS별 필수/선택 항목을 구분하지 않고 누락 항목을 모두 failure로 계산한다. 따라서 Linux나 일부 도구를 의도적으로 설치하지 않은 머신에서는 non-zero가 “dotfiles 전체 실패”가 아니라 선택 도구 누락을 뜻할 수 있다.
+`~/.local/bin/dotfiles-doctor`는 설치와 managed target 상태를 확인한다. AI CLI 중 Claude와 Codex만 required이며 누락 시 non-zero다. Copilot, CodeGraph, Antigravity, Hermes, 언어 runtime과 확장은 optional로 표시한다. zsh/git/vim과 Claude/Codex 설정·공통 skills 경로 같은 dotfiles 핵심 target은 계속 required다.
 
 | 검사 카테고리          | 대상                                                          | 검사 내용                            |
 |------------------|-------------------------------------------------------------|----------------------------------|
@@ -13,12 +11,12 @@
 | Terminal         | ghostty                                                     | Ghostty 터미널의 설치 여부 확인            |
 | Languages        | node, python3, go, rustc, php, ruby                         | 프로그래밍 언어 런타임의 설치 여부와 버전 확인       |
 | Package Managers | brew, zb, pipx, bun                                         | 패키지 관리자의 설치 여부 확인. zb는 zerobrew  |
-| AI CLI           | claude, codex, codegraph, hermes, ollama, antigravity(agy)  | AI 도구 CLI의 설치 여부 확인              |
+| AI CLI           | claude, codex, copilot, codegraph, hermes, ollama, antigravity(agy) | 필수 Claude/Codex와 선택 AI CLI 상태 확인 |
 | AI 확장            | Claude `enabledPlugins`, `codex@openai-codex`, `remember`, oh-my-codex | 설정 파일에 선언된 Claude 확장과 Codex 확장 프레임워크 확인 |
 | 스킬 디렉토리          | `~/.skills` + 도구별 symlink 2개(claude·agents)                 | 단일 출처 존재 여부와 symlink·대상 존재 여부 확인 |
 | AGENTS.md        | `~/AGENTS.md` 존재 여부                                         | 공통 에이전트 지침 파일 배포 상태 확인           |
 | Dotfiles         | ~/.zshrc, ~/.gitconfig, ~/.vimrc, ~/.oh-my-zsh              | 핵심 dotfiles의 배포 상태 확인            |
-| Config           | ghostty, claude, codex                                      | 각 도구의 설정 디렉토리 존재 여부 확인           |
+| Config           | ghostty, claude, codex, copilot                             | 각 도구의 설정 디렉토리 존재 여부 확인           |
 | MCP              | ~/.claude.json                                              | MCP 서버 설정 파일 존재 여부 확인            |
 
 ## 요구사항 요약
@@ -33,8 +31,8 @@
 | Languages      | dotnet, go, kotlin, node, openjdk, php, python, ruby, rust                                               |
 | Pkg Managers   | composer, mise, npm, pipx, uv, xcodes, yarn                                                              |
 | Runtime        | Bun                                                                                                      |
-| AI Core        | Claude Code, Codex CLI, Antigravity CLI, Hermes Agent, CodeGraph                                         |
-| Claude         | SuperClaude, Claude official plugin toggles, CodeGraph MCP, repository `CLAUDE.md` 지침                          |
+| AI Core        | 필수 Claude Code/Codex CLI, 선택 Copilot/Antigravity/Hermes/CodeGraph                                    |
+| Claude         | Claude official plugin toggles, CodeGraph MCP, repository `CLAUDE.md` 지침                               |
 | Codex          | oh-my-codex, CodeGraph MCP, 스킬 ~/.skills 공유                                                              |
 | Skills         | 단일 출처 `~/.skills` (Claude·Codex가 symlink 공유). 사용자 스킬·oh-my-codex 스킬을 한 곳에서 관리                            |
 | Apps           | ghostty, docker, iterm2, chrome, rectangle, slack, figma 등                                               |
