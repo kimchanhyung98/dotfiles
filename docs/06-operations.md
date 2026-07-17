@@ -39,15 +39,20 @@
 | Shell          | Oh My Zsh + autosuggestions + syntax-highlighting                                                        |
 | Linux          | curl, git, vim, zsh, bat, zoxide, Ghostty 수동 설치 안내, 셸/Git baseline, claude, codex, codegraph, antigravity, hermes, oh-my-codex |
 
-## 현재 update 계약
+## 예약 작업과 update 계약
 
 - 최초 config 생성은 대화형 전용이며 name/email/deviceName을 모두 입력해야 한다.
-- 다른 컴퓨터의 원격 변경을 가져오는 동작은 현재 수동 `chezmoi update`다. launchd/systemd 기반 dotfiles update timer는 없다.
+- macOS에서는 두 LaunchAgent가 독립적으로 실행된다.
+  - tokscale: 3일마다 14:00
+  - dotfiles: 매월 1일과 16일 14:00
 - 평상시 update에는 `--init`을 붙이지 않는다. `.chezmoi.toml.tmpl`의 data key를 다시 생성해야 할 때만 대화형 터미널에서 `--init`을 사용한다.
 - `chezmoi update`는 source pull 뒤 managed target을 apply하지만, source가 바뀌지 않은 `run_once_`/`run_onchange_` package와 OS 설정 drift를 지속 복구하지는 않는다.
 - external의 `refreshPeriod = "168h"`는 scheduler가 아니다. chezmoi command가 external 상태를 읽는 시점에 cache age를 판단한다.
+- 예약 작업은 실행·성공 timestamp나 별도 cache를 저장하지 않는다.
 
-수동 update 전후에는 다음 순서로 확인한다.
+launchd는 예약 시각에 Mac이 잠들어 있으면 깨어난 뒤 누락된 실행을 한 번으로 합쳐 실행한다.
+
+예약 시점과 무관하게 직접 검토·갱신하려면 다음 순서로 확인한다.
 
 ```sh
 chezmoi diff

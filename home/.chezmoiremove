@@ -10,5 +10,12 @@
 .config/opencode/plugins
 .config/opencode/skills
 
+# timestamp/cache 기반 maintenance 구현 정리
+Library/LaunchAgents/dev.dotfiles.maintenance.plist
+Library/Logs/dotfiles-maintenance.log
+Library/Logs/tokscale-submit.log
+.local/state/dotfiles/last-update-epoch
+.local/state/tokscale/last-submit-epoch
+
 # Codex legacy skills path removal (official path is ~/.agents/skills)
 .codex/skills

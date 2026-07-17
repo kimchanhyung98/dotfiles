@@ -9,21 +9,30 @@
         <string>/bin/bash</string>
         <string>{{ .chezmoi.homeDir }}/.config/tokscale/submit.sh</string>
     </array>
-    <!-- 발화 시각은 시스템 로컬 타임존 기준(launchd에 TZ 키 없음). 시스템 TZ=Asia/Seoul 전제로 KST 14:00 -->
-    <key>StartCalendarInterval</key>
+    <key>EnvironmentVariables</key>
     <dict>
-        <key>Hour</key>
-        <integer>14</integer>
-        <key>Minute</key>
-        <integer>0</integer>
+        <key>PATH</key>
+        <string>{{ .chezmoi.homeDir }}/.bun/bin:{{ .homebrewPrefix }}/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>TZ</key>
+        <string>Asia/Seoul</string>
     </dict>
+    <!-- Fixed monthly schedule: days 1,4,...,28 at 14:00 -->
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict><key>Day</key><integer>1</integer><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Day</key><integer>4</integer><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Day</key><integer>7</integer><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Day</key><integer>10</integer><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Day</key><integer>13</integer><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Day</key><integer>16</integer><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Day</key><integer>19</integer><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Day</key><integer>22</integer><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Day</key><integer>25</integer><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Day</key><integer>28</integer><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
+    </array>
     <key>RunAtLoad</key>
     <false/>
     <key>ProcessType</key>
     <string>Background</string>
-    <key>StandardOutPath</key>
-    <string>{{ .chezmoi.homeDir }}/Library/Logs/tokscale-submit.log</string>
-    <key>StandardErrorPath</key>
-    <string>{{ .chezmoi.homeDir }}/Library/Logs/tokscale-submit.log</string>
 </dict>
 </plist>

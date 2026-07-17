@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Fetch, apply, and verify dotfiles when invoked by its calendar schedule.
+
+set -euo pipefail
+
+if ! command -v chezmoi >/dev/null 2>&1; then
+    echo "[dotfiles-update][error] chezmoi not found" >&2
+    exit 1
+fi
+
+source_path="$(chezmoi source-path)"
+source_root="$(git -C "$source_path" rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -n "$source_root" ] && [ -n "$(git -C "$source_root" status --porcelain)" ]; then
+    echo "[dotfiles-update][error] source repository has local changes: $source_root" >&2
+    echo "[dotfiles-update][error] commit, stash, or discard them before automatic update" >&2
+    exit 1
+fi
+
+echo "[dotfiles-update] fetching and applying source updates"
+chezmoi update --no-tty
+
+echo "[dotfiles-update] verifying managed targets"
+chezmoi verify
+echo "[dotfiles-update] complete"

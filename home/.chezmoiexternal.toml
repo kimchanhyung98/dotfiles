@@ -1,5 +1,5 @@
 # chezmoi 외부 리소스 관리
-# `chezmoi apply` 시 자동 다운로드/업데이트 (168h = 7일마다 갱신)
+# chezmoi가 external 상태를 읽을 때 cache가 168h보다 오래됐으면 갱신
 
 # Oh My Zsh 프레임워크
 [".oh-my-zsh"]

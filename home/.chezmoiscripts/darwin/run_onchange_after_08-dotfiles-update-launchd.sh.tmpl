@@ -1,0 +1,37 @@
+#!/bin/bash
+# Register or refresh the dotfiles update calendar schedule.
+#
+# plist hash: {{ include "Library/LaunchAgents/dev.dotfiles.update.plist.tmpl" | sha256sum }}
+
+{{ if ne .chezmoi.os "darwin" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "[dotfiles-update-launchd][start]"
+
+uid="$(id -u)"
+label="dev.dotfiles.update"
+plist="$HOME/Library/LaunchAgents/${label}.plist"
+helper="$HOME/.local/bin/dotfiles-update"
+
+if [ ! -f "$plist" ] || ! plutil -lint "$plist" >/dev/null; then
+    echo "[dotfiles-update-launchd][error] invalid or missing plist: $plist" >&2
+    exit 1
+fi
+if [ ! -x "$helper" ]; then
+    echo "[dotfiles-update-launchd][error] helper missing or not executable: $helper" >&2
+    exit 1
+fi
+
+launchctl bootout "gui/${uid}/${label}" 2>/dev/null || true
+if launchctl bootstrap "gui/${uid}" "$plist"; then
+    launchctl enable "gui/${uid}/${label}" 2>/dev/null || true
+    echo "[dotfiles-update-launchd] (re)loaded ${label}"
+else
+    echo "[dotfiles-update-launchd][error] bootstrap failed for ${label}" >&2
+    exit 1
+fi
+
+echo "[dotfiles-update-launchd][done]"

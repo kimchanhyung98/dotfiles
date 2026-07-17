@@ -8,6 +8,7 @@ Brewfile
 .config/stats/**
 .config/tokscale/**
 Library/LaunchAgents/**
+.local/bin/dotfiles-update
 {{ end }}
 
 {{ if ne .chezmoi.os "linux" }}

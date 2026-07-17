@@ -26,6 +26,7 @@ dotfiles/
     │   │   ├── run_onchange_after_05-app-settings.sh.tmpl
     │   │   ├── run_once_05-runtime.sh.tmpl
     │   │   ├── run_onchange_after_07-tokscale-launchd.sh.tmpl
+    │   │   ├── run_onchange_after_08-dotfiles-update-launchd.sh.tmpl
     │   │   ├── run_once_10-ai-core.sh.tmpl
     │   │   ├── run_once_11-ai-claude.sh.tmpl
     │   │   ├── run_once_12-ai-codex.sh.tmpl
@@ -82,10 +83,12 @@ dotfiles/
     │   └── symlink_skills             # → ~/.skills
     │
     ├── Library/LaunchAgents/
-    │   └── ai.tokscale.submit.plist.tmpl
+    │   ├── ai.tokscale.submit.plist.tmpl
+    │   └── dev.dotfiles.update.plist.tmpl
     │
     └── dot_local/bin/
         ├── executable_dotfiles-doctor
+        ├── executable_dotfiles-update
         └── executable_mattpocock-skills-sync
 ```
 
@@ -105,8 +108,8 @@ dotfiles/
 | `dot_codex/`                | `~/.codex/`                        | Codex CLI 설정                                      |
 | `dot_copilot/`              | `~/.copilot/`                      | Copilot CLI 사용자 MCP 설정                           |
 | `dot_<tool>/symlink_skills` | `~/.<tool>/skills/` → `~/.skills/` | 지원 스킬 경로를 단일 출처로 잇는 symlink (claude·agents)       |
-| `Library/LaunchAgents/`     | `~/Library/LaunchAgents/`          | macOS launchd 작업. 현재 tokscale 예약 submit 관리           |
-| `dot_local/bin/`            | `~/.local/bin/`                    | 사용자 스크립트 (doctor, mattpocock 스킬 동기화)                  |
+| `Library/LaunchAgents/`     | `~/Library/LaunchAgents/`          | tokscale 3일·dotfiles 매월 1·16일 calendar schedule    |
+| `dot_local/bin/`            | `~/.local/bin/`                    | 사용자 스크립트 (doctor, dotfiles update, mattpocock 스킬 동기화) |
 
 ## chezmoi special 파일
 
