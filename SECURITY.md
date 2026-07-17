@@ -2,28 +2,24 @@
 
 ## Supported Versions / 지원 버전
 
-프로젝트의 어떤 버전이 현재 보안 업데이트를 지원하는지 알려주세요.
+기본 브랜치의 최신 상태만 보안 업데이트 대상으로 지원합니다.
 
-| Version | Supported          |
-|---------|--------------------|
-| latest  | :white_check_mark: |
-| < 1.0   | :x:                |
+| Version | Supported |
+| --- | --- |
+| Latest | :white_check_mark: |
+| Older commits or releases | :x: |
 
 ## Reporting a Vulnerability / 취약점 보고
 
-취약점을 보고하는 방법을 안내해주세요.
-보고할 위치, 보고된 취약점에 대한 업데이트 빈도, 취약점 승인 또는 거부 시 예상되는 사항 등을 알려주세요.
+보안 취약점은 공개 이슈, 토론 또는 Pull Request에 게시하지 마세요.
 
 ### How to Report / 보고 방법
 
-* 공개 GitHub 이슈를 통해 보안 취약점을 보고하지 마세요.
-* 대신 다음 방법 중 하나를 사용하세요:
+다음 방법 중 하나로 비공개 보고해 주세요.
 
-1. GitHub Security Advisories
-    - 저장소의 Security 탭으로 이동
-    - "Report a vulnerability" 클릭
-    - 세부 정보와 함께 양식 작성
+1. 저장소의 **Security > Advisories > Report a vulnerability**를 사용합니다.
+2. 비공개 보고 기능을 사용할 수 없다면 `kimchanhyung98@gmail.com`으로 이메일을 보내고 제목에 `[SECURITY]`를 포함합니다.
 
-2. Direct Email
-    - 저장소 관리자에게 세부 정보 전송
-    - 제목에 "SECURITY" 포함
+보고에는 영향받는 구성 요소나 버전, 재현 방법, 예상 영향, 가능한 완화 방법과 연락 가능한 정보를 포함해 주세요.
+관리자는 접수 후 7일 이내에 확인을 목표로 하며, 조사 결과와 공개 일정을 보고자와 조율합니다.
+수정 또는 완화가 준비되기 전에는 취약점 세부 정보를 공개하지 마세요.

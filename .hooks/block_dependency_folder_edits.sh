@@ -2,6 +2,7 @@
 set -euo pipefail
 
 hook_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=.hooks/pre_tool_use_common.sh
 source "$hook_dir/pre_tool_use_common.sh"
 
 blocked_dir='(^|/)(node_modules|vendor|\.venv|venv|__pycache__|\.git)(/|$)'

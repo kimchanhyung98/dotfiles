@@ -42,10 +42,10 @@ dependabot/npm_and_yarn/tailwindcss/postcss-4.1.18
 
 ## 검증 계층
 
-| 계층             | 시점              | 우회 가능 여부                   |
-|----------------|-----------------|----------------------------|
-| 로컬 Husky       | `git push` 실행 시 | ✅ `--no-verify` 플래그로 우회 가능 |
-| GitHub Actions | PR 생성/수정 시      | ❌ 필수 체크 (우회 불가)            |
+| 계층 | 시점 | 동작 |
+| --- | --- | --- |
+| 로컬 Husky | `git push` 실행 시 | `--no-verify`로 건너뛸 수 있음 |
+| GitHub Actions | PR 생성/수정 시 | 로컬 옵션과 무관하게 실행되지만, 아래 required status check를 설정해야 병합을 차단함 |
 
 ## Branch Protection 설정 권장
 
