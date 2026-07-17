@@ -1,120 +1,62 @@
-# Chezmoi Dotfiles Testing
+# 테스트
 
-이 문서는 현재 구현된 테스트 경로를 설명한다. 전체 dotfiles 적용 CI(`test-dotfiles.yml`)는 현재 저장소에 없으며, GitHub Actions는 브랜치명과 PR 제목 검증만 수행한다.
+## 로컬 검사
 
-## 대상 범위
-
-- 템플릿 29개
-  - 배포 템플릿 12개: `home/.chezmoi.toml.tmpl`, zsh/git/AI/cmux/ghostty/tokscale/LaunchAgent 등
-  - 실행 스크립트 17개: 공통 2개, darwin 10개, linux 5개
-- 테스트 스크립트
-  - `tests/macos.sh`
-  - `tests/linux.sh`
-  - `tests/zsh-config.sh`
-  - `tests/skills-migrate.sh`
-  - `tests/mattpocock-skills-sync.sh`
-
-## 로컬 테스트
-
-`make check`가 현재 유일한 전체 검증 진입점이다.
-
-```text
-make check
-├── [macOS host] tests/macos.sh
-└── tests/Dockerfile build → tests/linux.sh
-```
-
-macOS가 아닌 호스트에서는 `tests/macos.sh`를 건너뛰고 Docker 기반 Linux 테스트만 실행한다. Docker CLI가 없거나 Docker daemon이 실행 중이 아니면 `make check`는 실패한다.
-
-Docker 설정 경로 권한 문제가 있는 환경에서는 다음처럼 임시 Docker config를 지정한다.
+`make check`와 pre-commit은 Docker나 network를 요구하지 않는 빠른 검사만 실행한다.
 
 ```sh
-DOCKER_CONFIG=/private/tmp/dotfiles-docker-config make check
+make check
 ```
 
-## macOS 테스트
+검사 범위:
 
-`tests/macos.sh`는 세 값이 저장된 임시 config로 기본 source를 `--no-tty` 초기화한다. 별도의 빈 HOME에서는 pseudo-TTY로 최초 name/email/deviceName prompt를 입력하고, 제어 터미널 없는 최초 init이 실패하는지도 검증한다. 모든 대상은 임시 HOME이며 실제 사용자 HOME에는 적용하지 않는다.
+- staged/working tree whitespace 오류
+- 일반 shell script 문법과 ShellCheck(설치된 경우)
+- `make init`의 Docker 확인과 npm ci/Husky 설정
+- 프로젝트 clone, 저장소명/`local` Doppler sync fixture
+- stateless dotfiles update의 반복 실행과 dirty source 차단 fixture
 
-bootstrap 회귀 테스트는 macOS 기본 `/usr/bin/expect`로 대화형 pipe를 만들고, `/usr/bin/perl`의 별도 session으로 제어 터미널 없는 실행을 재현한다.
+`make test`는 빠른 검사 후 Docker CLI와 daemon을 확인한다. macOS host에서는 macOS 격리 테스트를 먼저 실행하고, 이후 Linux Docker와 Codespaces 테스트를 실행한다. Linux host에서는 Linux Docker와 Codespaces 테스트를 실행한다.
 
-엄격 실패 항목:
+```sh
+make test
+make test-macos
+make test-linux
+```
 
-| 영역 | 검증 내용 |
-|---|---|
-| Bootstrap | 최초 세 값의 필수 입력, headless 차단, pipe 실행의 제어 터미널 전달 |
-| 템플릿 | `chezmoi cat`으로 관리 파일 템플릿 렌더링 |
-| Codex | `home/dot_codex/config.toml.tmpl` 권한 deny/write 규칙과 cloudflare plugin 비활성 상태 |
-| cmux | `cmux.json` JSON 구조와 automation 기본값 |
-| App settings | Rectangle JSON, Stats plist, app-settings 스크립트 |
-| Skills | legacy skills cleanup, `.claude/skills`/`.agents/skills` symlink topology |
-| mattpocock skills | 선택된 upstream skill 동기화와 stale runtime state 제거 |
-| Brew | `pkgconf`, `docker-desktop`, zerobrew 우선 및 Homebrew 폴백 |
-| tokscale | submit wrapper, LaunchAgent plist, launchd bootstrap 스크립트 target path |
-| Zsh | LANG 폴백과 fzf 바인딩 순서 회귀 검증 |
-| ShellCheck | shellcheck가 설치된 경우 공통+darwin 렌더링 스크립트 lint |
+OS와 Docker 같은 실행 환경 검사는 Make target이 담당한다. 테스트 스크립트는 준비된 환경에서 dotfiles 동작만 검증한다. `make test-linux`는 실행할 때마다 Docker CLI와 daemon 상태를 확인한다.
 
-2026-07-16의 bootstrap 변경 commit `804ddbc` 기준 실행 결과는 21 passed, 0 failed다.
+## macOS
 
-관찰 항목:
+`make test-macos`는 macOS host인지 확인한 뒤 `tests/macos.sh`를 실행한다. 스크립트는 임시 HOME에서 다음을 확인한다.
 
-- `chezmoi diff`
-- `chezmoi apply --dry-run --verbose`
-- `chezmoi verify`
-- `chezmoi doctor`
+- 최초 config와 bootstrap의 대화형 입력 계약
+- managed template render
+- Codex, cmux, Rectangle, Stats, Brewfile 설정
+- skills migration과 pinned mattpocock sync
+- tokscale 3일마다, dotfiles 매월 1·16일 오후 2시 calendar와 state/cache 부재
+- Zsh 회귀와 rendered script ShellCheck
 
-임시 HOME에서는 아직 실제 적용 전 차이가 있을 수 있으므로, 위 항목은 일부 non-zero 결과를 warning으로 보고 테스트 실패로 보지 않는다.
+실제 사용자 HOME은 변경하지 않는다.
 
-## Linux Docker 테스트
+## Ubuntu와 Codespaces
 
-`tests/Dockerfile`은 `ubuntu:24.04` 기반으로 비root `testuser`를 만들고, `home/`을 chezmoi source directory로 복사한 뒤 `tests/linux.sh`를 실행한다.
+`make test-linux`가 Docker와 daemon을 확인하고 `tests/Dockerfile`로 두 container 경로를 실행한다. container의 기본 command인 `tests/linux.sh`는 준비된 Ubuntu 환경에서 dotfiles actual apply와 검증만 수행한다.
 
-컨테이너 사전 설치 항목:
+Docker image는 공식 `ubuntu:26.04`에서 non-root actual apply와 verify를 수행한다. Node/npm을 미리 제공하지 않으므로 npm 기반 선택 도구는 건너뛸 수 있고, 필수 Claude/Codex는 standalone installer 경로를 사용한다.
 
-- curl, git, vim, zsh, sudo, ca-certificates, locales
-- shellcheck, zoxide, bat
-- nodejs, npm
-- chezmoi
+같은 image에서 `CODESPACES=true`를 별도로 주입해 다음 제한 경로도 확인한다.
 
-`tests/linux.sh`의 주요 검증:
+- apt 기반 CLI package baseline
+- system timezone·locale·login shell 변경 제외
+- GitHub-managed repository 인증 유지
+- desktop app 설치 제외
 
-| 단계 | 검증 내용 |
-|---|---|
-| chezmoi version | 실행 가능 여부와 버전 출력 |
-| 템플릿 | `chezmoi cat`으로 관리 파일 렌더링 |
-| OS ignore | macOS-only 파일(Rectangle, Stats, cmux, tokscale, LaunchAgent 등)이 Linux에서 관리되지 않는지 확인 |
-| Skills | cleanup, symlink topology, mattpocock sync |
-| Zsh | `tests/zsh-config.sh` |
-| Doctor | `chezmoi doctor --no-network` error 여부 |
-| Apply | dry-run 후 `chezmoi apply --force --verbose` 실제 적용 |
-| Verify | `chezmoi managed` 목록과 `chezmoi verify` |
-| ShellCheck | 공통+linux 렌더링 스크립트 lint |
+## GitHub Actions
 
-## Git Hooks와 GitHub Checks
+`test-dotfiles.yml`은 다음 경우에만 전체 검사를 실행한다.
 
-| 위치 | 시점 | 동작 |
-|---|---|---|
-| `.husky/pre-commit` | `git commit` 전 | `make check` 실행 |
-| `.husky/commit-msg` | `git commit` 전 | `.husky/validate-commit.cjs`로 conventional commit 형식 검증 |
-| `.husky/pre-push` | `git push` 전 | `.husky/validate-branch.cjs`로 브랜치명 검증 |
-| `.github/workflows/branch-name-check.yml` | PR 생성/수정 | PR head branch 형식 검증 |
-| `.github/workflows/pr-title-check.yml` | PR 생성/수정/label 변경 | `amannn/action-semantic-pull-request@v6`로 PR 제목 검증 |
+- pull request
+- main branch push
 
-현재 GitHub Actions에는 macOS/Linux dotfiles 적용 테스트 workflow가 없다. PR에서 전체 적용 검증이 필요하면 로컬 `make check` 결과를 기준으로 판단한다.
-
-## 로컬 vs 자동 검증
-
-| 테스트 항목 | 로컬 `make check` | Husky | GitHub Actions |
-|---|:---:|:---:|:---:|
-| macOS 템플릿/설정 회귀 | O(macOS host) | pre-commit | - |
-| Linux Docker 적용 검증 | O | pre-commit | - |
-| ShellCheck | O | pre-commit | - |
-| 커밋 메시지 | - | commit-msg | - |
-| 브랜치명 | - | pre-push | O(PR) |
-| PR 제목 | - | - | O(PR) |
-
-## 향후 고려사항
-
-- GitHub Actions에 전체 dotfiles 적용 workflow를 추가할 경우, 이 문서의 CI 섹션을 새 workflow 파일명과 job 구조에 맞춰 갱신한다.
-- macOS runner 검증을 추가할 경우 비용과 runner 제공 기간을 별도 확인한다.
-- `dotfiles-doctor` 항목이 늘어나면 별도 테스트로 전환해 문서와 진단 스크립트의 drift를 줄인다.
+각 job은 `make check` 후 플랫폼별 target을 실행한다. macOS job은 `make test-macos`, Ubuntu job은 `make test-linux`를 사용하며, 두 job의 합이 전체 플랫폼 범위를 구성한다. 로컬 Mac의 `make test`는 두 경로를 연속으로 실행한다. 브랜치명과 PR 제목 workflow는 별도로 유지한다.
