@@ -20,6 +20,6 @@ if hook_grep_command "$normalized_command" "${HOOK_COMMAND_BOUNDARY}${command_pr
   deny
   exit 0
 fi
-if hook_grep_command "$normalized_command" "(>|>>)[[:space:]]*(/etc|/usr|/bin|/sbin|/System|/Library|/Applications|/opt|~|\$HOME)(/|${HOOK_COMMAND_END})"; then
+if hook_grep_command "$normalized_command" "(>|>>)[[:space:]]*(/etc|/usr|/bin|/sbin|/System|/Library|/Applications|/opt|~|\\\$HOME)(/|${HOOK_COMMAND_END})"; then
   deny
 fi
