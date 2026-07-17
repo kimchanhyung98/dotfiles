@@ -19,6 +19,12 @@ else
     echo "[git-baseline][warning] Git user not configured. Check ~/.gitconfig"
 fi
 
+if [ "${CODESPACES:-false}" = "true" ]; then
+    echo "[git-baseline][codespaces] using GitHub-managed repository authentication"
+    echo "[git-baseline][done]"
+    exit 0
+fi
+
 # SSH 키 기본 설정
 # - ~/.ssh 디렉토리 생성 및 권한 설정
 SSH_DIR="$HOME/.ssh"
@@ -32,12 +38,32 @@ fi
 KNOWN_HOSTS="$SSH_DIR/known_hosts"
 if command -v ssh-keyscan &>/dev/null; then
     if ! ssh-keygen -F github.com -f "$KNOWN_HOSTS" >/dev/null 2>&1; then
-        echo "[git-baseline][github-ssh] adding host keys"
-        if ssh-keyscan -t ed25519,ecdsa,rsa github.com >> "$KNOWN_HOSTS" 2>/dev/null; then
+        echo "[git-baseline][github-ssh] fetching and verifying host keys"
+        scanned_keys=$(mktemp)
+        verified_keys=$(mktemp)
+        if ssh-keyscan -T 10 -t ed25519,ecdsa,rsa github.com >"$scanned_keys" 2>/dev/null; then
+            while IFS= read -r key_line; do
+                [ -n "$key_line" ] || continue
+                fingerprint="$(printf '%s\n' "$key_line" | ssh-keygen -E sha256 -lf - 2>/dev/null | awk '{print $2}' || true)"
+                case "$fingerprint" in
+                    SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU | \
+                    SHA256:p2QAMXNIC1TJYWeIOttrVc98/R1BUFWu3/LiyKgUfQM | \
+                    SHA256:uNiVztksCsDhcc0u9e8BujQXVUpKZIDTMczCvj3tD2s)
+                        printf '%s\n' "$key_line" >>"$verified_keys"
+                        ;;
+                    *)
+                        echo "[git-baseline][warning] rejected unrecognized GitHub host key: ${fingerprint:-unknown}" >&2
+                        ;;
+                esac
+            done <"$scanned_keys"
+        fi
+        if [ -s "$verified_keys" ]; then
+            cat "$verified_keys" >>"$KNOWN_HOSTS"
             chmod 600 "$KNOWN_HOSTS"
         else
-            echo "[git-baseline][warning] Failed to fetch GitHub host keys; continuing."
+            echo "[git-baseline][warning] Failed to fetch verified GitHub host keys; continuing."
         fi
+        rm -f "$scanned_keys" "$verified_keys"
     else
         echo "[git-baseline][github-ssh] already registered"
     fi

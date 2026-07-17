@@ -51,6 +51,19 @@ check_version() {
     fi
 }
 
+check_version_optional() {
+    local label="$1"
+    local cmd="$2"
+    if command -v "$(echo "$cmd" | awk '{print $1}')" &>/dev/null; then
+        local ver
+        ver=$(eval "$cmd" 2>/dev/null | head -1 || echo "unknown")
+        echo -e "  ${GREEN}✓${NC} $label ($ver)"
+        pass=$((pass + 1))
+    else
+        echo -e "  ${YELLOW}○${NC} $label (optional)"
+    fi
+}
+
 check_path() {
     local label="$1"
     local path="$2"
@@ -76,37 +89,51 @@ OS=$(uname -s)
 ARCH=$(uname -m)
 if [ "$OS" = "Darwin" ]; then
     echo -e "  ${GREEN}✓${NC} macOS $(sw_vers -productVersion) ($ARCH)"
+    pass=$((pass + 1))
+elif [ "$OS" = "Linux" ] && [ "${CODESPACES:-false}" = "true" ]; then
+    echo -e "  ${GREEN}✓${NC} GitHub Codespaces ($(uname -r), $ARCH)"
+    pass=$((pass + 1))
+elif [ "$OS" = "Linux" ] && [ -r /etc/os-release ]; then
+    linux_id="$(sed -n 's/^ID=//p' /etc/os-release | tr -d '"')"
+    linux_version="$(sed -n 's/^VERSION_ID=//p' /etc/os-release | tr -d '"')"
+    if [ "$linux_id" = "ubuntu" ] && [ "$linux_version" = "26.04" ]; then
+        echo -e "  ${GREEN}✓${NC} Ubuntu 26.04 LTS ($ARCH)"
+        pass=$((pass + 1))
+    else
+        echo -e "  ${RED}✗${NC} unsupported Linux: ${linux_id:-unknown} ${linux_version:-unknown}"
+        fail=$((fail + 1))
+    fi
 else
-    echo -e "  ${GREEN}✓${NC} Linux $(uname -r) ($ARCH)"
+    echo -e "  ${RED}✗${NC} unsupported system: $OS ($ARCH)"
+    fail=$((fail + 1))
 fi
-pass=$((pass + 1))
 
 # Shell
 section "Shell"
 check_version "zsh" "zsh --version"
 check_version "git" "git --version"
 check_version "vim" "vim --version"
-check "tmux" "command -v tmux"
+check_optional "tmux" "command -v tmux"
 
 # Terminal
 section "Terminal"
-check "ghostty" "command -v ghostty"
+check_optional "ghostty" "command -v ghostty"
 
 # Languages
 section "Languages"
-check_version "node" "node --version"
-check_version "python3" "python3 --version"
-check_version "go" "go version"
-check_version "rustc" "rustc --version"
-check_version "php" "php --version"
-check_version "ruby" "ruby --version"
+check_version_optional "node" "node --version"
+check_version_optional "python3" "python3 --version"
+check_version_optional "go" "go version"
+check_version_optional "rustc" "rustc --version"
+check_version_optional "php" "php --version"
+check_version_optional "ruby" "ruby --version"
 
 # Package Managers
 section "Package Managers"
-check "brew" "command -v brew"
-check "zb" "command -v zb"
-check "pipx" "command -v pipx"
-check "bun" "command -v bun"
+check_optional "brew" "command -v brew"
+check_optional "zb" "command -v zb"
+check_optional "pipx" "command -v pipx"
+check_optional "bun" "command -v bun"
 
 # AI CLI
 section "AI CLI"
@@ -134,14 +161,14 @@ check "Codex skills (~/.agents) -> ~/.skills" "[ -L '$HOME/.agents/skills' ] && 
 
 # AGENTS.md
 section "AGENTS.md"
-check_path "~/AGENTS.md" "$HOME/AGENTS.md"
+check_path "AGENTS.md" "$HOME/AGENTS.md"
 
 # Dotfiles
 section "Dotfiles"
-check_path "~/.zshrc" "$HOME/.zshrc"
-check_path "~/.gitconfig" "$HOME/.gitconfig"
-check_path "~/.vimrc" "$HOME/.vimrc"
-check_path "~/.oh-my-zsh" "$HOME/.oh-my-zsh"
+check_path ".zshrc" "$HOME/.zshrc"
+check_path ".gitconfig" "$HOME/.gitconfig"
+check_path ".vimrc" "$HOME/.vimrc"
+check_path ".oh-my-zsh" "$HOME/.oh-my-zsh"
 
 # Config
 section "Config"

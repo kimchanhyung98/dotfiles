@@ -7,8 +7,8 @@
 | 환경 | 보장 수준 | 현재 검증 |
 |---|---|---|
 | 개인 macOS | 주 사용 환경 | 격리 HOME의 템플릿·bootstrap·설정 회귀 테스트 |
-| Ubuntu 24.04 non-root | 부분 검증 기준선 | Docker fixture의 apply·verify·ShellCheck. fixture가 Node/npm을 미리 제공하므로 pristine bootstrap은 아직 미검증 |
-| apt/dnf/yum 기반 기타 Linux | best effort | 패키지 관리자 분기는 있으나 배포판별 통합 검증 없음 |
+| Ubuntu 26.04 LTS non-root | Linux 기준선 | Docker actual apply·verify |
+| GitHub Codespaces | 제한 지원 | `CODESPACES=true`에서 시스템 설정과 데스크톱 앱을 제외한 CLI 경로 |
 
 최초 설정은 대화형 터미널에서 실행해야 한다. 이름, 이메일, 기기명에는 기본값이 없으며 세 값 중 하나라도 비어 있으면 config 생성이 중단된다.
 

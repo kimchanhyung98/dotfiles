@@ -11,6 +11,21 @@ set -eufo pipefail
 
 echo "[shell-baseline][start]"
 
+if [ "${CODESPACES:-false}" = "true" ]; then
+    echo "[shell-baseline][codespaces] skipping login shell, locale, and timezone changes"
+    echo "[shell-baseline][done]"
+    exit 0
+fi
+
+run_as_root=()
+if [ "$(id -u)" -ne 0 ]; then
+    if command -v sudo &>/dev/null; then
+        run_as_root=(sudo)
+    else
+        echo "[shell-baseline][warning] sudo not found; locale and timezone changes may be skipped"
+    fi
+fi
+
 # 기본 셸 설정
 # - zsh를 기본 로그인 셸로 변경
 ZSH_PATH=$(command -v zsh 2>/dev/null)
@@ -31,8 +46,10 @@ fi
 if [ -f /etc/locale.gen ]; then
     if ! locale -a 2>/dev/null | grep -q "en_US.utf8"; then
         echo "[shell-baseline][locale] setting en_US.UTF-8"
-        sudo sed -i 's/# en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen 2>/dev/null
-        sudo locale-gen 2>/dev/null || echo "[shell-baseline][warning] locale-gen failed — Korean text handling may be affected"
+        if [ "$(id -u)" -eq 0 ] || [ ${#run_as_root[@]} -ne 0 ]; then
+            "${run_as_root[@]}" sed -i 's/^# *en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen 2>/dev/null
+            "${run_as_root[@]}" locale-gen 2>/dev/null || echo "[shell-baseline][warning] locale-gen failed — Korean text handling may be affected"
+        fi
     fi
 fi
 
@@ -42,9 +59,11 @@ if [ -f /etc/timezone ]; then
     CURRENT_TZ=$(cat /etc/timezone 2>/dev/null || echo "")
     if [ "$CURRENT_TZ" != "Asia/Seoul" ]; then
         echo "[shell-baseline][timezone] setting Asia/Seoul"
-        sudo timedatectl set-timezone Asia/Seoul 2>/dev/null || \
-            sudo ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime 2>/dev/null || \
-            echo "[shell-baseline][warning] timezone setting failed"
+        if [ "$(id -u)" -eq 0 ] || [ ${#run_as_root[@]} -ne 0 ]; then
+            "${run_as_root[@]}" timedatectl set-timezone Asia/Seoul 2>/dev/null || \
+                "${run_as_root[@]}" ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime 2>/dev/null || \
+                echo "[shell-baseline][warning] timezone setting failed"
+        fi
     fi
 fi
 

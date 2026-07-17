@@ -1,7 +1,8 @@
 #!/bin/bash
 #
-# Install essential packages: curl, git, vim, zsh, bat, zoxide, ghostty
-# Runs once on first setup
+# Install the Ubuntu CLI baseline used on native Ubuntu and GitHub Codespaces.
+# Native Linux support targets Ubuntu 26.04 LTS. Codespaces is detected through
+# its documented CODESPACES=true environment variable and uses its Ubuntu image.
 
 {{ if ne .chezmoi.os "linux" }}
 exit 0
@@ -11,17 +12,53 @@ set -eufo pipefail
 
 echo "[install-packages][start]"
 
-# 필수 패키지 목록
-packages=(curl git vim zsh bat zoxide)
+if [ ! -r /etc/os-release ]; then
+    echo "[install-packages][error] /etc/os-release not found" >&2
+    exit 1
+fi
+
+# shellcheck disable=SC1091
+. /etc/os-release
+if [ "${ID:-}" != "ubuntu" ]; then
+    echo "[install-packages][error] unsupported Linux distribution: ${ID:-unknown}" >&2
+    echo "[install-packages][error] supported: Ubuntu 26.04 LTS and GitHub Codespaces" >&2
+    exit 1
+fi
+
+is_codespaces=false
+if [ "${CODESPACES:-false}" = "true" ]; then
+    is_codespaces=true
+    echo "[install-packages][platform] GitHub Codespaces (${VERSION_ID:-unknown})"
+elif [ "${VERSION_ID:-}" != "26.04" ]; then
+    echo "[install-packages][error] unsupported Ubuntu version: ${VERSION_ID:-unknown}" >&2
+    echo "[install-packages][error] native Linux support requires Ubuntu 26.04 LTS" >&2
+    exit 1
+else
+    echo "[install-packages][platform] Ubuntu 26.04 LTS"
+fi
+
+if ! command -v apt-get &>/dev/null || ! command -v dpkg-query &>/dev/null; then
+    echo "[install-packages][error] apt-get and dpkg-query are required" >&2
+    exit 1
+fi
+
+packages=(
+    bat
+    ca-certificates
+    curl
+    git
+    locales
+    make
+    openssh-client
+    vim
+    zoxide
+    zsh
+)
 
 # 미설치 패키지 확인
 install_needed=()
 for pkg in "${packages[@]}"; do
-    if ! command -v "$pkg" &>/dev/null; then
-        # Debian/Ubuntu: bat 패키지는 batcat으로 설치됨
-        if [ "$pkg" = "bat" ] && command -v batcat &>/dev/null; then
-            continue
-        fi
+    if ! dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null | grep -Fq 'install ok installed'; then
         install_needed+=("$pkg")
     fi
 done
@@ -31,11 +68,10 @@ if [ ${#install_needed[@]} -eq 0 ]; then
 else
     echo "[install-packages][packages] installing: ${install_needed[*]}"
 
-    # root가 아닌 경우 sudo 사용
-    sudo_cmd=""
+    run_as_root=()
     if [ "$(id -u)" -ne 0 ]; then
         if command -v sudo &>/dev/null; then
-            sudo_cmd="sudo"
+            run_as_root=(sudo)
         else
             echo "[install-packages][error] not running as root and sudo is not available"
             echo "[install-packages][manual] install manually: ${install_needed[*]}"
@@ -43,19 +79,9 @@ else
         fi
     fi
 
-    # 배포판별 패키지 매니저 자동 감지 (apt-get, dnf, yum)
-    if command -v apt-get &>/dev/null; then
-        $sudo_cmd apt-get update -qq
-        $sudo_cmd apt-get install -y -qq "${install_needed[@]}"
-    elif command -v dnf &>/dev/null; then
-        $sudo_cmd dnf install -y -q "${install_needed[@]}"
-    elif command -v yum &>/dev/null; then
-        $sudo_cmd yum install -y -q "${install_needed[@]}"
-    else
-        echo "[install-packages][error] no supported package manager found (apt-get, dnf, yum)"
-        echo "[install-packages][manual] install manually: ${install_needed[*]}"
-        exit 1
-    fi
+    "${run_as_root[@]}" apt-get update -qq
+    "${run_as_root[@]}" env DEBIAN_FRONTEND=noninteractive \
+        apt-get install -y -qq "${install_needed[@]}"
 fi
 
 # bat → batcat 심볼릭 링크 (Debian/Ubuntu에서 bat 패키지는 batcat으로 설치됨)
@@ -65,11 +91,8 @@ if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
     echo "[install-packages][bat] created symlink: bat -> batcat"
 fi
 
-# Ghostty
-# - GPU 가속 터미널 에뮬레이터 (표준 저장소 미포함, 수동 설치 필요)
-if ! command -v ghostty &>/dev/null; then
-    echo "[install-packages][ghostty] manual installation required"
-    echo "[install-packages][ghostty] https://ghostty.org/docs/install/linux"
+if [ "$is_codespaces" = true ]; then
+    echo "[install-packages][codespaces] system settings and desktop apps are intentionally excluded"
 fi
 
 echo "[install-packages][done]"

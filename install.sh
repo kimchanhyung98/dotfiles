@@ -39,6 +39,23 @@ if [[ "$OS" != "Darwin" && "$OS" != "Linux" ]]; then
     exit 1
 fi
 
+if [[ "$OS" == "Linux" ]]; then
+    if [[ ! -r /etc/os-release ]]; then
+        echo_error "Cannot identify the Linux distribution."
+        exit 1
+    fi
+    # shellcheck disable=SC1091
+    . /etc/os-release
+    if [[ "${ID:-}" != "ubuntu" ]]; then
+        echo_error "Linux support requires Ubuntu."
+        exit 1
+    fi
+    if [[ "${CODESPACES:-false}" != "true" && "${VERSION_ID:-}" != "26.04" ]]; then
+        echo_error "Native Linux support requires Ubuntu 26.04 LTS."
+        exit 1
+    fi
+fi
+
 echo_info "Detected OS: $OS"
 
 echo_info "Starting dotfiles installation..."
