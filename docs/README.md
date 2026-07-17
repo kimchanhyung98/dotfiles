@@ -35,6 +35,7 @@
 | Linux 패키지 | `home/.chezmoiscripts/linux/run_once_before_01-install-packages.sh.tmpl` |
 | 선택된 mattpocock 스킬과 ref | `home/dot_local/bin/executable_mattpocock-skills-sync` |
 | 프로젝트 clone | `home/dot_local/bin/executable_projects-bootstrap` |
+| Doppler `.env` 동기화 | `executable_projects-doppler-sync` |
 | 테스트 범위 | `tests/`, `Makefile` |
 
 문서와 구현이 다르면 위 기준 파일을 먼저 확인하고 같은 변경에서 문서를 갱신한다.

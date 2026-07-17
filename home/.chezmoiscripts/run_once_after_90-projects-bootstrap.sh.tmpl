@@ -1,9 +1,10 @@
 #!/bin/bash
-# Bootstrap public GitHub repositories on the first chezmoi apply.
+# Bootstrap public GitHub repositories and matching Doppler local environments.
 
 set -u
 
 projects_bootstrap="$HOME/.local/bin/projects-bootstrap"
+projects_doppler_sync="$HOME/.local/bin/projects-doppler-sync"
 github_name={{ .name | quote }}
 
 if [ ! -x "$projects_bootstrap" ]; then
@@ -13,4 +14,14 @@ fi
 
 if ! "$projects_bootstrap" "$github_name"; then
     echo "[projects-bootstrap-once][warning] retry manually: projects-bootstrap '$github_name'" >&2
+    exit 0
+fi
+
+if [ ! -x "$projects_doppler_sync" ]; then
+    echo "[projects-bootstrap-once][error] helper missing or not executable: $projects_doppler_sync" >&2
+    exit 0
+fi
+
+if ! "$projects_doppler_sync"; then
+    echo "[projects-bootstrap-once][warning] retry manually: projects-doppler-sync" >&2
 fi

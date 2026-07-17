@@ -91,6 +91,7 @@ dotfiles/
         ├── executable_dotfiles-doctor
         ├── executable_dotfiles-update
         ├── executable_mattpocock-skills-sync
+        ├── executable_projects-doppler-sync
         └── executable_projects-bootstrap
 ```
 

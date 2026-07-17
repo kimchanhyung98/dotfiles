@@ -92,6 +92,30 @@ if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
     echo "[install-packages][bat] created symlink: bat -> batcat"
 fi
 
+# Doppler CLI (GitHub project bootstrap 후 local config 동기화에 필요)
+export PATH="$HOME/.local/bin:$PATH"
+if ! command -v doppler &>/dev/null; then
+    echo "[install-packages][doppler] installing"
+    mkdir -p "$HOME/.local/bin"
+    installer="$(mktemp)"
+    if ! curl -fsSL --tlsv1.2 --proto '=https' --retry 3 \
+        https://cli.doppler.com/install.sh -o "$installer"; then
+        rm -f "$installer"
+        echo "[install-packages][error] Doppler CLI download failed" >&2
+        exit 1
+    fi
+    if ! sh "$installer" --install-path "$HOME/.local/bin"; then
+        rm -f "$installer"
+        echo "[install-packages][error] Doppler CLI installation failed" >&2
+        exit 1
+    fi
+    rm -f "$installer"
+fi
+if ! command -v doppler &>/dev/null; then
+    echo "[install-packages][error] doppler command not found after installation" >&2
+    exit 1
+fi
+
 if [ "$is_codespaces" = true ]; then
     echo "[install-packages][codespaces] system settings and desktop apps are intentionally excluded"
 fi

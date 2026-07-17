@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+# Create missing .env files from matching Doppler local configs.
+
+set -euo pipefail
+
+readonly PROJECTS_ROOT="${PROJECTS_ROOT:-$HOME/Documents/GitHub}"
+readonly DOPPLER_CONFIG="local"
+
+if [ "$#" -ne 0 ]; then
+    echo "usage: projects-doppler-sync" >&2
+    exit 2
+fi
+if [ ! -d "$PROJECTS_ROOT" ]; then
+    echo "[projects-doppler-sync] projects directory not found; skipping"
+    exit 0
+fi
+
+project_dirs=()
+preserved=0
+shopt -s dotglob nullglob
+for project_dir in "$PROJECTS_ROOT"/*; do
+    [ -d "$project_dir" ] || continue
+    if [ ! -d "$project_dir/.git" ] && [ ! -f "$project_dir/.git" ]; then
+        continue
+    fi
+    if [ -e "$project_dir/.env" ] || [ -L "$project_dir/.env" ]; then
+        preserved=$((preserved + 1))
+        continue
+    fi
+    project_dirs+=("$project_dir")
+done
+
+if [ "${#project_dirs[@]}" -eq 0 ]; then
+    echo "[projects-doppler-sync] complete (created: 0, preserved: $preserved, unmatched: 0)"
+    exit 0
+fi
+
+export PATH="$HOME/.local/bin:$PATH"
+if ! command -v doppler >/dev/null 2>&1; then
+    echo "[projects-doppler-sync][error] doppler not found" >&2
+    exit 1
+fi
+
+if ! doppler --no-read-env --no-check-version --silent me >/dev/null 2>&1; then
+    if [ ! -t 0 ]; then
+        echo "[projects-doppler-sync][error] interactive terminal required for doppler login" >&2
+        exit 1
+    fi
+    echo "[projects-doppler-sync] Doppler login required"
+    if ! doppler --no-read-env --no-check-version login; then
+        echo "[projects-doppler-sync][error] doppler login failed" >&2
+        exit 1
+    fi
+    if ! doppler --no-read-env --no-check-version --silent me >/dev/null 2>&1; then
+        echo "[projects-doppler-sync][error] doppler login could not be verified" >&2
+        exit 1
+    fi
+fi
+
+created=0
+unmatched=0
+tmp_file=""
+umask 077
+trap 'if [ -n "$tmp_file" ]; then rm -f "$tmp_file"; fi' EXIT
+
+for project_dir in "${project_dirs[@]}"; do
+    project_name="${project_dir##*/}"
+    env_file="$project_dir/.env"
+    tmp_file="$(mktemp "$project_dir/.env.tmp.XXXXXX")"
+
+    if doppler --no-read-env --no-check-version --silent \
+        secrets download \
+        --project "$project_name" \
+        --config "$DOPPLER_CONFIG" \
+        --no-file \
+        --no-fallback \
+        --format env >"$tmp_file" 2>/dev/null \
+        && [ -s "$tmp_file" ]; then
+        chmod 600 "$tmp_file"
+        mv "$tmp_file" "$env_file"
+        tmp_file=""
+        created=$((created + 1))
+        echo "[projects-doppler-sync] created: $project_name/.env"
+    else
+        rm -f "$tmp_file"
+        tmp_file=""
+        unmatched=$((unmatched + 1))
+    fi
+done
+
+trap - EXIT
+echo "[projects-doppler-sync] complete (created: $created, preserved: $preserved, unmatched: $unmatched)"
