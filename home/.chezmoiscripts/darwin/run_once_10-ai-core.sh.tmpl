@@ -10,36 +10,59 @@ set -eufo pipefail
 
 echo "[ai-core][start]"
 
-if ! command -v npm &>/dev/null; then
-    echo "[ai-core][error] npm not found. Ensure Node.js was installed via Brewfile."
-    exit 1
-fi
+export PATH="$HOME/.local/bin:$HOME/.claude/local/bin:$PATH"
 
 # Claude Code
 if ! command -v claude &>/dev/null; then
     echo "[ai-core][claude] installing"
     installer=$(mktemp)
-    if curl -fsSL https://claude.ai/install.sh -o "$installer"; then
-        bash "$installer" || echo "[ai-core][warning] Claude Code installation failed"
-    else
-        echo "[ai-core][warning] Claude Code download failed"
+    if ! curl -fsSL https://claude.ai/install.sh -o "$installer"; then
+        rm -f "$installer"
+        echo "[ai-core][error] Claude Code download failed" >&2
+        exit 1
+    fi
+    if ! bash "$installer"; then
+        rm -f "$installer"
+        echo "[ai-core][error] Claude Code installation failed" >&2
+        exit 1
     fi
     rm -f "$installer"
 else
     echo "[ai-core][claude] already installed ($(claude --version 2>/dev/null || echo 'unknown'))"
 fi
+if ! command -v claude &>/dev/null; then
+    echo "[ai-core][error] claude command not found after installation" >&2
+    exit 1
+fi
 
 # Codex CLI
 if ! command -v codex &>/dev/null; then
     echo "[ai-core][codex] installing"
-    npm install -g @openai/codex || echo "[ai-core][warning] Codex CLI installation failed"
+    installer=$(mktemp)
+    if ! curl -fsSL https://chatgpt.com/codex/install.sh -o "$installer"; then
+        rm -f "$installer"
+        echo "[ai-core][error] Codex CLI download failed" >&2
+        exit 1
+    fi
+    if ! sh "$installer"; then
+        rm -f "$installer"
+        echo "[ai-core][error] Codex CLI installation failed" >&2
+        exit 1
+    fi
+    rm -f "$installer"
 else
     echo "[ai-core][codex] already installed ($(codex --version 2>/dev/null || echo 'unknown'))"
+fi
+if ! command -v codex &>/dev/null; then
+    echo "[ai-core][error] codex command not found after installation" >&2
+    exit 1
 fi
 
 # CodeGraph
 # - Claude Code / Codex 공통 코드 인텔리전스 MCP 서버
-if ! command -v codegraph &>/dev/null; then
+if ! command -v npm &>/dev/null; then
+    echo "[ai-core][warning] npm not found; skipping optional CodeGraph installation"
+elif ! command -v codegraph &>/dev/null; then
     echo "[ai-core][codegraph] installing"
     NPM_CACHE_DIR="${TMPDIR:-/tmp}/dotfiles-npm-cache"
     mkdir -p "$NPM_CACHE_DIR"

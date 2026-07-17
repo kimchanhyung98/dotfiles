@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# AI Tools and extensions (Linux): claude, codex, codegraph, antigravity, hermes, oh-my-codex
+# AI Tools and extensions (Linux): required claude/codex, optional integrations
 # Runs once on first setup
 
 {{ if ne .chezmoi.os "linux" }}
@@ -11,39 +11,61 @@ set -eufo pipefail
 
 echo "[ai-tools][start]"
 
-# npm 사전 확인
-if ! command -v npm &>/dev/null; then
-    echo "[ai-tools][error] npm not found. Install Node.js first."
-    exit 1
-fi
+export PATH="$HOME/.local/bin:$HOME/.claude/local/bin:$PATH"
 
 # Claude Code
 # - Anthropic Claude 터미널 AI 코딩 도우미
 if ! command -v claude &>/dev/null; then
     echo "[ai-tools][claude] installing"
     installer=$(mktemp)
-    if curl -fsSL https://claude.ai/install.sh -o "$installer"; then
-        bash "$installer" || echo "[ai-tools][warning] Claude Code installation failed"
-    else
-        echo "[ai-tools][warning] Claude Code download failed"
+    if ! curl -fsSL https://claude.ai/install.sh -o "$installer"; then
+        rm -f "$installer"
+        echo "[ai-tools][error] Claude Code download failed" >&2
+        exit 1
+    fi
+    if ! bash "$installer"; then
+        rm -f "$installer"
+        echo "[ai-tools][error] Claude Code installation failed" >&2
+        exit 1
     fi
     rm -f "$installer"
 else
     echo "[ai-tools][claude] already installed ($(claude --version 2>/dev/null || echo 'unknown'))"
+fi
+if ! command -v claude &>/dev/null; then
+    echo "[ai-tools][error] claude command not found after installation" >&2
+    exit 1
 fi
 
 # Codex CLI
 # - OpenAI Codex 터미널 AI 코딩 도우미
 if ! command -v codex &>/dev/null; then
     echo "[ai-tools][codex] installing"
-    npm install -g @openai/codex || echo "[ai-tools][warning] Codex install failed"
+    installer=$(mktemp)
+    if ! curl -fsSL https://chatgpt.com/codex/install.sh -o "$installer"; then
+        rm -f "$installer"
+        echo "[ai-tools][error] Codex download failed" >&2
+        exit 1
+    fi
+    if ! sh "$installer"; then
+        rm -f "$installer"
+        echo "[ai-tools][error] Codex installation failed" >&2
+        exit 1
+    fi
+    rm -f "$installer"
 else
     echo "[ai-tools][codex] already installed"
+fi
+if ! command -v codex &>/dev/null; then
+    echo "[ai-tools][error] codex command not found after installation" >&2
+    exit 1
 fi
 
 # CodeGraph
 # - Claude Code / Codex 공통 코드 인텔리전스 MCP 서버
-if ! command -v codegraph &>/dev/null; then
+if ! command -v npm &>/dev/null; then
+    echo "[ai-tools][warning] npm not found; skipping optional CodeGraph installation"
+elif ! command -v codegraph &>/dev/null; then
     echo "[ai-tools][codegraph] installing"
     NPM_CACHE_DIR="${TMPDIR:-/tmp}/dotfiles-npm-cache"
     mkdir -p "$NPM_CACHE_DIR"
@@ -70,7 +92,9 @@ fi
 
 # oh-my-codex
 # - Codex CLI 확장 프레임워크
-if ! command -v omx &>/dev/null; then
+if ! command -v npm &>/dev/null; then
+    echo "[ai-tools][warning] npm not found; skipping optional oh-my-codex installation"
+elif ! command -v omx &>/dev/null; then
     echo "[ai-tools][oh-my-codex] installing"
     npm install -g oh-my-codex || echo "[ai-tools][warning] oh-my-codex install failed"
 else

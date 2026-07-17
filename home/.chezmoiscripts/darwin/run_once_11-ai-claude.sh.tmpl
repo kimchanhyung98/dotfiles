@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# AI Claude: SuperClaude
+# AI Claude integrations
 
 {{ if ne .chezmoi.os "darwin" }}
 exit 0
@@ -9,19 +9,6 @@ exit 0
 set -eufo pipefail
 
 echo "[ai-claude][start]"
-
-# SuperClaude
-# - Claude Code 확장 프레임워크 (페르소나, 명령어, 플래그 시스템)
-if ! command -v superclaude &>/dev/null; then
-    echo "[ai-claude][superclaude] installing"
-    if pipx install superclaude; then
-        SuperClaude install --force --yes || echo "[ai-claude][warning] SuperClaude post-install setup failed"
-    else
-        echo "[ai-claude][warning] SuperClaude installation failed (requires pipx)"
-    fi
-else
-    echo "[ai-claude][superclaude] already installed"
-fi
 
 # CodeGraph MCP
 # - Claude Code용 로컬 코드 인텔리전스 서버

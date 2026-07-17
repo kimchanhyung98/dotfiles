@@ -26,6 +26,17 @@ check() {
     fi
 }
 
+check_optional() {
+    local label="$1"
+    local cmd="$2"
+    if eval "$cmd" &>/dev/null; then
+        echo -e "  ${GREEN}✓${NC} $label"
+        pass=$((pass + 1))
+    else
+        echo -e "  ${YELLOW}○${NC} $label (optional)"
+    fi
+}
+
 check_version() {
     local label="$1"
     local cmd="$2"
@@ -101,18 +112,18 @@ check "bun" "command -v bun"
 section "AI CLI"
 check "claude" "command -v claude"
 check "codex" "command -v codex"
-check "codegraph" "command -v codegraph"
-check "ollama" "command -v ollama"
-check "antigravity (agy)" "command -v agy"
-check "hermes" "command -v hermes"
+check_optional "codegraph" "command -v codegraph"
+check_optional "ollama" "command -v ollama"
+check_optional "antigravity (agy)" "command -v agy"
+check_optional "hermes" "command -v hermes"
 
 # AI Extensions
 section "AI Extensions"
 CLAUDE_SETTINGS="$HOME/.claude/settings.json"
-check "Claude enabledPlugins config" "[ -f \"$CLAUDE_SETTINGS\" ] && grep -q '\"enabledPlugins\"' \"$CLAUDE_SETTINGS\""
-check "Claude Codex plugin config" "[ -f \"$CLAUDE_SETTINGS\" ] && grep -q '\"codex@openai-codex\": true' \"$CLAUDE_SETTINGS\" && grep -q '\"openai-codex\"' \"$CLAUDE_SETTINGS\""
-check "Claude remember plugin config" "[ -f \"$CLAUDE_SETTINGS\" ] && grep -q '\"remember@claude-plugins-official\": true' \"$CLAUDE_SETTINGS\""
-check "oh-my-codex" "command -v omx"
+check_optional "Claude enabledPlugins config" "[ -f \"$CLAUDE_SETTINGS\" ] && grep -q '\"enabledPlugins\"' \"$CLAUDE_SETTINGS\""
+check_optional "Claude Codex plugin config" "[ -f \"$CLAUDE_SETTINGS\" ] && grep -q '\"codex@openai-codex\": true' \"$CLAUDE_SETTINGS\" && grep -q '\"openai-codex\"' \"$CLAUDE_SETTINGS\""
+check_optional "Claude remember plugin config" "[ -f \"$CLAUDE_SETTINGS\" ] && grep -q '\"remember@claude-plugins-official\": true' \"$CLAUDE_SETTINGS\""
+check_optional "oh-my-codex" "command -v omx"
 
 # Skill Directories (단일 출처 ~/.skills + 도구별 symlink)
 section "Skill Directories"
@@ -139,7 +150,7 @@ check_path "codex" "$HOME/.codex/config.toml"
 
 # MCP
 section "MCP"
-check_path "~/.claude.json" "$HOME/.claude.json"
+check_optional ".claude.json" "[ -f '$HOME/.claude.json' ]"
 
 # Summary
 echo ""
