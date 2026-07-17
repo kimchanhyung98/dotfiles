@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+# Clone missing public repositories for one GitHub user without authentication.
+
+set -euo pipefail
+
+readonly GITHUB_API_BASE="${GITHUB_API_BASE:-https://api.github.com}"
+readonly MAX_REPOSITORIES=100
+readonly PROJECTS_ROOT="${PROJECTS_ROOT:-$HOME/Documents/GitHub}"
+readonly USER_AGENT="dotfiles-projects-bootstrap"
+
+dry_run=false
+if [ "${1:-}" = "--dry-run" ]; then
+    dry_run=true
+    shift
+fi
+if [ "$#" -ne 1 ]; then
+    echo "usage: projects-bootstrap [--dry-run] <github-name>" >&2
+    exit 2
+fi
+readonly github_name="$1"
+
+for command in curl git jq; do
+    if ! command -v "$command" >/dev/null 2>&1; then
+        echo "[projects-bootstrap][error] $command not found" >&2
+        exit 1
+    fi
+done
+
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+profile_json="$tmp/profile.json"
+repositories_json="$tmp/repositories.json"
+clone_errors="$tmp/clone-errors.log"
+: >"$clone_errors"
+
+api_get() {
+    local url="$1"
+    local output="$2"
+    curl --silent --show-error --location \
+        --connect-timeout 10 \
+        --max-time 30 \
+        --header "Accept: application/vnd.github+json" \
+        --header "User-Agent: $USER_AGENT" \
+        --output "$output" \
+        --write-out '%{http_code}' \
+        "$url"
+}
+
+encoded_name="$(jq -rn --arg value "$github_name" '$value | @uri')"
+if ! profile_status="$(api_get "$GITHUB_API_BASE/users/$encoded_name" "$profile_json")"; then
+    echo "[projects-bootstrap][error] failed to query GitHub user: $github_name" >&2
+    exit 1
+fi
+if [ "$profile_status" = "404" ]; then
+    echo "[projects-bootstrap][error] GitHub user not found: $github_name" >&2
+    exit 1
+fi
+if [ "$profile_status" != "200" ] || ! jq -e 'type == "object"' "$profile_json" >/dev/null; then
+    echo "[projects-bootstrap][error] GitHub user lookup failed (HTTP $profile_status)" >&2
+    exit 1
+fi
+if [ "$(jq -r '.type // empty' "$profile_json")" != "User" ]; then
+    echo "[projects-bootstrap][error] GitHub organizations are not supported: $github_name" >&2
+    exit 1
+fi
+canonical_name="$(jq -r '.login // empty' "$profile_json")"
+if [ -z "$canonical_name" ]; then
+    echo "[projects-bootstrap][error] GitHub user response is missing a login" >&2
+    exit 1
+fi
+
+repositories_url="$GITHUB_API_BASE/users/$encoded_name/repos?type=owner&sort=full_name&direction=asc&per_page=$MAX_REPOSITORIES"
+if ! repositories_status="$(api_get "$repositories_url" "$repositories_json")"; then
+    echo "[projects-bootstrap][error] failed to query public repositories for $canonical_name" >&2
+    exit 1
+fi
+if [ "$repositories_status" != "200" ] || ! jq -e 'type == "array"' "$repositories_json" >/dev/null; then
+    echo "[projects-bootstrap][error] repository lookup failed (HTTP $repositories_status)" >&2
+    exit 1
+fi
+
+repositories="$(jq -r '
+    .[]
+    | select(.archived == false and .private == false and .owner.type == "User")
+    | [.name, .clone_url]
+    | @tsv
+' "$repositories_json")"
+
+if [ -z "$repositories" ]; then
+    echo "[projects-bootstrap] no active public repositories found for $canonical_name"
+    exit 0
+fi
+
+if [ "$dry_run" = false ]; then
+    mkdir -p "$PROJECTS_ROOT"
+fi
+
+clone_attempts=0
+clone_successes=0
+while IFS=$'\t' read -r name clone_url; do
+    [ -n "$name" ] && [ -n "$clone_url" ] || continue
+    destination="$PROJECTS_ROOT/$name"
+
+    if [ -d "$destination/.git" ] || [ -f "$destination/.git" ]; then
+        echo "[projects-bootstrap] keeping existing repository: $name"
+        continue
+    fi
+
+    clone_attempts=$((clone_attempts + 1))
+    if [ -e "$destination" ]; then
+        printf '%s\n' "destination exists but is not a Git repository: $destination" >>"$clone_errors"
+        continue
+    fi
+
+    if [ "$dry_run" = true ]; then
+        echo "[projects-bootstrap][dry-run] clone $canonical_name/$name -> $destination"
+        clone_successes=$((clone_successes + 1))
+        continue
+    fi
+
+    echo "[projects-bootstrap] cloning $canonical_name/$name"
+    repository_error="$tmp/$name.log"
+    if git clone --quiet "$clone_url" "$destination" 2>"$repository_error"; then
+        clone_successes=$((clone_successes + 1))
+    else
+        printf '%s\n' "clone failed: $canonical_name/$name" >>"$clone_errors"
+        sed 's/^/  /' "$repository_error" >>"$clone_errors"
+    fi
+done <<<"$repositories"
+
+if [ "$clone_attempts" -gt 0 ] && [ "$clone_successes" -eq 0 ]; then
+    cat "$clone_errors" >&2
+    echo "[projects-bootstrap][error] all repository clones failed" >&2
+    exit 1
+fi
+
+echo "[projects-bootstrap] complete"

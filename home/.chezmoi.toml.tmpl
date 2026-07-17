@@ -44,9 +44,9 @@
 {{- $deviceName := "" -}}
 
 {{/* 이름/이메일/기기명 입력 프롬프트 (최초 1회) */}}
-{{- $name = promptStringOnce . "name" "Full name" | trim -}}
+{{- $name = promptStringOnce . "name" "Name (GitHub username and Git author)" | trim -}}
 {{- if eq $name "" -}}
-{{-   fail "Full name is required" -}}
+{{-   fail "Name is required" -}}
 {{- end -}}
 {{- $email = promptStringOnce . "email" "Email address" | trim -}}
 {{- if eq $email "" -}}

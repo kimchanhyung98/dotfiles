@@ -71,7 +71,7 @@ fi
 
 # dotfiles 초기화 및 적용
 echo_info "Applying dotfiles with chezmoi..."
-echo_info "Name, email, and device name are required."
+echo_info "Name (GitHub username and Git author), email, and device name are required."
 chezmoi init --apply kimchanhyung98 <&3
 exec 3>&-
 

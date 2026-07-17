@@ -18,6 +18,7 @@ dotfiles/
     ├── .chezmoiscripts/
     │   ├── run_once_before_00-skills-ssot-migrate.sh.tmpl   # OS 공통: legacy 스킬 디렉토리 삭제 후 symlink 전환
     │   ├── run_onchange_after_06-mattpocock-skills.sh.tmpl  # OS 공통: mattpocock 스킬 런타임 동기화
+    │   ├── run_once_after_90-projects-bootstrap.sh.tmpl     # OS 공통: 최초 적용 시 공개 GitHub 저장소 clone
     │   │
     │   ├── darwin/
     │   │   ├── run_once_before_01-prerequisites.sh.tmpl
@@ -89,7 +90,8 @@ dotfiles/
     └── dot_local/bin/
         ├── executable_dotfiles-doctor
         ├── executable_dotfiles-update
-        └── executable_mattpocock-skills-sync
+        ├── executable_mattpocock-skills-sync
+        └── executable_projects-bootstrap
 ```
 
 ## 배포 매핑
