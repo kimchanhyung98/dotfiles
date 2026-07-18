@@ -3,7 +3,7 @@
   "respectGitignore": true,
   "cleanupPeriodDays": 28,
   "attribution": {
-    "commit": "Co-Authored-By: Claude <noreply@anthropic.com>",
+    "commit": "",
     "pr": ""
   },
   "permissions": {
@@ -34,6 +34,50 @@
     ],
     "defaultMode": "bypassPermissions"
   },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.hooks/block_git_origin_push.sh\"",
+            "timeout": 10,
+            "statusMessage": "Checking git push origin"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.hooks/block_global_system_commands.sh\"",
+            "timeout": 10,
+            "statusMessage": "Checking global/system command"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.hooks/block_global_package_install.sh\"",
+            "timeout": 10,
+            "statusMessage": "Checking global package install"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.hooks/block_pipe_to_shell.sh\"",
+            "timeout": 10,
+            "statusMessage": "Checking pipe-to-shell"
+          }
+        ]
+      },
+      {
+        "matcher": "^(Edit|MultiEdit|Write|apply_patch)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.hooks/block_dependency_folder_edits.sh\"",
+            "timeout": 10,
+            "statusMessage": "Checking dependency folder edit"
+          }
+        ]
+      }
+    ]
+  },
   "enabledPlugins": {
     "agent-sdk-dev@claude-plugins-official": false,
     "clangd-lsp@claude-plugins-official": false,
@@ -53,15 +97,11 @@
     "github@claude-plugins-official": false,
     "gitlab@claude-plugins-official": false,
     "gopls-lsp@claude-plugins-official": false,
-    "greptile@claude-plugins-official": false,
     "hookify@claude-plugins-official": true,
-    "huggingface-skills@claude-plugins-official": false,
-    "jdtls-lsp@claude-plugins-official": false,
     "kotlin-lsp@claude-plugins-official": false,
     "laravel-boost@claude-plugins-official": false,
     "learning-output-style@claude-plugins-official": false,
     "linear@claude-plugins-official": false,
-    "lua-lsp@claude-plugins-official": false,
     "php-lsp@claude-plugins-official": false,
     "playground@claude-plugins-official": false,
     "playwright@claude-plugins-official": true,
@@ -75,7 +115,6 @@
     "serena@claude-plugins-official": false,
     "skill-creator@claude-plugins-official": false,
     "supabase@claude-plugins-official": false,
-    "swift-lsp@claude-plugins-official": false,
     "typescript-lsp@claude-plugins-official": false,
     "vercel@claude-plugins-official": true
   },
@@ -90,10 +129,10 @@
   "language": "korean",
   "spinnerTipsEnabled": false,
   "alwaysThinkingEnabled": true,
-  "model": "fable",
+  "model": "opus",
   "effortLevel": "xhigh",
   "companyAnnouncements": [
-    "\nWelcome!\nRun 'make init' on first launch."
+    "\nWelcome to dotfiles!\nRun 'make init' on first launch."
   ],
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true

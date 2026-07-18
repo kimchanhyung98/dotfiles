@@ -1,274 +1,451 @@
 #:schema https://developers.openai.com/codex/config-schema.json
-# Codex 구성(config.toml)
+
+# Recommended variant derived from config2.toml for codex-cli 0.144.0.
+
+# Codex example configuration (config.toml)
 #
-# 이 파일은 Codex가 config.toml에서 읽는 주요 키와 기본 동작, 권장 예시, 간단한 설명을 정리합니다. 필요에 맞게 조정하세요.
+# This file lists the main keys Codex reads from config.toml, along with default
+# behaviors, recommended examples, and concise explanations. Adjust as needed.
 #
-# 참고
-# - TOML에서는 루트 키를 테이블보다 앞에 두어야 합니다.
-# - 기본값이 "unset"인 선택 키는 설명과 함께 주석 처리해 두었습니다.
-# - MCP 서버, 프로필 파일, 모델 provider는 예시입니다. 필요 없으면 제거하거나 수정하세요.
+# Notes
+# - Root keys must appear before tables in TOML.
+# - Optional keys that default to "unset" are shown commented out with notes.
+# - MCP servers, profile files, and model providers are examples; remove or edit.
 
 ################################################################################
-# 핵심 모델 선택
+
+# Core Model Selection
+
 ################################################################################
-# Codex가 사용할 기본 모델입니다. 대부분의 사용자에게 권장하는 예시는 "gpt-5.6"입니다.
+
+# Primary model used by Codex. Recommended example for most users: "gpt-5.6".
+
 model = "gpt-5.6-sol"
-# 지원 모델의 커뮤니케이션 스타일입니다. 허용값: none | friendly | pragmatic
-#personality = "pragmatic"
-# /review에서 사용할 선택적 모델 override입니다. 기본값: unset(현재 세션 모델 사용).
-#review_model = "gpt-5.6"
-# [model_providers]에서 선택할 provider id입니다. 기본값: "openai".
-#model_provider = "openai"
-# --oss 세션의 기본 OSS provider입니다. 설정하지 않으면 Codex가 물어봅니다. 기본값: unset.
-#oss_provider = "ollama"
-# 선호 service tier입니다. 기본 제공 예시: fast | flex; 모델 카탈로그가 값을 더 추가할 수 있습니다.
-#service_tier = "flex"
-# 선택적 수동 모델 메타데이터입니다. 설정하지 않으면 Codex가 모델 또는 preset 기본값을 사용합니다.
-#model_context_window = 128000 # 토큰 수; 기본값: 모델 자동값
-#model_auto_compact_token_limit = 64000 # 토큰 수; 설정하지 않으면 모델 기본값 사용
-#tool_output_token_limit = 12000 # 히스토리에 저장할 도구 출력별 토큰 수
-#model_catalog_json = "/absolute/path/to/models.json" # 선택적 시작 시점 전용 모델 카탈로그 override
-#background_terminal_max_timeout = 300000 # ms; 빈 write_stdin polling의 최대 대기 시간(기본 5분)
-#log_dir = "/absolute/path/to/codex-logs" # 로그 디렉터리; 명시하면 해당 위치에 codex-tui.log도 생성됩니다. 기본값: "$CODEX_HOME/log"
-#sqlite_home = "/absolute/path/to/codex-state" # 선택적 SQLite 기반 런타임 상태 디렉터리
+
+# Communication style for supported models. Allowed values: none | friendly | pragmatic
+
+# personality = "pragmatic"
+
+# Optional model override for /review. Default: unset (uses current session model).
+
+# review_model = "gpt-5.6"
+
+# Provider id selected from [model_providers]. Default: "openai".
+
+# model_provider = "openai"
+
+# Default OSS provider for --oss sessions. When unset, Codex prompts. Default: unset.
+
+# oss_provider = "ollama"
+
+# Preferred service tier. Built-in examples: fast | flex; model catalogs can add more.
+
+# service_tier = "flex"
+
+# Optional manual model metadata. When unset, Codex uses model or preset defaults.
+
+# model_context_window = 128000 # tokens; default: auto for model
+
+# model_auto_compact_token_limit = 64000 # tokens; unset uses model defaults
+
+# model_auto_compact_token_limit_scope = "total" # total | body_after_prefix; default: total
+
+# tool_output_token_limit = 12000 # tokens stored per tool output
+
+# model_catalog_json = "/absolute/path/to/models.json" # optional startup-only model catalog override
+
+# background_terminal_max_timeout = 300000 # ms; max empty write_stdin poll window (default 5m)
+
+# log_dir = "/absolute/path/to/codex-logs" # log directory; setting explicitly enables codex-tui.log; default: "$CODEX_HOME/log"
+
+# sqlite_home = "/absolute/path/to/codex-state" # optional SQLite-backed runtime state directory
 
 ################################################################################
-# 추론 및 응답 상세도
+
+# Reasoning & Verbosity (Responses API capable models)
+
 ################################################################################
-# 추론 강도: minimal | low | medium | high | xhigh | max | ultra (모델별 지원 범위가 다름)
+
+# Reasoning effort: minimal | low | medium | high | xhigh | max | ultra (model-dependent)
+
 model_reasoning_effort = "xhigh"
-# Codex가 plan mode로 실행될 때의 선택적 override입니다: none | minimal | low | medium | high | xhigh | max | ultra
+
+# Optional plan-mode override: none | minimal | low | medium | high | xhigh | max | ultra (model-dependent)
+
 plan_mode_reasoning_effort = "ultra"
-# reasoning summary 설정: auto | concise | detailed | none
+
+# Reasoning summary: auto | concise | detailed | none
+
 model_reasoning_summary = "auto"
-# GPT-5 계열(Responses API)의 텍스트 상세도: low | medium | high
-#model_verbosity = "medium"
-# 현재 모델의 reasoning summary 지원 여부를 강제로 켜거나 끕니다.
-#model_supports_reasoning_summaries = true
+
+# Text verbosity for GPT-5 family (Responses API): low | medium | high
+
+# model_verbosity = "medium"
+
+# Force enable or disable reasoning summaries for current model.
+
+# model_supports_reasoning_summaries = true
 
 ################################################################################
-# 지침 Override
-################################################################################
-# AGENTS.md 앞에 추가로 주입되는 개발자 지침입니다. 기본값: unset.
-# 기본 지시사항 (andrej-karpathy-skills 4원칙)
-developer_instructions = """
-Think Before Coding: Understand the full context before writing code.
-Simplicity First: Choose the simplest solution and avoid unnecessary complexity.
-Surgical Changes: Minimize change scope and don't modify unrelated code.
-Goal-Driven Execution: Focus on the user's goal and prevent unnecessary expansion.
-"""
-# 히스토리 compaction prompt의 인라인 override입니다. 기본값: unset.
-#compact_prompt = ""
-# 기본 commit 공동 작성자 trailer를 바꿉니다. 이 설정은
-# [features].codex_git_commit이 켜져 있을 때만 적용됩니다. 켜져 있고 설정하지 않으면 Codex는
-# "Codex <noreply@openai.com>"를 사용합니다. 비활성화하려면 ""로 설정하세요.
-#commit_attribution = "Jane Doe <jane@example.com>"
-# 내장 기본 지침을 파일 경로로 대체합니다. 기본값: unset.
-#model_instructions_file = "/absolute/or/relative/path/to/instructions.txt"
-# compaction prompt override를 파일에서 불러옵니다. 기본값: unset.
-#experimental_compact_prompt_file = "/absolute/or/relative/path/to/compact_prompt.txt"
+
+# Instruction Overrides
 
 ################################################################################
-# 알림
-################################################################################
-# 외부 알림 프로그램(argv 배열)입니다. 설정하지 않으면 비활성화됩니다.
-#notify = ["notify-send", "Codex"]
+
+# Additional user instructions are injected before AGENTS.md. Default: unset.
+
+# developer_instructions = ""
+
+# Inline override for the history compaction prompt. Default: unset.
+
+# compact_prompt = ""
+
+# Override built-in base instructions with a file path. Default: unset.
+
+# model_instructions_file = "/absolute/or/relative/path/to/instructions.txt"
+
+# Load the compact prompt override from a file. Default: unset.
+
+# experimental_compact_prompt_file = "/absolute/or/relative/path/to/compact_prompt.txt"
 
 ################################################################################
-# 승인 및 Sandbox
+
+# Notifications
+
 ################################################################################
-# 명령 실행 승인을 언제 요청할지 정합니다:
-# - untrusted: 알려진 안전한 읽기 전용 명령만 자동 실행하고, 나머지는 묻습니다.
-# - on-request: 모델이 승인 요청 시점을 판단합니다(기본값).
-# - never: 절대 묻지 않습니다(위험).
-# - { granular = { ... } }: 선택한 prompt category를 허용하거나 자동 거부합니다.
+
+# External notifier program (argv array). When unset: disabled.
+
+# notify = ["notify-send", "Codex"]
+
+################################################################################
+
+# Approval & Sandbox
+
+################################################################################
+
+# When to ask for command approval:
+
+# - untrusted: only known-safe read-only commands auto-run; others prompt
+
+# - on-request: model decides when to ask (default)
+
+# - never: never prompt (risky)
+
+# - { granular = { ... } }: allow or auto-reject selected prompt categories
+
 approval_policy = "never"
-# 승인 prompt를 검토할 주체입니다: user(기본값) | auto_review
-#approvals_reviewer = "user"
-# granular policy 예시:
-#approval_policy = { granular = { sandbox_approval = true, rules = true, mcp_elicitations = true, request_permissions = false, skill_approval = false } }
-# shell 기반 도구가 `login = true`를 요청할 때 login-shell semantics를 허용합니다.
-# 기본값: true. false로 설정하면 non-login shell을 강제하고 명시적 login-shell 요청을 거부합니다.
+
+# Who reviews eligible approval prompts: user (default) | auto_review
+
+# approvals_reviewer = "user"
+
+# Example granular policy:
+
+# approval_policy = { granular = {
+
+# sandbox_approval = true,
+
+# rules = true,
+
+# mcp_elicitations = true,
+
+# request_permissions = false,
+
+# skill_approval = false
+
+# } }
+
+# Allow login-shell semantics for shell-based tools when they request `login = true`.
+
+# Default: true. Set false to force non-login shells and reject explicit login-shell requests.
+
 allow_login_shell = false
-# 도구 호출의 파일시스템/네트워크 sandbox 정책입니다:
-# - read-only(기본값)
+
+# Filesystem/network sandbox policy for tool calls:
+
+# - read-only (default)
+
 # - workspace-write
-# - danger-full-access(sandbox 없음, 매우 위험)
-# default_permissions가 아래의 사용자 정의 workspace profile을 선택하므로 비활성화합니다.
-#sandbox_mode = "danger-full-access"
-# 기본으로 적용할 named permissions profile입니다. 내장값:
+
+# - danger-full-access (no sandbox; extremely risky)
+
+# Disabled because default_permissions selects the custom profile below.
+# sandbox_mode = "danger-full-access"
+
+# Named permissions profile to apply by default. Built-ins:
+
 # :read-only | :workspace | :danger-full-access
-# "workspace" 같은 사용자 정의 이름은 [permissions.workspace]를 함께 정의할 때만 사용하세요.
+
+# Use a custom name such as "workspace" only when you also define [permissions.workspace].
+
 default_permissions = "workspace"
 
 ################################################################################
-# 인증 및 로그인
+
+# Authentication & Login
+
 ################################################################################
-# CLI 로그인 자격 증명을 저장할 위치입니다: file(기본값) | keyring | auto
+
+# Where to persist CLI login credentials: file (default) | keyring | auto
+
 cli_auth_credentials_store = "file"
-# ChatGPT 인증 흐름의 Base URL입니다(OpenAI API가 아닙니다).
-#chatgpt_base_url = "https://chatgpt.com/backend-api/"
-# 내장 OpenAI provider의 선택적 Base URL override입니다.
-#openai_base_url = "https://us.api.openai.com/v1"
-# ChatGPT 로그인을 특정 workspace id로 제한합니다. 기본값: unset.
-#forced_chatgpt_workspace_id = "00000000-0000-0000-0000-000000000000"
-# Codex가 보통 자동 선택하는 로그인 방식을 강제합니다. 기본값: unset.
-# 허용값: chatgpt | api
-#forced_login_method = "chatgpt"
-# MCP OAuth 자격 증명의 선호 저장소입니다: auto(기본값) | file | keyring
+
+# Base URL for ChatGPT auth flow (not OpenAI API).
+
+# chatgpt_base_url = "https://chatgpt.com/backend-api/"
+
+# Optional base URL override for the built-in OpenAI provider.
+
+# openai_base_url = "https://us.api.openai.com/v1"
+
+# Restrict ChatGPT login to a specific workspace id. Default: unset.
+
+# forced_chatgpt_workspace_id = "00000000-0000-0000-0000-000000000000"
+
+# Force login mechanism when Codex would normally auto-select. Default: unset.
+
+# Allowed values: chatgpt | api
+
+# forced_login_method = "chatgpt"
+
+# Preferred store for MCP OAuth credentials: auto (default) | file | keyring
+
 mcp_oauth_credentials_store = "auto"
-# MCP OAuth callback의 선택적 고정 포트입니다: 1-65535. 기본값: unset.
-#mcp_oauth_callback_port = 4321
-# MCP OAuth login의 선택적 redirect URI override입니다(예: 원격 devbox ingress).
-# 사용자 지정 callback path를 지원합니다. `mcp_oauth_callback_port`는 여전히 listener port를 제어합니다.
-#mcp_oauth_callback_url = "https://devbox.example.internal/callback"
+
+# Optional fixed port for MCP OAuth callback: 1-65535. Default: unset.
+
+# mcp_oauth_callback_port = 4321
+
+# Optional redirect URI override for MCP OAuth login (for example, remote devbox ingress).
+
+# Codex appends a server-specific callback ID before OAuth login.
+
+# Register the full derived URI with your provider, not just the base host or unsuffixed path.
+
+# Custom callback paths are supported. `mcp_oauth_callback_port` still controls the listener port.
+
+# mcp_oauth_callback_url = "https://devbox.example.internal/callback"
 
 ################################################################################
-# 프로젝트 문서 제어
+
+# Project Documentation Controls
+
 ################################################################################
-# 첫 turn 지침에 포함할 AGENTS.md 최대 바이트 수입니다. 기본값: 32768
+
+# Max bytes from AGENTS.md to embed into first-turn instructions. Default: 32768
+
 project_doc_max_bytes = 32768
-# 디렉터리 단계에서 AGENTS.md가 없을 때 순서대로 시도할 fallback 파일명입니다. 기본값: []
+
+# Ordered fallbacks when AGENTS.md is missing at a directory level. Default: []
+
 project_doc_fallback_filenames = []
-# 상위 디렉터리에서 프로젝트 루트를 찾을 때 사용할 marker 파일명입니다. 기본값: [".git"]
-#project_root_markers = [".git"]
+
+# Project root marker filenames used when searching parent directories. Default: [".git"]
+
+# project_root_markers = [".git"]
 
 ################################################################################
-# 히스토리 및 파일 열기
+
+# History & File Opener
+
 ################################################################################
-# 클릭 가능한 citation에 사용할 URI scheme입니다: vscode(기본값) | vscode-insiders | windsurf | cursor | none
+
+# URI scheme for clickable citations: vscode (default) | vscode-insiders | windsurf | cursor | none
+
 file_opener = "vscode"
 
 ################################################################################
-# UI, 알림, 기타
+
+# UI, Notifications, and Misc
+
 ################################################################################
-# 내부 reasoning event 출력을 숨깁니다. 기본값: false
+
+# Suppress internal reasoning events from output. Default: false
+
 hide_agent_reasoning = false
-# 사용할 수 있을 때 raw reasoning content를 표시합니다. 기본값: false
+
+# Show raw reasoning content when available. Default: false
+
 show_raw_agent_reasoning = false
-# TUI의 burst-paste 감지를 끕니다. 기본값: false
+
+# Disable burst-paste detection in the TUI. Default: false
+
 disable_paste_burst = false
-# Windows onboarding 확인 여부를 기록합니다(Windows 전용). 기본값: false
-windows_wsl_setup_acknowledged = false
-# 시작 시 업데이트를 확인합니다. 기본값: true
+
+# Check for updates on startup. Default: true
+
 check_for_update_on_startup = true
 
 ################################################################################
-# 웹 검색
+
+# Web Search
+
 ################################################################################
-# Web search mode: disabled | cached | live. 기본값: "cached"
-# cached는 웹 검색 cache(OpenAI가 관리하는 index)에서 결과를 제공합니다.
-# cached는 미리 색인된 결과를 반환하고, live는 최신 데이터를 가져옵니다.
-# --yolo 또는 다른 full access sandbox 설정을 사용하면 web search 기본값은 live입니다.
+
+# Web search mode: disabled | cached | indexed | live. Default: "cached"
+
+# cached serves results from a web search cache (an OpenAI-maintained index).
+
+# cached returns pre-indexed results; indexed gates external web access through
+
+# the search index; live fetches the most recent data.
+
+# If you use --yolo or another full access sandbox setting, web search defaults to live.
+
 web_search = "live"
-# Config profile은 CODEX_HOME 아래 별도 파일입니다.
-# 예: ~/.codex/ci.config.toml, codex --profile ci로 선택합니다.
-# 개발 중인 feature flag가 켜졌을 때 표시되는 경고를 숨깁니다.
-#suppress_unstable_features_warning = true
+
+# Config profiles are separate files under CODEX_HOME.
+
+# Example: ~/.codex/ci.config.toml, selected with codex --profile ci.
+
+# Suppress the warning shown when under-development feature flags are enabled.
+
+# suppress_unstable_features_warning = true
 
 ################################################################################
-# Agents(멀티 에이전트 역할 및 제한)
+
+# Agents (multi-agent roles and limits)
+
 ################################################################################
+
 [agents]
-# 동시에 열 수 있는 agent thread 최대 개수입니다. 기본값: 6
+
+# Maximum concurrently open agent threads. Default: 6
+
 max_threads = 12
-# 중첩 spawn 최대 깊이입니다. 루트 세션은 depth 0에서 시작합니다. 기본값: 1
+
+# Maximum nested spawn depth. Root session starts at depth 0. Default: 1
+
 max_depth = 2
-# spawn_agents_on_csv job의 worker별 기본 timeout입니다. 설정하지 않으면 도구 기본값은 1800초입니다.
-#job_max_runtime_seconds = 1800
-#[agents.reviewer]
-#description = "Find correctness, security, and test risks in code."
-#config_file = "./agents/reviewer.toml" # 이 항목을 정의한 config.toml 기준 상대 경로
-#nickname_candidates = ["Athena", "Ada"]
+
+# Default timeout per worker for spawn_agents_on_csv jobs. When unset, the tool defaults to 1800 seconds.
+
+# job_max_runtime_seconds = 1800
+
+# Record a model-visible message when an agent turn is interrupted. Default: true
+
+# interrupt_message = true
+
+# [agents.reviewer]
+
+# description = "Find correctness, security, and test risks in code."
+
+# config_file = "./agents/reviewer.toml" # relative to the config.toml that defines it
+
+# nickname_candidates = ["Athena", "Ada"]
 
 ################################################################################
-# Skills(스킬별 override)
-################################################################################
-# 특정 skill을 삭제하지 않고 비활성화하거나 다시 활성화합니다.
-#[[skills.config]]
-#path = "/path/to/skill/SKILL.md"
-#enabled = false
+
+# Skills (per-skill overrides)
 
 ################################################################################
-# Sandbox 설정(테이블)
-################################################################################
-# sandbox_mode = "workspace-write"일 때만 사용하는 추가 설정입니다.
-#[sandbox_workspace_write]
-# workspace(cwd) 외에 추가로 쓸 수 있는 root입니다. 기본값: []
-#writable_roots = []
-# sandbox 안의 outbound network access를 허용합니다. 기본값: false
-#network_access = false
-# $TMPDIR를 writable root에서 제외합니다. 기본값: false
-#exclude_tmpdir_env_var = false
-# /tmp를 writable root에서 제외합니다. 기본값: false
-#exclude_slash_tmp = false
+
+# Disable or re-enable a specific skill without deleting it.
+
+# [[skills.config]]
+
+# path = "/path/to/skill/SKILL.md"
+
+# enabled = false
 
 ################################################################################
-# spawned process용 Shell Environment Policy(테이블)
+
+# Sandbox settings (tables)
+
 ################################################################################
+
+# Extra settings used only when sandbox_mode = "workspace-write".
+
+# [sandbox_workspace_write]
+
+# Additional writable roots beyond the workspace (cwd). Default: []
+
+# writable_roots = []
+
+# Allow outbound network access inside the sandbox. Default: false
+
+# network_access = false
+
+# Exclude $TMPDIR from writable roots. Default: false
+
+# exclude_tmpdir_env_var = false
+
+# Exclude /tmp from writable roots. Default: false
+
+# exclude_slash_tmp = false
+
+################################################################################
+
+# Shell Environment Policy for spawned processes (table)
+
+################################################################################
+
 [shell_environment_policy]
-# inherit: all(기본값) | core | none
+
+# inherit: all (default) | core | none
+
 inherit = "all"
-# KEY/SECRET/TOKEN을 포함하는 변수명의 기본 제외 규칙을 건너뜁니다(대소문자 무시). 기본값: false
+
+# Skip default excludes for names containing KEY/SECRET/TOKEN (case-insensitive). Default: false
+
 ignore_default_excludes = false
-# 제거할 대소문자 무시 glob pattern입니다(예: "AWS**", "AZURE**"). 기본값: []
+
+# Case-insensitive glob patterns to remove (e.g., "AWS**", "AZURE**"). Default: []
+
 exclude = []
-# 명시적 key/value override입니다(항상 우선). 기본값: {}
+
+# Explicit key/value overrides (always win). Default: {}
+
 set = {}
-# whitelist입니다. 비어 있지 않으면 일치하는 변수만 유지합니다. 기본값: []
+
+# Whitelist; if non-empty, keep only matching vars. Default: []
+
 include_only = []
-# 실험적 기능: 사용자 shell profile을 통해 실행합니다. 기본값: false
+
+# Experimental: run via user shell profile. Default: false
+
 experimental_use_profile = false
 
 ################################################################################
-# Sandboxed networking 설정
+
+# Sandboxed networking settings
+
 ################################################################################
-# sandboxed networking rule을 설정하기 전에 기능을 활성화하세요.
-#[features.network_proxy]
-#enabled = true
-#domains = { "api.openai.com" = "allow", "example.com" = "deny" }
+
+# Enable the feature before configuring sandboxed networking rules.
+
+# [features.network_proxy]
+
+# enabled = true
+
+# domains = { "api.openai.com" = "allow", "example.com" = "deny" }
+
 #
-# 정확한 host는 그 host에만 일치합니다.
-# "*.example.com"은 subdomain에만 일치하고, "**.example.com"은 apex와 subdomain 모두에 일치합니다.
-# "*"는 거부되지 않은 모든 public host를 허용하므로, 가능하면 범위를 좁힌 rule을 사용하세요.
-# `allow_local_binding = false`는 기본적으로 loopback과 private destination을 차단합니다.
-# 특정 local target 하나만 허용하려면 정확한 local IP literal 또는 `localhost` rule을 추가하고, 더 넓은 local access가 필요할 때만 true로 설정하세요.
+
+# Exact hosts match only themselves.
+
+# "*.example.com" matches subdomains only; "**.example.com" matches the apex plus subdomains.
+
+# "*" allows any public host that is not denied, so prefer scoped rules when possible.
+
+# `allow_local_binding = false` blocks loopback and private destinations by default.
+
+# Add an exact local IP literal or `localhost` allow rule for one target, or set it to true only when broader local access is required.
+
 #
-# 이 profile을 활성화하기 전에 `default_permissions = "workspace"`를 설정하세요.
-# 이 profile의 `:workspace_roots` filesystem rule을 상속하는
-# 추가 workspace root 예시입니다.
-#[permissions.workspace.workspace_roots]
-#"~/code/app" = true
-#"~/code/shared-lib" = true
-#
-# filesystem profile 예시입니다. 정확한 path 또는 glob pattern의 read를 막으려면 `"deny"`를 사용하세요.
-# platform에서 glob match를 미리 펼쳐야 하는 경우 `**` 같은 무제한 pattern을 사용할 때
-# glob_scan_max_depth를 설정하세요.
-#[permissions.workspace.filesystem]
-#glob_scan_max_depth = 3
-#":workspace_roots" = { "." = "write", "**/*.env" = "deny" }
-#"/absolute/path/to/secrets" = "deny"
-#
-#[permissions.workspace.network]
-#enabled = true
-#proxy_url = "http://127.0.0.1:43128"
-#admin_url = "http://127.0.0.1:43129"
-#enable_socks5 = false
-#socks_url = "http://127.0.0.1:43130"
-#enable_socks5_udp = false
-#allow_upstream_proxy = false
-#dangerously_allow_non_loopback_proxy = false
-#dangerously_allow_non_loopback_admin = false
-#dangerously_allow_all_unix_sockets = false
-#mode = "limited" # limited | full
-#allow_local_binding = false
-#
-#[permissions.workspace.network.domains]
-#"api.openai.com" = "allow"
-#"example.com" = "deny"
-#
-#[permissions.workspace.network.unix_sockets]
-#"/var/run/docker.sock" = "allow"
+
+# Set `default_permissions = "workspace"` before enabling this profile.
+
+# Example additional workspace roots that inherit this profile's
+
+# `:workspace_roots` filesystem rules.
+
+# [permissions.workspace.workspace_roots]
+
+# "~/code/app" = true
+
+# "~/code/shared-lib" = true
 
 [permissions.workspace]
 extends = ":workspace"
@@ -325,158 +502,258 @@ allow_local_binding = false
 "127.0.0.1" = "allow"
 "::1" = "allow"
 
-################################################################################
-# 히스토리(테이블)
-################################################################################
-[history]
-# save-all(기본값) | none
-persistence = "save-all"
-# 히스토리 파일의 최대 바이트 수입니다. 초과 시 오래된 항목부터 제거됩니다. 예: 5242880
-#max_bytes = 5242880
+# Example filesystem profile. Use `"deny"` to deny reads for exact paths or
+
+# glob patterns. On platforms that need pre-expanded glob matches, set
+
+# glob_scan_max_depth when using unbounded patterns such as `**`.
+
+# [permissions.workspace.filesystem]
+
+# glob_scan_max_depth = 3
+
+# ":workspace_roots" = { "." = "write", "**/*.env" = "deny" }
+
+# "/absolute/path/to/secrets" = "deny"
+
+#
+
+# [permissions.workspace.network]
+
+# enabled = true
+
+# proxy_url = "http://127.0.0.1:43128"
+
+# admin_url = "http://127.0.0.1:43129"
+
+# enable_socks5 = false
+
+# socks_url = "http://127.0.0.1:43130"
+
+# enable_socks5_udp = false
+
+# allow_upstream_proxy = false
+
+# dangerously_allow_non_loopback_proxy = false
+
+# dangerously_allow_non_loopback_admin = false
+
+# dangerously_allow_all_unix_sockets = false
+
+# mode = "limited" # limited | full
+
+# allow_local_binding = false
+
+#
+
+# [permissions.workspace.network.domains]
+
+# "api.openai.com" = "allow"
+
+# "example.com" = "deny"
+
+#
+
+# [permissions.workspace.network.unix_sockets]
+
+# "/var/run/docker.sock" = "allow"
 
 ################################################################################
-# UI, 알림, 기타(테이블)
+
+# History (table)
+
 ################################################################################
+
+[history]
+
+# save-all (default) | none
+
+persistence = "save-all"
+
+# Maximum bytes for history file; oldest entries are trimmed when exceeded. Example: 5242880
+
+# max_bytes = 5242880
+
+################################################################################
+
+# UI, Notifications, and Misc (tables)
+
+################################################################################
+
 [tui]
-# TUI의 desktop notification입니다: boolean 또는 filtered list. 기본값: true
-# 예: false | ["agent-turn-complete", "approval-requested"]
+
+# Desktop notifications from the TUI: boolean or filtered list. Default: true
+
+# Examples: false | ["agent-turn-complete", "approval-requested"]
+
 notifications = false
-# terminal alert의 notification mechanism입니다: auto | osc9 | bel. 기본값: "auto"
-#notification_method = "auto"
-# 알림이 발생하는 조건입니다: unfocused(기본값) | always
-#notification_condition = "unfocused"
-# welcome/status/spinner animation을 활성화합니다. 기본값: true
+
+# Notification mechanism for terminal alerts: auto | osc9 | bel. Default: "auto"
+
+# notification_method = "auto"
+
+# When notifications fire: unfocused (default) | always
+
+# notification_condition = "unfocused"
+
+# Enables welcome/status/spinner animations. Default: true
+
 animations = true
-# welcome screen의 onboarding tooltip을 표시합니다. 기본값: true
+
+# Show onboarding tooltips in the welcome screen. Default: true
+
 show_tooltips = true
-# alternate screen 사용을 제어합니다(auto는 Zellij에서 scrollback 보존을 위해 건너뜁니다).
+
+# Control alternate screen usage (auto skips it in Zellij to preserve scrollback).
+
 alternate_screen = "auto"
-# footer status-line item ID의 순서 있는 목록입니다. 설정하지 않으면 Codex는 다음을 사용합니다:
+
+# Ordered list of footer status-line item IDs. When unset, Codex uses:
+
 # ["model-with-reasoning", "context-remaining", "current-dir"].
-# footer를 숨기려면 []로 설정하세요.
+
+# Set to [] to hide the footer.
+
 status_line = ["model-with-reasoning", "context-remaining", "git-branch", "current-dir"]
-# terminal window/tab title item ID의 순서 있는 목록입니다. 설정하지 않으면 Codex는 다음을 사용합니다:
-# ["spinner", "project"]. title을 비우려면 []로 설정하세요.
-# 사용 가능한 ID에는 app-name, project, spinner, status, thread, git-branch, model,
-# task-progress가 포함됩니다.
+
+# Ordered list of terminal window/tab title item IDs. When unset, Codex uses:
+
+# ["spinner", "project"]. Set to [] to clear the title.
+
+# Available IDs include app-name, project, spinner, status, thread, git-branch, model,
+
+# and task-progress.
+
 terminal_title = ["spinner", "project"]
-# syntax highlighting theme입니다(kebab-case). TUI에서 /theme으로 미리 보고 저장할 수 있습니다.
-# 사용자 지정 .tmTheme 파일은 $CODEX_HOME/themes 아래에 추가할 수도 있습니다.
-#theme = "catppuccin-mocha"
-# 사용자 지정 key binding입니다. context별 binding은 [tui.keymap.global]보다 우선합니다.
-# action을 unbind하려면 []를 사용하세요.
-#[tui.keymap.global]
-#open_transcript = "ctrl-t"
-#open_external_editor = []
+
+# Syntax-highlighting theme (kebab-case). Use /theme in the TUI to preview and save.
+
+# You can also add custom .tmTheme files under $CODEX_HOME/themes.
+
+# theme = "catppuccin-mocha"
+
+# Custom key bindings. Selected composer actions fall back to matching [tui.keymap.global] bindings.
+
+# Use [] to unbind an action.
+
+# [tui.keymap.global]
+
+# open_transcript = "ctrl-t"
+
+# open_external_editor = []
+
 #
-#[tui.keymap.composer]
-#submit = ["enter", "ctrl-m"]
-# 모델 slug별 내부 tooltip 상태입니다. 보통 Codex가 관리합니다.
-#[tui.model_availability_nux]
-#"gpt-5.4" = 1
-# 이 machine의 analytics 활성화 여부입니다. 설정하지 않으면 Codex 기본 동작을 따릅니다.
+
+# [tui.keymap.composer]
+
+# submit = ["enter", "ctrl-m"]
+
+# [tui.keymap.chat]
+
+# interrupt_turn = "f12"
+
+# Internal tooltip state keyed by model slug. Usually managed by Codex.
+
+# [tui.model_availability_nux]
+
+# "gpt-5.4" = 1
+
+# Enable or disable analytics for this machine. When unset, Codex uses its default behavior.
+
 [analytics]
 enabled = true
-# 사용자가 `/feedback`으로 feedback을 제출할 수 있는지 제어합니다. 기본값: true
+
+# Control whether users can submit feedback from `/feedback`. Default: true
+
 [feedback]
 enabled = false
-# 제품 내 notice입니다. 대부분 Codex가 자동으로 설정합니다.
+
+# In-product notices (mostly set automatically by Codex).
+
 [notice]
-#hide_full_access_warning = true
-#hide_world_writable_warning = true
-#hide_rate_limit_model_nudge = true
-#hide_gpt5_1_migration_prompt = true
-#"hide_gpt-5.1-codex-max_migration_prompt" = true
-#model_migrations = { "gpt-5.3-codex" = "gpt-5.4" }
+
+# hide_full_access_warning = true
+
+# hide_world_writable_warning = true
+
+# hide_rate_limit_model_nudge = true
+
+# hide_gpt5_1_migration_prompt = true
+
+# "hide_gpt-5.1-codex-max_migration_prompt" = true
+
+# model_migrations = { "gpt-5.3-codex" = "gpt-5.4" }
 
 ################################################################################
-# 중앙 Feature Flag(권장)
+
+# Centralized Feature Flags (preferred)
+
 ################################################################################
+
 [features]
-# 기본값을 쓰려면 이 테이블을 비워 두세요. 명시적으로 켜거나 끄려면 boolean을 설정하세요.
-#shell_tool = true
-#apps = true
-hooks = true
-#codex_git_commit = false
-#unified_exec = true
-#shell_snapshot = true
-multi_agent = true
-#personality = true
-#network_proxy = false
-fast_mode = true
-#enable_request_compression = true
-#skill_mcp_dependency_install = true
-#prevent_idle_sleep = false
 
-# Code mode namespace는 개발 중인 기능이며 기본적으로 비활성화합니다.
+# Leave this table empty to accept defaults. Set explicit booleans to opt in/out.
+
+# shell_tool = true
+
+# apps = true
+
+hooks = true
+
+# unified_exec = true
+
+# shell_snapshot = true
+
+multi_agent = true
+
+# remote_plugin = true
+
+# personality = true
+
+# network_proxy = false
+
+fast_mode = true
+
+# enable_request_compression = true
+
+# skill_mcp_dependency_install = true
+
+# prevent_idle_sleep = false
+
+# Code mode namespaces. This feature is under development and off by default.
+
 code_mode_only = false
 code_mode_host = false
 
 [features.code_mode]
+
 enabled = false
 
-################################################################################
-# Memories(테이블)
-################################################################################
-# [features].memories로 memories를 활성화한 뒤 여기서 동작을 조정하세요.
-#[memories]
-#generate_memories = true
-#use_memories = true
-#disable_on_external_context = false # legacy alias: no_memories_if_mcp_or_web_search
+# excluded_tool_namespaces = ["mcp__codex_apps"]
+
+# direct_only_tool_namespaces = ["mcp__history"]
+
+# Rollout budget tracking. This feature is under development and off by default.
+
+# limit_tokens is required when enabled.
+
+# Optional reminder_interval_tokens defaults to 10% of limit_tokens.
+
+# Token weights default to 1.0.
+
+# [features.rollout_budget]
+
+# enabled = true
+
+# limit_tokens = 100000
+
+# reminder_interval_tokens = 10000
+
+# sampling_token_weight = 1.0
+
+# prefill_token_weight = 1.0
 
 ################################################################################
-# Lifecycle hook은 여기 인라인으로 설정하거나 같은 디렉터리의 hooks.json에 설정할 수 있습니다.
-################################################################################
-#[hooks]
-#[[hooks.PreToolUse]]
-#matcher = "^Bash$"
-#
-#[[hooks.PreToolUse.hooks]]
-#type = "command"
-#command = 'python3 "/absolute/path/to/pre_tool_use_policy.py"'
-#timeout = 30
-#statusMessage = "Checking Bash command"
-
-################################################################################
-# MCP server는 이 테이블 아래에 정의합니다. 비활성화하려면 비워 두세요.
-################################################################################
-#[mcp_servers]
-# --- 예시: STDIO transport ---
-#[mcp_servers.docs]
-#enabled = true # 선택 사항; 기본값 true
-#required = true # 선택 사항; 이 server를 초기화할 수 없으면 startup/resume 실패
-#command = "docs-server" # 필수
-#args = ["--port", "4000"] # 선택 사항
-#env = { "API_KEY" = "value" } # 선택적 key/value 쌍, 그대로 복사됩니다.
-#env_vars = ["ANOTHER_SECRET"] # 선택 사항: local parent env var 전달
-#env_vars = ["LOCAL_TOKEN", { name = "REMOTE_TOKEN", source = "remote" }]
-#cwd = "/path/to/server" # 선택적 working directory override
-#experimental_environment = "remote" # 실험적 기능: remote executor로 stdio 실행
-#startup_timeout_sec = 10.0 # 선택 사항; 기본값 10.0초
-##startup_timeout_ms = 10000 # startup timeout의 선택적 alias(밀리초)
-#tool_timeout_sec = 60.0 # 선택 사항; 기본값 60.0초
-#enabled_tools = ["search", "summarize"] # 선택적 allow-list
-#disabled_tools = ["slow-tool"] # 선택적 deny-list(allow-list 뒤에 적용)
-#scopes = ["read:docs"] # 선택적 OAuth scope
-#oauth_resource = "https://docs.example.com/" # 선택적 OAuth resource
-# --- 예시: Streamable HTTP transport ---
-#[mcp_servers.github]
-#enabled = true # 선택 사항; 기본값 true
-#required = true # 선택 사항; 이 server를 초기화할 수 없으면 startup/resume 실패
-#url = "https://github-mcp.example.com/mcp" # 필수
-#bearer_token_env_var = "GITHUB_TOKEN" # 선택 사항; Authorization: Bearer <token>
-#http_headers = { "X-Example" = "value" } # 선택적 static header
-#env_http_headers = { "X-Auth" = "AUTH_ENV" } # env var에서 채우는 선택적 header
-#startup_timeout_sec = 10.0 # 선택 사항
-#tool_timeout_sec = 60.0 # 선택 사항
-#enabled_tools = ["list_issues"] # 선택적 allow-list
-#disabled_tools = ["delete_issue"] # 선택적 deny-list
-#scopes = ["repo"] # 선택적 OAuth scope
-
-################################################################################
-# 플러그인
-################################################################################
-# 설치된 플러그인의 활성화 상태를 제어합니다.
 
 [plugins."github@openai-curated"]
 enabled = true
@@ -490,182 +767,431 @@ enabled = true
 [plugins."openai-developers@openai-curated"]
 enabled = true
 
-[plugins."vercel@openai-curated"]
-enabled = true
+# [plugins."vercel@openai-curated"]
+# enabled = true
+
+# [plugins."cloudflare@openai-curated"]
+# enabled = true
+
+# Memories (table)
 
 ################################################################################
-# 모델 Provider
+
+# Enable memories with [features].memories, then tune memory behavior here.
+
+# [memories]
+
+# generate_memories = true
+
+# use_memories = true
+
+# disable_on_external_context = false # legacy alias: no_memories_if_mcp_or_web_search
+
 ################################################################################
-# 내장 provider:
-# - openai
-# - ollama
-# - lmstudio
-# - amazon-bedrock
-# 이 ID들은 예약되어 있습니다. custom provider에는 다른 ID를 사용하세요.
-#[model_providers]
-# --- 예시: 내장 Amazon Bedrock provider option ---
-#model_provider = "amazon-bedrock"
-#model = "<bedrock-model-id>"
-#[model_providers.amazon-bedrock.aws]
-#profile = "default"
-#region = "eu-central-1"
-# --- 예시: 명시적 Base URL 또는 header를 사용하는 OpenAI data residency ---
-#[model_providers.openaidr]
-#name = "OpenAI Data Residency"
-#base_url = "https://us.api.openai.com/v1" # 'us' domain prefix를 사용한 예시
-#wire_api = "responses" # 지원되는 유일한 값
-##requires_openai_auth = true # OpenAI auth 기반 provider에서만 사용
-##request_max_retries = 4 # 기본값 4; 최대 100
-##stream_max_retries = 5 # 기본값 5; 최대 100
-##stream_idle_timeout_ms = 300000 # 기본값 300_000(5분)
-##supports_websockets = true # 선택 사항
-##experimental_bearer_token = "sk-example" # 선택적 개발 전용 직접 bearer token
-##http_headers = { "X-Example" = "value" }
-##env_http_headers = { "OpenAI-Organization" = "OPENAI_ORGANIZATION", "OpenAI-Project" = "OPENAI_PROJECT" }
-# --- 예시: Azure/OpenAI-compatible provider ---
-#[model_providers.azure]
-#name = "Azure"
-#base_url = "https://YOUR_PROJECT_NAME.openai.azure.com/openai"
-#wire_api = "responses"
-#query_params = { api-version = "2025-04-01-preview" }
-#env_key = "AZURE_OPENAI_API_KEY"
-#env_key_instructions = "Set AZURE_OPENAI_API_KEY in your environment"
-##supports_websockets = false
-# --- 예시: command-backed bearer token auth ---
-#[model_providers.proxy]
-#name = "OpenAI using LLM proxy"
-#base_url = "https://proxy.example.com/v1"
-#wire_api = "responses"
+
+# Lifecycle hooks can be configured here inline or in a sibling hooks.json.
+
+################################################################################
+
+# [hooks]
+
+# [[hooks.PreToolUse]]
+
+# matcher = "^Bash$"
+
 #
-#[model_providers.proxy.auth]
-#command = "/usr/local/bin/fetch-codex-token"
-#args = ["--audience", "codex"]
-#timeout_ms = 5000
-#refresh_interval_ms = 300000
-# --- 예시: Local OSS(예: Ollama-compatible) ---
-#[model_providers.local_ollama]
-#name = "Ollama"
-#base_url = "http://localhost:11434/v1"
-#wire_api = "responses"
+
+# [[hooks.PreToolUse.hooks]]
+
+# type = "command"
+
+# command = 'python3 "/absolute/path/to/pre_tool_use_policy.py"'
+
+# timeout = 30
+
+# statusMessage = "Checking Bash command"
 
 ################################################################################
-# 앱 / 커넥터
+
+# Define MCP servers under this table. Leave empty to disable.
+
 ################################################################################
-# 선택적 app별 제어입니다.
+
+[mcp_servers]
+
+# --- Example: STDIO transport ---
+
+# [mcp_servers.docs]
+
+# enabled = true # optional; default true
+
+# required = true # optional; fail startup/resume if this server cannot initialize
+
+# command = "docs-server" # required
+
+# args = ["--port", "4000"] # optional
+
+# env = { "API_KEY" = "value" } # optional key/value pairs copied as-is
+
+# env_vars = ["ANOTHER_SECRET"] # optional: forward local parent env vars
+
+# env_vars = ["LOCAL_TOKEN", { name = "REMOTE_TOKEN", source = "remote" }]
+
+# cwd = "/path/to/server" # optional working directory override
+
+# experimental_environment = "remote" # experimental: run stdio via a remote executor
+
+# startup_timeout_sec = 10.0 # optional; default 10.0 seconds
+
+# # startup_timeout_ms = 10000 # optional alias for startup timeout (milliseconds)
+
+# tool_timeout_sec = 60.0 # optional; default 60.0 seconds
+
+# enabled_tools = ["search", "summarize"] # optional allow-list
+
+# disabled_tools = ["slow-tool"] # optional deny-list (applied after allow-list)
+
+# scopes = ["read:docs"] # optional OAuth scopes
+
+# oauth_resource = "https://docs.example.com/" # optional OAuth resource
+
+# --- Example: Streamable HTTP transport ---
+
+# [mcp_servers.github]
+
+# enabled = true # optional; default true
+
+# required = true # optional; fail startup/resume if this server cannot initialize
+
+# url = "https://github-mcp.example.com/mcp" # required
+
+# bearer_token_env_var = "GITHUB_TOKEN" # optional; Authorization: Bearer <token>
+
+# http_headers = { "X-Example" = "value" } # optional static headers
+
+# env_http_headers = { "X-Auth" = "AUTH_ENV" } # optional headers populated from env vars
+
+# startup_timeout_sec = 10.0 # optional
+
+# tool_timeout_sec = 60.0 # optional
+
+# enabled_tools = ["list_issues"] # optional allow-list
+
+# disabled_tools = ["delete_issue"] # optional deny-list
+
+# scopes = ["repo"] # optional OAuth scopes
+
+################################################################################
+
+# Model Providers
+
+################################################################################
+
+# Built-ins include:
+
+# - openai
+
+# - ollama
+
+# - lmstudio
+
+# - amazon-bedrock
+
+# These IDs are reserved. Use a different ID for custom providers.
+
+# [model_providers]
+
+# --- Example: built-in Amazon Bedrock provider options ---
+
+# model_provider = "amazon-bedrock"
+
+# model = "<bedrock-model-id>"
+
+# [model_providers.amazon-bedrock.aws]
+
+# profile = "default"
+
+# region = "eu-central-1"
+
+# --- Example: OpenAI data residency with explicit base URL or headers ---
+
+# [model_providers.openaidr]
+
+# name = "OpenAI Data Residency"
+
+# base_url = "https://us.api.openai.com/v1" # example with 'us' domain prefix
+
+# wire_api = "responses" # only supported value
+
+# # requires_openai_auth = true # use only for providers backed by OpenAI auth
+
+# # request_max_retries = 4 # default 4; max 100
+
+# # stream_max_retries = 5 # default 5; max 100
+
+# # stream_idle_timeout_ms = 300000 # default 300_000 (5m)
+
+# # supports_websockets = true # optional
+
+# # experimental_bearer_token = "sk-example" # optional dev-only direct bearer token
+
+# # http_headers = { "X-Example" = "value" }
+
+# # env_http_headers = { "OpenAI-Organization" = "OPENAI_ORGANIZATION", "OpenAI-Project" = "OPENAI_PROJECT" }
+
+# --- Example: Azure/OpenAI-compatible provider ---
+
+# [model_providers.azure]
+
+# name = "Azure"
+
+# base_url = "https://YOUR_PROJECT_NAME.openai.azure.com/openai"
+
+# wire_api = "responses"
+
+# query_params = { api-version = "2025-04-01-preview" }
+
+# env_key = "AZURE_OPENAI_API_KEY"
+
+# env_key_instructions = "Set AZURE_OPENAI_API_KEY in your environment"
+
+# # supports_websockets = false
+
+# --- Example: command-backed bearer token auth ---
+
+# [model_providers.proxy]
+
+# name = "OpenAI using LLM proxy"
+
+# base_url = "https://proxy.example.com/v1"
+
+# wire_api = "responses"
+
+#
+
+# [model_providers.proxy.auth]
+
+# command = "/usr/local/bin/fetch-codex-token"
+
+# args = ["--audience", "codex"]
+
+# timeout_ms = 5000
+
+# refresh_interval_ms = 300000
+
+# --- Example: Local OSS (e.g., Ollama-compatible) ---
+
+# [model_providers.local_ollama]
+
+# name = "Ollama"
+
+# base_url = "http://localhost:11434/v1"
+
+# wire_api = "responses"
+
+################################################################################
+
+# Apps / Connectors
+
+################################################################################
+
+# Optional per-app controls.
+
 [apps]
-# [_default]는 app별 override가 없을 때 모든 app에 적용됩니다.
+
+# [_default] applies to all apps unless overridden per app.
+
+# [apps._default]
+
+# enabled = true
+
+# destructive_enabled = true
+
+# open_world_enabled = true
+
+# approvals_reviewer = "user" # user | auto_review
+
+# default_tools_approval_mode = "auto" # auto | prompt | writes | approve
+
 [apps._default]
 enabled = true
 destructive_enabled = false
 open_world_enabled = true
 approvals_reviewer = "auto_review"
 default_tools_approval_mode = "writes"
+
+# [apps.google_drive]
+
+# enabled = false
+
+# destructive_enabled = false # block destructive-hint tools for this app
+
+# default_tools_enabled = true
+
+# approvals_reviewer = "auto_review"
+
+# default_tools_approval_mode = "prompt" # auto | prompt | writes | approve
+
 #
-#[apps.google_drive]
-#enabled = false
-#destructive_enabled = false # 이 app의 destructive-hint tool 차단
-#default_tools_enabled = true
-#default_tools_approval_mode = "prompt" # auto | prompt | approve
-#
-#[apps.google_drive.tools."files/delete"]
-#enabled = false
-#approval_mode = "approve"
-# Codex가 설치를 제안할 수 있는 connector 또는 plugin의 선택적 tool suggestion allowlist입니다.
-#[tool_suggest]
-#discoverables = [
-#{ type = "connector", id = "gmail" },
-#{ type = "plugin", id = "figma@openai-curated" },
-#]
-#disabled_tools = [
-#{ type = "plugin", id = "slack@openai-curated" },
-#{ type = "connector", id = "connector_googlecalendar" },
-#]
+
+# [apps.google_drive.tools."files/delete"]
+
+# enabled = false
+
+# approval_mode = "approve"
+
+# Optional tool suggestion allowlist for connectors or plugins Codex can offer to install.
+
+# [tool_suggest]
+
+# discoverables = [
+
+# { type = "connector", id = "gmail" },
+
+# { type = "plugin", id = "figma@openai-curated" },
+
+# ]
+
+# disabled_tools = [
+
+# { type = "plugin", id = "slack@openai-curated" },
+
+# { type = "connector", id = "connector_googlecalendar" },
+
+# ]
 
 ################################################################################
-# Config Profile(별도 파일)
-################################################################################
-# config profile을 만들려면 override를 $CODEX_HOME 아래 별도 profile 파일에 넣으세요.
-# codex --profile ci로 선택합니다.
-# 예를 들어 CI profile은 $CODEX_HOME/ci.config.toml에 둘 수 있습니다:
-#model = "gpt-5.4"
-#approval_policy = "on-request"
-#sandbox_mode = "read-only"
-#service_tier = "flex" # 또는 지원되는 다른 service tier id
-#oss_provider = "ollama"
-#model_reasoning_effort = "medium"
-#plan_mode_reasoning_effort = "high"
-#model_reasoning_summary = "auto"
-#model_verbosity = "medium"
-#personality = "pragmatic" # 또는 "friendly" 또는 "none"
-#chatgpt_base_url = "https://chatgpt.com/backend-api/"
-#model_catalog_json = "./models.json"
-#model_instructions_file = "/absolute/or/relative/path/to/instructions.txt"
-#experimental_compact_prompt_file = "./compact_prompt.txt"
-#tools_view_image = true
-#features = { unified_exec = false }
+
+# Config Profiles (separate files)
 
 ################################################################################
-# 프로젝트(trust level)
+
+# To create a config profile, put overrides in a separate profile file under $CODEX_HOME.
+
+# Select it with codex --profile ci.
+
+# For example, a CI profile could live at $CODEX_HOME/ci.config.toml:
+
+# model = "gpt-5.4"
+
+# approval_policy = "on-request"
+
+# sandbox_mode = "read-only"
+
+# service_tier = "flex" # or another supported service tier id
+
+# oss_provider = "ollama"
+
+# model_reasoning_effort = "medium"
+
+# plan_mode_reasoning_effort = "high"
+
+# model_reasoning_summary = "auto"
+
+# model_verbosity = "medium"
+
+# personality = "pragmatic" # or "friendly" or "none"
+
+# chatgpt_base_url = "https://chatgpt.com/backend-api/"
+
+# model_catalog_json = "./models.json"
+
+# model_instructions_file = "/absolute/or/relative/path/to/instructions.txt"
+
+# experimental_compact_prompt_file = "./compact_prompt.txt"
+
+# tools_view_image = true
+
+# features = { unified_exec = false }
+
 ################################################################################
+
+# Projects (trust levels)
+
+################################################################################
+
 [projects]
-# 특정 worktree를 trusted 또는 untrusted로 표시합니다.
-#[projects."/absolute/path/to/project"]
-#trust_level = "trusted" # 또는 "untrusted"
+
+# Mark specific worktrees as trusted or untrusted.
+
+# [projects."/absolute/path/to/project"]
+
+# trust_level = "trusted" # or "untrusted"
 
 ################################################################################
-# 도구
+
+# Tools
+
 ################################################################################
+
 [tools]
-#view_image = true
+
+# view_image = true
 
 ################################################################################
-# OpenTelemetry(OTEL) - 기본적으로 비활성화
-################################################################################
-#[otel]
-# log에 user prompt text를 포함합니다. 기본값: false
-#log_user_prompt = false
-# telemetry에 적용할 environment label입니다. 기본값: "dev"
-#environment = "dev"
-# Exporter: none(기본값) | otlp-http | otlp-grpc
-#exporter = "none"
-# Trace exporter: none(기본값) | otlp-http | otlp-grpc
-#trace_exporter = "none"
-# Metrics exporter 값입니다: none | statsig | otlp-http | otlp-grpc
-#metrics_exporter = "statsig"
-# OTLP/HTTP exporter 설정 예시
-#[otel.exporter."otlp-http"]
-#endpoint = "https://otel.example.com/v1/logs"
-#protocol = "binary" # "binary" | "json"
-#[otel.exporter."otlp-http".headers]
-#"x-otlp-api-key" = "${OTLP_TOKEN}"
-#[otel.exporter."otlp-http".tls]
-#ca-certificate = "certs/otel-ca.pem"
-#client-certificate = "/etc/codex/certs/client.pem"
-#client-private-key = "/etc/codex/certs/client-key.pem"
-# OTLP/gRPC trace exporter 설정 예시
-#[otel.trace_exporter."otlp-grpc"]
-#endpoint = "https://otel.example.com:4317"
-#headers = { "x-otlp-meta" = "abc123" }
+
+# OpenTelemetry (OTEL) - disabled by default
 
 ################################################################################
+
+# [otel]
+
+# Include user prompt text in logs. Default: false
+
+# log_user_prompt = false
+
+# Environment label applied to telemetry. Default: "dev"
+
+# environment = "dev"
+
+# Exporter: none (default) | otlp-http | otlp-grpc
+
+# exporter = "none"
+
+# Trace exporter: none (default) | otlp-http | otlp-grpc
+
+# trace_exporter = "none"
+
+# Metrics exporter: none | statsig | otlp-http | otlp-grpc
+
+# metrics_exporter = "statsig"
+
+# Example OTLP/HTTP exporter configuration
+
+# [otel.exporter."otlp-http"]
+
+# endpoint = "https://otel.example.com/v1/logs"
+
+# protocol = "binary" # "binary" | "json"
+
+# [otel.exporter."otlp-http".headers]
+
+# "x-otlp-api-key" = "${OTLP_TOKEN}"
+
+# [otel.exporter."otlp-http".tls]
+
+# ca-certificate = "certs/otel-ca.pem"
+
+# client-certificate = "/etc/codex/certs/client.pem"
+
+# client-private-key = "/etc/codex/certs/client-key.pem"
+
+# Example OTLP/gRPC trace exporter configuration
+
+# [otel.trace_exporter."otlp-grpc"]
+
+# endpoint = "https://otel.example.com:4317"
+
+# headers = { "x-otlp-meta" = "abc123" }
+
+################################################################################
+
 # Windows
+
 ################################################################################
+
 [windows]
-# Native Windows sandbox mode입니다(Windows 전용): unelevated | elevated
+
+# Native Windows sandbox mode (Windows only): unelevated | elevated
+
 sandbox = "unelevated"
-
-# MCP servers
-[mcp_servers.openai_developer_docs]
-command = "npx"
-args = ["-y", "mcp-remote", "https://developers.openai.com/mcp"]
-enabled = true
-
-[mcp_servers.context7]
-command = "npx"
-args = ["-y", "@upstash/context7-mcp@latest"]
-enabled = true
-
-[mcp_servers.codegraph]
-command = "codegraph"
-args = ["serve", "--mcp"]
-enabled = true
