@@ -15,7 +15,7 @@ macOS에서 두 LaunchAgent가 독립적으로 실행된다.
 - tokscale: 3일마다 14:00
 - dotfiles: 매월 1일과 16일 14:00
 
-두 작업 모두 월간 calendar로 실행한다. 성공 시각, 마지막 실행 timestamp, cache를 저장하지 않으며 성공이나 실패가 다음 calendar 실행일을 바꾸지 않는다.
+두 작업 모두 launchd calendar로 실행한다. 성공 시각, 마지막 실행 timestamp, cache를 저장하지 않으며 성공이나 실패가 다음 calendar 실행일을 바꾸지 않는다.
 
 launchd는 예약 시각에 Mac이 잠들어 있으면 깨어난 뒤 누락된 실행을 한 번으로 합쳐 실행한다.
 
@@ -37,9 +37,11 @@ make init
 
 `make init`은 Docker CLI와 daemon, 로컬 npm을 확인한 뒤 lockfile 기준 `npm ci`를 실행한다. npm의 `prepare` lifecycle이 Husky를 설정한다. 환경 파일을 만들거나 Compose container를 시작하지 않는다.
 
-첫 chezmoi 적용 시 apply 후 `name`을 GitHub username으로 사용하여 공개·비보관 저장소를 최대 100개 `~/Documents/GitHub`에 clone한다. GitHub REST API를 인증 없이 사용하며 개인 계정만 허용하고 organization은 무시한다. clone이 끝나면 대화형 Doppler 로그인을 확인하고, 저장소명과 같은 Doppler project의 `local` config로 누락된 `.env`만 생성한다. `run_once_after_` 접두사가 같은 렌더 결과의 재실행을 막고, helper가 기존 Git 저장소와 `.env`를 보존한다. 예약 동기화는 이 흐름을 별도로 호출하지 않는다.
+native 첫 chezmoi 적용 시 apply 후 `name`을 GitHub username으로 사용하여 공개·비보관 저장소를 최대 100개 `~/Documents/GitHub`에 clone한다. GitHub REST API를 인증 없이 사용하며 개인 계정만 허용하고 organization은 무시한다. clone이 끝나면 대화형 Doppler 로그인을 확인하고, 저장소명과 같은 Doppler project의 `local` config로 누락된 `.env`만 생성한다. Codespaces는 이미 선택한 repository에서 시작하므로 이 전체 흐름을 건너뛴다. `run_once_after_` 접두사가 같은 렌더 결과의 재실행을 막고, helper가 기존 Git 저장소와 `.env`를 보존한다. 예약 동기화는 이 흐름을 별도로 호출하지 않는다.
 
-기존 Git 저장소는 pull/reset하지 않는다. archived 저장소는 제외하고 fork는 포함한다. 일부 clone만 실패하면 성공한 저장소를 유지하고 오류를 보고하지 않으며, 잘못된 ID·API 조회 실패·모든 clone 실패만 보고한다. clone helper는 `.env`를 변경하지 않고, 후속 Doppler helper만 누락된 `.env`를 생성한다.
+기존 Git 저장소는 pull/reset하지 않는다. archived 저장소는 제외하고 fork는 포함한다. 일부 clone이나 대상 경로 충돌만 실패하면 성공한 저장소를 유지하고 warning과 상세 목록을 출력한 뒤 exit 0으로 완료한다. 잘못된 ID·API 조회 실패·모든 clone 실패는 오류로 보고한다. clone helper는 `.env`를 변경하지 않고, 후속 Doppler helper만 누락된 `.env`를 생성한다.
+
+이 전체 프로젝트 준비는 dotfiles 핵심 설치와 분리된 optional best-effort 단계다. wrapper는 helper 누락이나 clone·Doppler 실패를 warning과 수동 재시도 명령으로 남기고 성공 종료하므로, 해당 실패가 dotfiles apply 실패로 전이되지 않는다.
 
 최초 실행 결과를 미리 확인하거나 수동으로 재시도할 때만 name을 명시하여 실행한다.
 

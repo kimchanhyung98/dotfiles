@@ -16,9 +16,9 @@ dotfiles/
     ├── .chezmoiremove
     │
     ├── .chezmoiscripts/
-    │   ├── run_once_before_00-skills-ssot-migrate.sh.tmpl   # OS 공통: legacy 스킬 디렉토리 삭제 후 symlink 전환
+    │   ├── run_once_before_00-skills-ssot-migrate.sh.tmpl   # OS 공통: legacy 디렉토리 제거 후 ~/.skills symlink 전환
     │   ├── run_onchange_after_06-mattpocock-skills.sh.tmpl  # OS 공통: mattpocock 스킬 런타임 동기화
-    │   ├── run_once_after_90-projects-bootstrap.sh.tmpl     # OS 공통: 최초 적용 시 공개 GitHub 저장소 clone
+    │   ├── run_once_after_90-projects-bootstrap.sh.tmpl     # native 최초 적용: project/Doppler best-effort 준비
     │   │
     │   ├── darwin/
     │   │   ├── run_once_before_01-prerequisites.sh.tmpl
@@ -72,13 +72,16 @@ dotfiles/
     │   │   └── 80-secrets.zsh
     ├── dot_claude/
     │   ├── settings.json.tmpl
+    │   ├── symlink_CLAUDE.md          # → ~/AGENTS.md
     │   └── symlink_skills             # → ~/.skills
     │
     ├── dot_codex/
-    │   └── config.toml.tmpl
+    │   ├── config.toml.tmpl
+    │   └── symlink_AGENTS.md          # → ~/AGENTS.md
     │
     ├── dot_copilot/
-    │   └── mcp-config.json.tmpl
+    │   ├── mcp-config.json.tmpl
+    │   └── symlink_copilot-instructions.md # → ~/AGENTS.md
     │
     ├── dot_agents/
     │   └── symlink_skills             # → ~/.skills
@@ -111,7 +114,8 @@ dotfiles/
 | `dot_codex/`                | `~/.codex/`                        | Codex CLI 설정                                      |
 | `dot_copilot/`              | `~/.copilot/`                      | Copilot CLI 사용자 MCP 설정                           |
 | `dot_<tool>/symlink_skills` | `~/.<tool>/skills/` → `~/.skills/` | 지원 스킬 경로를 단일 출처로 잇는 symlink (claude·agents)       |
-| `Library/LaunchAgents/`     | `~/Library/LaunchAgents/`          | tokscale 3일·dotfiles 매월 1·16일 calendar schedule    |
+| 도구별 instruction symlink | `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.copilot/copilot-instructions.md` → `~/AGENTS.md` | 공통 지침을 각 도구의 공식 사용자 경로로 연결 |
+| `Library/LaunchAgents/`     | `~/Library/LaunchAgents/`          | tokscale 3일마다, dotfiles 매월 1·16일 calendar schedule |
 | `dot_local/bin/`            | `~/.local/bin/`                    | doctor, 프로젝트 clone/Doppler, 유지보수, 스킬 동기화 command |
 
 ## chezmoi special 파일
@@ -126,18 +130,19 @@ dotfiles/
 
 ## 템플릿 변수
 
-`.chezmoi.toml.tmpl`에서 감지 또는 입력받아 모든 `.tmpl` 파일에서 참조한다. 최초 `chezmoi init` 실행 시 대화형으로 수집되며, 이후
-`~/.config/chezmoi/chezmoi.toml`에 저장되어 재사용된다.
+`.chezmoi.toml.tmpl`에서 감지 또는 입력받아 모든 `.tmpl` 파일에서 참조한다. native 최초 `chezmoi init`은 대화형으로 수집하고,
+GitHub Codespaces 최초 설치는 공식 환경 변수로 채운다. 이후 `~/.config/chezmoi/chezmoi.toml`에 저장되어 재사용된다.
 
 **사용자 입력 (최초 1회, 모두 필수)**
 
 | 변수 | 용도 | 사용처 |
 |---|---|---|
-| `name` | Git 사용자 이름 | `.gitconfig` |
+| `name` | GitHub username 및 Git 사용자 이름 | `.gitconfig`, projects bootstrap |
 | `email` | Git 사용자 이메일 | `.gitconfig`, SSH 키 생성 안내 |
 | `deviceName` | 머신 식별 이름 | tokscale submit 식별자 |
 
-새 config는 대화형 터미널에서만 만들 수 있고 공백만 입력한 값도 거부한다. 이미 세 값이 저장된 config는 이후 비대화형 `--init`에서도 재사용한다.
+native 새 config는 대화형 터미널에서만 만들 수 있고 공백만 입력한 값도 거부한다. Codespaces는 `GITHUB_USER`,
+`GIT_COMMITTER_EMAIL`, `CODESPACE_NAME`을 사용해 비대화형으로 만든다. 이미 세 값이 저장된 config는 이후 비대화형 `--init`에서도 재사용한다.
 
 **자동 감지**
 

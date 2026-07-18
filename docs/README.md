@@ -10,7 +10,7 @@
 | Ubuntu 26.04 LTS non-root | Linux 기준선 | Docker actual apply·verify |
 | GitHub Codespaces | 제한 지원 | `CODESPACES=true`에서 시스템 설정과 데스크톱 앱을 제외한 CLI 경로 |
 
-최초 설정은 대화형 터미널에서 실행해야 한다. 이름, 이메일, 기기명에는 기본값이 없으며 세 값 중 하나라도 비어 있으면 config 생성이 중단된다.
+native 최초 설정은 대화형 터미널에서 실행해야 한다. 이름, 이메일, 기기명에는 기본값이 없으며 세 값 중 하나라도 비어 있으면 config 생성이 중단된다. Codespaces 자동 설치는 공식 identity 환경 변수를 사용해 비대화형으로 같은 값을 만든다.
 
 ## 운영 문서
 
@@ -35,7 +35,7 @@
 | Linux 패키지 | `home/.chezmoiscripts/linux/run_once_before_01-install-packages.sh.tmpl` |
 | 선택된 mattpocock 스킬과 ref | `home/dot_local/bin/executable_mattpocock-skills-sync` |
 | 프로젝트 clone | `home/dot_local/bin/executable_projects-bootstrap` |
-| Doppler `.env` 동기화 | `executable_projects-doppler-sync` |
+| Doppler `.env` 동기화 | `home/dot_local/bin/executable_projects-doppler-sync` |
 | 테스트 범위 | `tests/`, `Makefile` |
 
 문서와 구현이 다르면 위 기준 파일을 먼저 확인하고 같은 변경에서 문서를 갱신한다.
