@@ -76,6 +76,19 @@ check_path() {
     fi
 }
 
+check_symlink() {
+    local label="$1"
+    local path="$2"
+    local expected_target="$3"
+    if [ -L "$path" ] && [ "$(readlink "$path")" = "$expected_target" ] && [ -e "$path" ]; then
+        echo -e "  ${GREEN}✓${NC} $label"
+        pass=$((pass + 1))
+    else
+        echo -e "  ${RED}✗${NC} $label — $path -> $expected_target"
+        fail=$((fail + 1))
+    fi
+}
+
 section() {
     echo -e "\n${BLUE}[$1]${NC}"
 }
@@ -90,13 +103,16 @@ ARCH=$(uname -m)
 if [ "$OS" = "Darwin" ]; then
     echo -e "  ${GREEN}✓${NC} macOS $(sw_vers -productVersion) ($ARCH)"
     pass=$((pass + 1))
-elif [ "$OS" = "Linux" ] && [ "${CODESPACES:-false}" = "true" ]; then
-    echo -e "  ${GREEN}✓${NC} GitHub Codespaces ($(uname -r), $ARCH)"
-    pass=$((pass + 1))
 elif [ "$OS" = "Linux" ] && [ -r /etc/os-release ]; then
     linux_id="$(sed -n 's/^ID=//p' /etc/os-release | tr -d '"')"
     linux_version="$(sed -n 's/^VERSION_ID=//p' /etc/os-release | tr -d '"')"
-    if [ "$linux_id" = "ubuntu" ] && [ "$linux_version" = "26.04" ]; then
+    if [ "${CODESPACES:-false}" = "true" ] && [ "$linux_id" = "ubuntu" ]; then
+        echo -e "  ${GREEN}✓${NC} GitHub Codespaces (Ubuntu ${linux_version:-unknown}, $ARCH)"
+        pass=$((pass + 1))
+    elif [ "${CODESPACES:-false}" = "true" ]; then
+        echo -e "  ${RED}✗${NC} unsupported Codespaces distribution: ${linux_id:-unknown}"
+        fail=$((fail + 1))
+    elif [ "$linux_id" = "ubuntu" ] && [ "$linux_version" = "26.04" ]; then
         echo -e "  ${GREEN}✓${NC} Ubuntu 26.04 LTS ($ARCH)"
         pass=$((pass + 1))
     else
@@ -134,6 +150,7 @@ check_optional "brew" "command -v brew"
 check_optional "zb" "command -v zb"
 check_optional "pipx" "command -v pipx"
 check_optional "bun" "command -v bun"
+check "doppler" "command -v doppler"
 
 # AI CLI
 section "AI CLI"
@@ -156,12 +173,15 @@ check_optional "oh-my-codex" "command -v omx"
 # Skill Directories (단일 출처 ~/.skills + 도구별 symlink)
 section "Skill Directories"
 check_path "Shared skills (~/.skills)" "$HOME/.skills"
-check "Claude skills -> ~/.skills" "[ -L '$HOME/.claude/skills' ] && [ -e '$HOME/.claude/skills' ]"
-check "Codex skills (~/.agents) -> ~/.skills" "[ -L '$HOME/.agents/skills' ] && [ -e '$HOME/.agents/skills' ]"
+check_symlink "Claude skills -> ~/.skills" "$HOME/.claude/skills" "../.skills"
+check_symlink "Codex skills (~/.agents) -> ~/.skills" "$HOME/.agents/skills" "../.skills"
 
-# AGENTS.md
-section "AGENTS.md"
-check_path "AGENTS.md" "$HOME/AGENTS.md"
+# Agent Instructions
+section "Agent Instructions"
+check_path "Shared instructions" "$HOME/AGENTS.md"
+check_symlink "Claude instructions -> ~/AGENTS.md" "$HOME/.claude/CLAUDE.md" "../AGENTS.md"
+check_symlink "Codex instructions -> ~/AGENTS.md" "$HOME/.codex/AGENTS.md" "../AGENTS.md"
+check_symlink "Copilot instructions -> ~/AGENTS.md" "$HOME/.copilot/copilot-instructions.md" "../AGENTS.md"
 
 # Dotfiles
 section "Dotfiles"
