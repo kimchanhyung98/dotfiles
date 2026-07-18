@@ -128,8 +128,12 @@ while IFS=$'\t' read -r name clone_url; do
     fi
 done <<<"$repositories"
 
-if [ "$clone_attempts" -gt 0 ] && [ "$clone_successes" -eq 0 ]; then
+if [ -s "$clone_errors" ]; then
+    echo "[projects-bootstrap][warning] some repositories were not cloned:" >&2
     cat "$clone_errors" >&2
+fi
+
+if [ "$clone_attempts" -gt 0 ] && [ "$clone_successes" -eq 0 ]; then
     echo "[projects-bootstrap][error] all repository clones failed" >&2
     exit 1
 fi
