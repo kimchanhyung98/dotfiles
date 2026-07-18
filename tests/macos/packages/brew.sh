@@ -12,6 +12,7 @@ homebrew_prefix="$test_home/homebrew"
 fake_bin="$test_home/bin"
 call_log="$test_home/calls.log"
 bundle_state="$test_home/bundle-satisfied"
+trust_state="$test_home/doppler-trusted"
 mkdir -p "$homebrew_prefix/bin" "$fake_bin"
 configure_chezmoi_test_home "$test_home" "$homebrew_prefix"
 
@@ -27,9 +28,16 @@ case "${1:-}" in
         if [ "${2:-}" = "check" ]; then
             test -f "$BUNDLE_STATE"
         else
+            test -f "$TRUST_STATE"
             printf 'brew bundle\n' >> "$CALL_LOG"
             touch "$BUNDLE_STATE"
         fi
+        ;;
+    trust)
+        test "${2:-}" = "--formula"
+        test "${3:-}" = "dopplerhq/cli/doppler"
+        printf 'brew trust\n' >> "$CALL_LOG"
+        touch "$TRUST_STATE"
         ;;
     *) exit 1 ;;
 esac
@@ -49,11 +57,14 @@ run_chezmoi "$test_home" execute-template \
 PATH="$fake_bin:$PATH" \
 HOMEBREW_PREFIX="$homebrew_prefix" \
 BUNDLE_STATE="$bundle_state" \
+TRUST_STATE="$trust_state" \
 CALL_LOG="$call_log" \
     bash "$rendered" >/dev/null
 
 test "$(sed -n '1p' "$call_log")" = 'zb bundle'
-test "$(sed -n '2p' "$call_log")" = 'brew bundle'
+test "$(sed -n '2p' "$call_log")" = 'brew trust'
+test "$(sed -n '3p' "$call_log")" = 'brew bundle'
+test -f "$trust_state"
 test -f "$bundle_state"
 grep -Fq 'brew "pkgconf"' "$repo_dir/home/Brewfile"
 if grep -Fq 'brew "pkg-config"' "$repo_dir/home/Brewfile"; then

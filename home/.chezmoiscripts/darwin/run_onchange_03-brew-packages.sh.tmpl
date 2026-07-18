@@ -36,6 +36,10 @@ ensure_zb_available() {
 }
 
 run_homebrew_bundle() {
+    if ! brew trust --formula dopplerhq/cli/doppler; then
+        echo "[brew-packages][error] failed to trust Doppler formula" >&2
+        exit 1
+    fi
     if ! brew bundle --file="$BREWFILE"; then
         echo "[brew-packages][error] brew bundle failed"
         exit 1
