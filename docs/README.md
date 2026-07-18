@@ -7,7 +7,7 @@
 | 환경 | 보장 수준 | 현재 검증 |
 |---|---|---|
 | 개인 macOS | 주 사용 환경 | 격리 HOME의 템플릿·bootstrap·설정 회귀 테스트 |
-| Ubuntu 26.04 LTS non-root | Linux 기준선 | Docker actual apply·verify |
+| Ubuntu 26.04 LTS non-root | Linux 기준선 | Linux 로컬 또는 Docker actual apply·verify |
 | GitHub Codespaces | 제한 지원 | `CODESPACES=true`에서 시스템 설정과 데스크톱 앱을 제외한 CLI 경로 |
 
 native 최초 설정은 대화형 터미널에서 실행해야 한다. 이름, 이메일, 기기명에는 기본값이 없으며 세 값 중 하나라도 비어 있으면 config 생성이 중단된다. Codespaces 자동 설치는 공식 identity 환경 변수를 사용해 비대화형으로 같은 값을 만든다.

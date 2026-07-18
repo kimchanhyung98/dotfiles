@@ -1,9 +1,41 @@
-# tests/Dockerfile only needs the Makefile, chezmoi source, and test fixtures.
+# tests/linux/Dockerfile only needs the installer, chezmoi source, and tests.
 # An allowlist keeps repository metadata, .env files, and local credentials out
 # of the build context without duplicating .gitignore's unrelated rules.
 **
-!Makefile
+!install.sh
 !home/
 !home/**
 !tests/
 !tests/**
+**/.env
+**/.env.*
+**/.aws/**
+**/.azure/**
+**/.docker/config.json
+**/.git-credentials
+**/.gcloud/**
+**/.gnupg/**
+**/.kube/config
+**/.netrc
+**/.npmrc
+**/.ssh/**
+**/.secrets
+**/.secrets/**
+**/auth.json
+**/application_default_credentials.json
+**/credentials.json
+**/secrets/**
+**/id_ed25519*
+**/id_rsa*
+**/*.cer
+**/*.crt
+**/*.jks
+**/*.key
+**/*.keystore
+**/*.p12
+**/*.pem
+**/*.pfx
+**/*.tfstate
+**/*.tfstate.*
+**/*.tfvars
+**/*.tfvars.json
