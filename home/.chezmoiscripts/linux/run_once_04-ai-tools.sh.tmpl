@@ -47,7 +47,7 @@ if ! command -v codex &>/dev/null; then
         echo "[ai-tools][error] Codex download failed" >&2
         exit 1
     fi
-    if ! sh "$installer"; then
+    if ! CODEX_NON_INTERACTIVE=1 sh "$installer"; then
         rm -f "$installer"
         echo "[ai-tools][error] Codex installation failed" >&2
         exit 1
@@ -106,7 +106,7 @@ if ! command -v copilot &>/dev/null; then
     echo "[ai-tools][copilot] installing"
     installer=$(mktemp)
     if curl -fsSL https://gh.io/copilot-install -o "$installer"; then
-        PREFIX="$HOME/.local" sh "$installer" || echo "[ai-tools][warning] Copilot CLI installation failed"
+        PREFIX="$HOME/.local" bash "$installer" || echo "[ai-tools][warning] Copilot CLI installation failed"
     else
         echo "[ai-tools][warning] Copilot CLI download failed"
     fi

@@ -23,7 +23,7 @@ fi
 mkdir -p "$HOME/.codex"
 if [ ! -f "$HOME/.codex/.profile-initialized" ]; then
     echo "[ai-codex][oh-my-codex] initializing"
-    if omx setup 2>/dev/null && omx doctor 2>/dev/null; then
+    if omx setup --scope user 2>/dev/null && omx doctor 2>/dev/null; then
         touch "$HOME/.codex/.profile-initialized"
     else
         echo "[ai-codex][warning] omx setup/doctor failed"

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Shell baseline: default shell zsh, history, keybindings, locale, timezone
+# Shell baseline: default login shell, locale, timezone
 # Re-applies when this script changes
 
 {{ if ne .chezmoi.os "linux" }}
@@ -32,7 +32,8 @@ ZSH_PATH=$(command -v zsh 2>/dev/null)
 if [ -n "$ZSH_PATH" ] && [ "$SHELL" != "$ZSH_PATH" ]; then
     echo "[shell-baseline][zsh] setting default shell"
     if grep -q "$ZSH_PATH" /etc/shells; then
-        chsh -s "$ZSH_PATH" 2>/dev/null || echo "[shell-baseline][warning] chsh failed. Run manually: chsh -s $ZSH_PATH"
+        "${run_as_root[@]}" chsh -s "$ZSH_PATH" "$(id -un)" 2>/dev/null || \
+            echo "[shell-baseline][warning] chsh failed. Run manually: chsh -s $ZSH_PATH"
     else
         echo "[shell-baseline][warning] $ZSH_PATH not in /etc/shells"
         echo "[shell-baseline][manual] echo '$ZSH_PATH' | sudo tee -a /etc/shells"
@@ -55,15 +56,13 @@ fi
 
 # 타임존
 # - Asia/Seoul (KST) 시간대 설정
-if [ -f /etc/timezone ]; then
-    CURRENT_TZ=$(cat /etc/timezone 2>/dev/null || echo "")
-    if [ "$CURRENT_TZ" != "Asia/Seoul" ]; then
-        echo "[shell-baseline][timezone] setting Asia/Seoul"
-        if [ "$(id -u)" -eq 0 ] || [ ${#run_as_root[@]} -ne 0 ]; then
-            "${run_as_root[@]}" timedatectl set-timezone Asia/Seoul 2>/dev/null || \
-                "${run_as_root[@]}" ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime 2>/dev/null || \
-                echo "[shell-baseline][warning] timezone setting failed"
-        fi
+CURRENT_TIMEZONE=$(readlink -f /etc/localtime 2>/dev/null || true)
+if [ "$CURRENT_TIMEZONE" != "/usr/share/zoneinfo/Asia/Seoul" ]; then
+    echo "[shell-baseline][timezone] setting Asia/Seoul"
+    if [ "$(id -u)" -eq 0 ] || [ ${#run_as_root[@]} -ne 0 ]; then
+        "${run_as_root[@]}" timedatectl set-timezone Asia/Seoul 2>/dev/null || \
+            "${run_as_root[@]}" ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime 2>/dev/null || \
+            echo "[shell-baseline][warning] timezone setting failed"
     fi
 fi
 

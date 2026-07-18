@@ -1,14 +1,20 @@
 #!/bin/bash
 # Bootstrap public GitHub repositories and matching Doppler local environments.
+# Native-only and best-effort: Codespaces skips this step, and failures must not fail dotfiles apply.
 
 set -u
+
+if [ "${CODESPACES:-false}" = "true" ]; then
+    echo "[projects-bootstrap-once] skipped in GitHub Codespaces"
+    exit 0
+fi
 
 projects_bootstrap="$HOME/.local/bin/projects-bootstrap"
 projects_doppler_sync="$HOME/.local/bin/projects-doppler-sync"
 github_name={{ .name | quote }}
 
 if [ ! -x "$projects_bootstrap" ]; then
-    echo "[projects-bootstrap-once][error] helper missing or not executable: $projects_bootstrap" >&2
+    echo "[projects-bootstrap-once][warning] helper missing or not executable: $projects_bootstrap" >&2
     exit 0
 fi
 
@@ -18,7 +24,7 @@ if ! "$projects_bootstrap" "$github_name"; then
 fi
 
 if [ ! -x "$projects_doppler_sync" ]; then
-    echo "[projects-bootstrap-once][error] helper missing or not executable: $projects_doppler_sync" >&2
+    echo "[projects-bootstrap-once][warning] helper missing or not executable: $projects_doppler_sync" >&2
     exit 0
 fi
 

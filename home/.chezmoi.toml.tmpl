@@ -1,13 +1,15 @@
 {{/* chezmoi 설정 템플릿 */}}
 {{/* macOS (Intel & Apple Silicon) 및 Linux 지원 */}}
 
-{{/* 최초 설정에는 이름, 이메일, 기기명을 직접 입력해야 한다. */}}
+{{/* 최초 설정에는 이름, 이메일, 기기명이 필요하다. Codespaces는 공식 환경 변수를 사용한다. */}}
 {{- $hasRequiredData := and (hasKey . "name") (hasKey . "email") (hasKey . "deviceName") -}}
-{{- if and (not stdinIsATTY) (not $hasRequiredData) -}}
+{{- $isCodespaces := and (eq .chezmoi.os "linux") (eq (env "CODESPACES") "true") -}}
+{{- if and (not stdinIsATTY) (not $hasRequiredData) (not $isCodespaces) -}}
 {{-   fail "Initial configuration requires an interactive terminal to enter name, email, and device name" -}}
 {{- end -}}
 {{- $name := "" -}}
 {{- $email := "" -}}
+{{- $deviceName := "" -}}
 
 {{/* macOS 아키텍처 감지 (Apple Silicon 여부) */}}
 {{- $isAppleSilicon := false -}}
@@ -40,21 +42,33 @@
 {{-   end -}}
 {{- end -}}
 
-{{/* 기기 이름 — tokscale 등 식별용 */}}
-{{- $deviceName := "" -}}
-
-{{/* 이름/이메일/기기명 입력 프롬프트 (최초 1회) */}}
-{{- $name = promptStringOnce . "name" "Name (GitHub username and Git author)" | trim -}}
-{{- if eq $name "" -}}
-{{-   fail "Name is required" -}}
-{{- end -}}
-{{- $email = promptStringOnce . "email" "Email address" | trim -}}
-{{- if eq $email "" -}}
-{{-   fail "Email address is required" -}}
-{{- end -}}
-{{- $deviceName = promptStringOnce . "deviceName" "Device name (tokscale 식별용)" | trim -}}
-{{- if eq $deviceName "" -}}
-{{-   fail "Device name is required" -}}
+{{/* 이름/이메일/기기명 수집 (Codespaces 자동 설치 또는 최초 대화형 실행) */}}
+{{- if and $isCodespaces (not $hasRequiredData) -}}
+{{-   $name = env "GITHUB_USER" | trim -}}
+{{-   $email = env "GIT_COMMITTER_EMAIL" | trim -}}
+{{-   $deviceName = env "CODESPACE_NAME" | trim -}}
+{{-   if eq $name "" -}}
+{{-     fail "GITHUB_USER is required for initial GitHub Codespaces configuration" -}}
+{{-   end -}}
+{{-   if eq $email "" -}}
+{{-     fail "GIT_COMMITTER_EMAIL is required for initial GitHub Codespaces configuration" -}}
+{{-   end -}}
+{{-   if eq $deviceName "" -}}
+{{-     fail "CODESPACE_NAME is required for initial GitHub Codespaces configuration" -}}
+{{-   end -}}
+{{- else -}}
+{{-   $name = promptStringOnce . "name" "Name (GitHub username and Git author)" | trim -}}
+{{-   if eq $name "" -}}
+{{-     fail "Name is required" -}}
+{{-   end -}}
+{{-   $email = promptStringOnce . "email" "Email address" | trim -}}
+{{-   if eq $email "" -}}
+{{-     fail "Email address is required" -}}
+{{-   end -}}
+{{-   $deviceName = promptStringOnce . "deviceName" "Device name (tokscale 식별용)" | trim -}}
+{{-   if eq $deviceName "" -}}
+{{-     fail "Device name is required" -}}
+{{-   end -}}
 {{- end -}}
 
 # chezmoi 소스 디렉토리 경로

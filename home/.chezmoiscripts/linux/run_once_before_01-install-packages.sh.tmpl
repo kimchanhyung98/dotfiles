@@ -47,6 +47,7 @@ packages=(
     ca-certificates
     curl
     git
+    gnupg
     jq
     locales
     make
@@ -92,7 +93,7 @@ if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
     echo "[install-packages][bat] created symlink: bat -> batcat"
 fi
 
-# Doppler CLI (GitHub project bootstrap 후 local config 동기화에 필요)
+# Doppler CLI (native 환경에서 project bootstrap 후 local config 동기화에 필요)
 export PATH="$HOME/.local/bin:$PATH"
 if ! command -v doppler &>/dev/null; then
     echo "[install-packages][doppler] installing"

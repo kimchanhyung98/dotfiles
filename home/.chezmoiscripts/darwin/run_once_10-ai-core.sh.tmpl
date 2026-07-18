@@ -44,7 +44,7 @@ if ! command -v codex &>/dev/null; then
         echo "[ai-core][error] Codex CLI download failed" >&2
         exit 1
     fi
-    if ! sh "$installer"; then
+    if ! CODEX_NON_INTERACTIVE=1 sh "$installer"; then
         rm -f "$installer"
         echo "[ai-core][error] Codex CLI installation failed" >&2
         exit 1

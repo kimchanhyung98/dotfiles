@@ -1,11 +1,11 @@
 #!/bin/bash
 #
 # 스킬 SSOT 전환 준비 (darwin/linux 공통)
-# - Claude Code와 Codex의 지원 skills 경로가 symlink 전환 이전의 실제 디렉터리면 삭제한다.
-#   기존 디렉터리를 제거해야 chezmoi가 ~/.skills symlink를 생성할 수 있다.
+# - Claude Code와 Codex의 지원 skills 경로가 symlink 전환 이전의 실제 디렉터리면 백업 없이 삭제한다.
+#   이후 chezmoi가 각 지원 경로에 ~/.skills를 가리키는 symlink를 생성한다.
+# - ~/.skills 본체는 이 스크립트에서 삭제하거나 수정하지 않는다.
 # - 모든 경로가 이미 symlink 인 머신에서는 아무 일도 하지 않는다 (멱등).
 
-# 주의: 이 스크립트는 glob 순회가 필요하므로 -f(noglob)를 켜지 않는다
 set -euo pipefail
 
 for dir in \
