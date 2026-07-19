@@ -15,3 +15,8 @@ run_chezmoi "$test_home" execute-template \
 
 jq empty "$rendered"
 diff -u "$repo_dir/.claude/settings.json" "$rendered"
+jq -e '
+    .permissions.deny
+    | index("Edit(../**)") != null
+      and index("Write(../**)") == null
+' "$rendered" >/dev/null

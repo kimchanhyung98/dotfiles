@@ -28,8 +28,7 @@
       "Read(**/.git-credentials)",
       "Read(**/.kube/config)",
       "Read(**/.gnupg/**)",
-      "Edit(../**)",
-      "Write(../**)"
+      "Edit(../**)"
     ],
     "defaultMode": "bypassPermissions"
   },
