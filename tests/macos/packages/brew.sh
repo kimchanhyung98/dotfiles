@@ -13,6 +13,7 @@ fake_bin="$test_home/bin"
 call_log="$test_home/calls.log"
 bundle_state="$test_home/bundle-satisfied"
 trust_state="$test_home/doppler-trusted"
+outdated_state="$test_home/outdated-package"
 mkdir -p "$homebrew_prefix/bin" "$fake_bin"
 configure_chezmoi_test_home "$test_home" "$homebrew_prefix"
 
@@ -27,6 +28,9 @@ case "${1:-}" in
     bundle)
         if [ "${2:-}" = "check" ]; then
             test -f "$BUNDLE_STATE"
+            if [[ " $* " != *" --no-upgrade "* ]]; then
+                test ! -f "$OUTDATED_STATE"
+            fi
         else
             test -f "$TRUST_STATE"
             printf 'brew bundle\n' >> "$CALL_LOG"
@@ -48,6 +52,7 @@ printf 'zb bundle\n' >> "$CALL_LOG"
 exit 0
 EOF
 chmod +x "$homebrew_prefix/bin/brew" "$fake_bin/zb"
+touch "$outdated_state"
 
 rendered="$test_home/brew-packages.sh"
 run_chezmoi "$test_home" execute-template \
@@ -58,6 +63,7 @@ PATH="$fake_bin:$PATH" \
 HOMEBREW_PREFIX="$homebrew_prefix" \
 BUNDLE_STATE="$bundle_state" \
 TRUST_STATE="$trust_state" \
+OUTDATED_STATE="$outdated_state" \
 CALL_LOG="$call_log" \
     bash "$rendered" >/dev/null
 
@@ -66,6 +72,7 @@ test "$(sed -n '2p' "$call_log")" = 'brew trust'
 test "$(sed -n '3p' "$call_log")" = 'brew bundle'
 test -f "$trust_state"
 test -f "$bundle_state"
+test -f "$outdated_state"
 grep -Fq 'brew "pkgconf"' "$repo_dir/home/Brewfile"
 if grep -Fq 'brew "pkg-config"' "$repo_dir/home/Brewfile"; then
     echo 'deprecated pkg-config formula remains in Brewfile' >&2

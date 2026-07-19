@@ -111,7 +111,7 @@ native Linux의 지원 범위는 Ubuntu 26.04 LTS다. GitHub Codespaces는 under
 
 ## Brewfile 패키지
 
-Brewfile은 `zb bundle install --auto-init -f Brewfile`로 먼저 처리한다. zerobrew가 실패하거나 이후 `brew bundle check`가 전체 상태의 누락을 발견하면 `brew bundle --file=Brewfile`로 폴백한다. 두 경로 모두 package 설치·upgrade를 담당하며, Brewfile에서 빠진 package 제거는 별도 cleanup 명령 없이는 수행하지 않는다.
+Brewfile은 `zb bundle install --auto-init -f Brewfile`로 먼저 처리한다. zerobrew가 실패하거나 이후 `brew bundle check --no-upgrade`가 설치되지 않은 의존성을 발견하면 `brew bundle --file=Brewfile`로 폴백한다. 두 경로 모두 package 설치·upgrade를 담당하며, 사후 검증은 보류 중인 upgrade가 아니라 설치 여부만 확인한다. Brewfile에서 빠진 package 제거는 별도 cleanup 명령 없이는 수행하지 않는다.
 Homebrew 폴백은 `brew trust --formula dopplerhq/cli/doppler`로 Doppler formula를 신뢰한 뒤 bundle을 실행한다. Doppler는 최초 프로젝트 `.env` 동기화에 필요하므로 설치 검사에서 제외하지 않는다.
 AI 도구는 설치 채널 정책에 따라 AI 스크립트에서 관리한다. 단, macOS Copilot CLI는 공식 Homebrew cask를 사용한다. Claude/Codex만 필수 baseline이며 나머지는 선택 도구다.
 
