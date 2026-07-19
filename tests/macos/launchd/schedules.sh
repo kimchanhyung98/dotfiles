@@ -35,6 +35,34 @@ grep -Fq 'export TOKSCALE_DEVICE_NAME=' "$tokscale_submit"
 grep -Fq 'bunx tokscale@latest whoami' "$tokscale_submit"
 grep -Fq 'bunx tokscale@latest submit' "$tokscale_submit"
 
+mkdir -p "$test_home/.bun/bin" "$test_home/.config/tokscale"
+touch "$test_home/.config/tokscale/credentials.json"
+tokscale_call_log="$test_home/tokscale-calls.log"
+cat > "$test_home/.bun/bin/bunx" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+test "${1:-}" = "tokscale@latest"
+case "${2:-}" in
+    whoami)
+        printf 'whoami\n' >> "$TOKSCALE_CALL_LOG"
+        ;;
+    submit)
+        IFS= read -r answer
+        test "$answer" = "n"
+        if IFS= read -r extra; then
+            exit 1
+        fi
+        printf 'submit:%s\n' "$answer" >> "$TOKSCALE_CALL_LOG"
+        ;;
+    *) exit 1 ;;
+esac
+EOF
+chmod +x "$test_home/.bun/bin/bunx"
+HOME="$test_home" TOKSCALE_CALL_LOG="$tokscale_call_log" bash "$tokscale_submit"
+test "$(sed -n '1p' "$tokscale_call_log")" = "whoami"
+test "$(sed -n '2p' "$tokscale_call_log")" = "submit:n"
+
 jq -e '
     .Label == "ai.tokscale.submit"
     and .RunAtLoad == false

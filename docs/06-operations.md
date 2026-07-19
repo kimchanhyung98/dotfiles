@@ -17,6 +17,8 @@ macOS에서 두 LaunchAgent가 독립적으로 실행된다.
 
 두 작업 모두 launchd calendar로 실행한다. 성공 시각, 마지막 실행 timestamp, cache를 저장하지 않으며 성공이나 실패가 다음 calendar 실행일을 바꾸지 않는다.
 
+tokscale 래퍼는 submit의 선택적 GitHub star 프롬프트에 `n`을 한 번 전달하여 비대화형으로 실행한다.
+
 launchd는 예약 시각에 Mac이 잠들어 있으면 깨어난 뒤 누락된 실행을 한 번으로 합쳐 실행한다.
 
 예약 시점과 무관하게 직접 검토·갱신하려면 다음 명령을 사용한다.

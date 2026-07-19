@@ -31,7 +31,8 @@ if ! bunx tokscale@latest whoami </dev/null >/dev/null; then
     exit 1
 fi
 
-if ! bunx tokscale@latest submit </dev/null >/dev/null; then
+# 거절 응답은 저장되지 않으므로 예약 실행마다 별표 프롬프트에 n을 한 번 전달한다.
+if ! printf 'n\n' | bunx tokscale@latest submit >/dev/null; then
     echo "[tokscale-submit][error] submit failed" >&2
     exit 1
 fi
