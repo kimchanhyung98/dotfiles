@@ -13,8 +13,6 @@ eggs/
 .eggs/
 lib/
 lib64/
-!tests/lib/
-!tests/lib/**
 parts/
 sdist/
 var/
@@ -197,6 +195,14 @@ $RECYCLE.BIN/
 # Agent-OS
 .agent-os/
 agent-os/
+
+# Playwright
+.agent-browser/
+.browser/
+.chrome/
+.next-browser/
+.playwright/
+.playwright-mcp/
 
 # etc
 .cmux/
