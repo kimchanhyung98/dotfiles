@@ -73,6 +73,17 @@
             "statusMessage": "Checking dependency folder edit"
           }
         ]
+      },
+      {
+        "matcher": "^(Edit|MultiEdit|Write|NotebookEdit|apply_patch)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.hooks/block_parent_directory_writes.sh\"",
+            "timeout": 10,
+            "statusMessage": "Checking parent directory write"
+          }
+        ]
       }
     ]
   },
@@ -127,7 +138,7 @@
   "language": "korean",
   "spinnerTipsEnabled": false,
   "alwaysThinkingEnabled": true,
-  "model": "opus",
+  "model": "fable",
   "effortLevel": "xhigh",
   "companyAnnouncements": [
     "\nWelcome to dotfiles!\nRun 'make init' on first launch."

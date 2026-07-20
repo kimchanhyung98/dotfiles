@@ -9,6 +9,12 @@
             "command": "bash \"$(git rev-parse --show-toplevel)/.hooks/block_dependency_folder_edits.sh\"",
             "timeout": 10,
             "statusMessage": "Checking dependency folder edit"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.hooks/block_parent_directory_writes.sh\"",
+            "timeout": 10,
+            "statusMessage": "Checking parent directory write"
           }
         ]
       },
