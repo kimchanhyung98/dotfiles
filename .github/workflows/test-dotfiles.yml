@@ -17,7 +17,7 @@ jobs:
       - name: Install test tools
         run: |
           brew install chezmoi jq shellcheck
-          curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh
+          npm install --global --prefix "$HOME/.local" @openai/codex
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Run local checks
         run: make check

@@ -11,7 +11,8 @@
 
 `tests/run.sh`는 선택한 환경 아래의 테스트를 경로순으로 각각 새 Bash
 process에서 실행한다. `tests/lib/`는 공통 helper, `tests/fixtures/`는 fixture만
-제공하며 테스트 케이스가 아니다.
+제공하며 테스트 케이스가 아니다. 명령이 실패하면 테스트 경로, 행, 종료 상태와
+실패한 명령을 출력한다.
 
 `make test`는 macOS에서 macOS 로컬 테스트와 Linux·Codespaces Docker 테스트를
 실행한다. Linux에서는 macOS를 생략하고 현재 호스트에서 Linux 테스트를 실행한다.

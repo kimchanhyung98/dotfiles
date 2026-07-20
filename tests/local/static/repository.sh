@@ -41,4 +41,6 @@ if command -v shellcheck >/dev/null 2>&1; then
     while IFS= read -r script; do
         shellcheck --severity=error "$script"
     done < <(list_shell_scripts)
+else
+    echo "[test][skip] shellcheck not found; skipping shellcheck lint" >&2
 fi

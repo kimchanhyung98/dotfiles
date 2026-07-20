@@ -10,6 +10,7 @@ fi
 environment="$1"
 tests_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 environment_root="$tests_root/$environment"
+test_case_env="$tests_root/lib/test-case-env.sh"
 
 if [ ! -d "$environment_root" ]; then
     echo "[test][error] unknown environment: $environment" >&2
@@ -22,7 +23,7 @@ failed=0
 while IFS= read -r test_file; do
     test_name="${test_file#"$tests_root/"}"
     echo "[test] $test_name"
-    if bash "$test_file"; then
+    if DOTFILES_TEST_CASE="$test_name" BASH_ENV="$test_case_env" bash "$test_file"; then
         echo "[test][pass] $test_name"
         passed=$((passed + 1))
     else

@@ -59,7 +59,8 @@ tests/{environment}/{function}/{name}.sh
 
 지원 환경은 `local`, `macos`, `linux`, `codespaces`다. `tests/run.sh`는 선택한
 환경의 파일을 경로순으로 각각 새 Bash process에서 실행한다. 모든 결과를 집계한
-뒤 하나라도 실패하면 non-zero로 종료한다.
+뒤 하나라도 실패하면 non-zero로 종료한다. 실패한 테스트는 경로, 행, 종료 상태와
+실패한 명령을 함께 출력한다.
 
 `tests/lib/`는 공통 helper, `tests/fixtures/`는 fixture를 제공하며 직접 실행되는
 테스트 케이스가 아니다. 새 테스트는 내부 함수 호출 여부보다 command의 exit
