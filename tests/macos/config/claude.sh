@@ -14,7 +14,7 @@ run_chezmoi "$test_home" execute-template \
     < "$repo_dir/home/dot_claude/settings.json.tmpl" > "$rendered"
 
 jq empty "$rendered"
-diff -u "$repo_dir/.claude/settings.json" "$rendered"
+jq -e 'has("hooks") | not' "$rendered" >/dev/null
 jq -e '
     .permissions.deny
     | index("Edit(../**)") != null

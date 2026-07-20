@@ -46,7 +46,6 @@ RUN mkdir -p "$HOME/.config/chezmoi" && \
 
 COPY --chown=testuser:testuser home/ /home/testuser/.local/share/chezmoi/
 COPY --chown=testuser:testuser tests/ /home/testuser/tests/
-COPY --chown=testuser:testuser install.sh /home/testuser/install.sh
 
 RUN test ! -e /home/testuser/tests/fixtures/.env.test-fixture
 

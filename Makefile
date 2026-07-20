@@ -79,7 +79,6 @@ test-linux: ## Linux 통합 테스트 실행(macOS에서는 Ubuntu 26.04 Docker 
 			HOME="$$test_root/home" \
 			XDG_CONFIG_HOME="$$test_root/home/.config" \
 			CHEZMOI_TEST_SOURCE_DIR="$(CURDIR)/home" \
-			CHEZMOI_TEST_INSTALL_SCRIPT="$(CURDIR)/install.sh" \
 				bash tests/run.sh "$$test_environment"; \
 			echo "[test-linux] all local $$test_environment tests passed" \
 			;; \

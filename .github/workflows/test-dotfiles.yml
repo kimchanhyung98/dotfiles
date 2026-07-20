@@ -31,15 +31,11 @@ jobs:
       - name: Install test tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y jq nodejs shellcheck zsh
+          sudo apt-get install -y jq shellcheck zsh
           curl -fsLS https://get.chezmoi.io -o /tmp/install-chezmoi.sh
           sh /tmp/install-chezmoi.sh -b "$HOME/.local/bin"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Run local and Ubuntu tests
         run: make test
-      - name: Run container tests
-        run: |
-          docker build -q -t dotfiles-test -f tests/linux/Dockerfile .
-          docker run --rm dotfiles-test
-          docker run --rm -e CODESPACES=true dotfiles-test \
-            bash /home/testuser/tests/run.sh codespaces
+      - name: Run Codespaces tests
+        run: CODESPACES=true make test-linux

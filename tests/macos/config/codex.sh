@@ -13,10 +13,17 @@ rendered="$test_home/config.toml"
 run_chezmoi "$test_home" execute-template \
     < "$repo_dir/home/dot_codex/config.toml.tmpl" > "$rendered"
 
-expected="$repo_dir/.codex/config.toml"
-if ! cmp -s "$expected" "$rendered"; then
-    echo 'rendered Codex config differs from the repository config' >&2
-    diff -u "$expected" "$rendered" >&2 || true
+if ! awk '
+    $0 == "include_only = []" { include_only = NR }
+    $0 == "experimental_use_profile = false" { experimental_use_profile = NR }
+    $0 == "[shell_environment_policy.set]" { set_table = NR; set_table_count++ }
+    END {
+        exit !(set_table_count == 1 &&
+            include_only < set_table &&
+            experimental_use_profile < set_table)
+    }
+' "$rendered"; then
+    echo 'shell_environment_policy.set must be an explicit trailing table' >&2
     exit 1
 fi
 

@@ -20,6 +20,10 @@ Linux 로컬 테스트는 실제 HOME 대신 임시 HOME과 현재 checkout의 `
 다만 actual apply가 패키지, 로그인 셸, locale, timezone 같은 시스템 설정을 바꿀
 수 있으므로 준비된 Ubuntu 26.04 환경이나 CI에서 실행한다.
 
+테스트 대상은 `home/` 아래의 chezmoi 관리 소스와 그 렌더·적용 결과로 한정한다.
+프로젝트 루트의 작업용 설정, Git 훅, installer 같은 저장소 도구는 이 테스트
+스위트의 대상이 아니다.
+
 새 테스트는 내부 함수 호출 여부가 아니라 command의 exit status, 생성된 파일,
 렌더링 결과처럼 사용자가 관찰할 수 있는 동작을 확인한다. 외부 API·repository는
 `local` fixture로 대체하고 실제 사용자 HOME이나 credential은 사용하지 않는다.
