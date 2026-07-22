@@ -36,6 +36,8 @@ ensure_zb_available() {
 }
 
 run_homebrew_bundle() {
+    local brew_skip="${HOMEBREW_BUNDLE_BREW_SKIP:-}"
+
     if ! brew tap dopplerhq/cli; then
         echo "[brew-packages][error] failed to tap Doppler repository" >&2
         exit 1
@@ -44,7 +46,13 @@ run_homebrew_bundle() {
         echo "[brew-packages][error] failed to trust Doppler formula" >&2
         exit 1
     fi
-    if ! brew bundle --file="$BREWFILE"; then
+    if brew list --formula --versions xcodes >/dev/null 2>&1; then
+        case " $brew_skip " in
+            *" xcodes "*) ;;
+            *) brew_skip="${brew_skip:+$brew_skip }xcodes" ;;
+        esac
+    fi
+    if ! HOMEBREW_BUNDLE_BREW_SKIP="$brew_skip" brew bundle --file="$BREWFILE"; then
         echo "[brew-packages][error] brew bundle failed"
         exit 1
     fi

@@ -33,14 +33,25 @@ case "${1:-}" in
                 test ! -f "$OUTDATED_STATE"
             fi
         else
+            if [[ " $* " == *" --no-upgrade "* ]]; then
+                echo 'brew bundle fallback must preserve normal upgrades' >&2
+                exit 1
+            fi
+            test "${HOMEBREW_BUNDLE_BREW_SKIP:-}" = 'xcodes'
             if [ ! -f "$TAP_STATE" ]; then
                 rm -f "$TRUST_STATE"
                 touch "$TAP_STATE"
             fi
             test -f "$TRUST_STATE"
             printf 'brew bundle\n' >> "$CALL_LOG"
+            rm -f "$OUTDATED_STATE"
             touch "$BUNDLE_STATE"
         fi
+        ;;
+    list)
+        test "${2:-}" = "--formula"
+        test "${3:-}" = "--versions"
+        test "${4:-}" = "xcodes"
         ;;
     tap)
         test "${2:-}" = "dopplerhq/cli"
@@ -88,7 +99,7 @@ test "$(sed -n '4p' "$call_log")" = 'brew bundle'
 test -f "$tap_state"
 test -f "$trust_state"
 test -f "$bundle_state"
-test -f "$outdated_state"
+test ! -f "$outdated_state"
 grep -Fq 'brew "pkgconf"' "$repo_dir/home/Brewfile"
 if grep -Fq 'brew "pkg-config"' "$repo_dir/home/Brewfile"; then
     echo 'deprecated pkg-config formula remains in Brewfile' >&2
