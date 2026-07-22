@@ -12,6 +12,7 @@ homebrew_prefix="$test_home/homebrew"
 fake_bin="$test_home/bin"
 call_log="$test_home/calls.log"
 bundle_state="$test_home/bundle-satisfied"
+tap_state="$test_home/doppler-tapped"
 trust_state="$test_home/doppler-trusted"
 outdated_state="$test_home/outdated-package"
 mkdir -p "$homebrew_prefix/bin" "$fake_bin"
@@ -32,9 +33,21 @@ case "${1:-}" in
                 test ! -f "$OUTDATED_STATE"
             fi
         else
+            if [ ! -f "$TAP_STATE" ]; then
+                rm -f "$TRUST_STATE"
+                touch "$TAP_STATE"
+            fi
             test -f "$TRUST_STATE"
             printf 'brew bundle\n' >> "$CALL_LOG"
             touch "$BUNDLE_STATE"
+        fi
+        ;;
+    tap)
+        test "${2:-}" = "dopplerhq/cli"
+        printf 'brew tap\n' >> "$CALL_LOG"
+        if [ ! -f "$TAP_STATE" ]; then
+            rm -f "$TRUST_STATE"
+            touch "$TAP_STATE"
         fi
         ;;
     trust)
@@ -62,14 +75,17 @@ run_chezmoi "$test_home" execute-template \
 PATH="$fake_bin:$PATH" \
 HOMEBREW_PREFIX="$homebrew_prefix" \
 BUNDLE_STATE="$bundle_state" \
+TAP_STATE="$tap_state" \
 TRUST_STATE="$trust_state" \
 OUTDATED_STATE="$outdated_state" \
 CALL_LOG="$call_log" \
     bash "$rendered" >/dev/null
 
 test "$(sed -n '1p' "$call_log")" = 'zb bundle'
-test "$(sed -n '2p' "$call_log")" = 'brew trust'
-test "$(sed -n '3p' "$call_log")" = 'brew bundle'
+test "$(sed -n '2p' "$call_log")" = 'brew tap'
+test "$(sed -n '3p' "$call_log")" = 'brew trust'
+test "$(sed -n '4p' "$call_log")" = 'brew bundle'
+test -f "$tap_state"
 test -f "$trust_state"
 test -f "$bundle_state"
 test -f "$outdated_state"
