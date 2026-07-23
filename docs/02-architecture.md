@@ -28,6 +28,7 @@ dotfiles/
     │   │   ├── run_once_05-runtime.sh.tmpl
     │   │   ├── run_onchange_after_07-tokscale-launchd.sh.tmpl
     │   │   ├── run_onchange_after_08-dotfiles-update-launchd.sh.tmpl
+    │   │   ├── run_onchange_after_09-openusage.sh.tmpl
     │   │   ├── run_once_10-ai-core.sh.tmpl
     │   │   ├── run_once_11-ai-claude.sh.tmpl
     │   │   ├── run_once_12-ai-codex.sh.tmpl
@@ -54,6 +55,8 @@ dotfiles/
     │   │   └── cmux.json.tmpl
     │   ├── ghostty/
     │   │   └── config.tmpl
+    │   ├── openusage/
+    │   │   └── OpenUsage.plist
     │   ├── rectangle/
     │   │   └── RectangleConfig.json
     │   ├── stats/
@@ -106,6 +109,7 @@ dotfiles/
 | `dot_config/bat/`           | `~/.config/bat/`                   | bat(cat 대체 뷰어) 설정                                 |
 | `dot_config/cmux/`          | `~/.config/cmux/`                  | cmux 설정 (`cmux.json`, `socketControlMode=allowAll` 자동화 기본값) |
 | `dot_config/ghostty/`       | `~/.config/ghostty/`               | Ghostty 터미널 설정                                    |
+| `dot_config/openusage/`     | `~/.config/openusage/`             | OpenUsage 설정 원본. openusage 스크립트가 `defaults import`로 적용 |
 | `dot_config/rectangle/`     | `~/.config/rectangle/`             | Rectangle 설정 원본. macOS app-settings 스크립트가 앱 import 경로로 복사 |
 | `dot_config/stats/`         | `~/.config/stats/`                 | Stats 설정 원본. app-settings 스크립트가 민감한 토큰을 보존하며 import |
 | `dot_config/tokscale/`      | `~/.config/tokscale/`              | tokscale submit 래퍼                                  |

@@ -1,0 +1,75 @@
+#!/bin/bash
+# Install the latest OpenUsage release and import baseline settings.
+#
+# OpenUsage config hash: {{ include "dot_config/openusage/OpenUsage.plist" | sha256sum }}
+
+{{ if ne .chezmoi.os "darwin" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "[openusage][start]"
+
+app="/Applications/OpenUsage.app"
+config="$HOME/.config/openusage/OpenUsage.plist"
+repo="robinebers/openusage"
+work_dir=""
+
+trap 'if [ -n "$work_dir" ]; then hdiutil detach "$work_dir/mnt" >/dev/null 2>&1 || true; rm -rf "$work_dir"; fi' EXIT
+
+# 설치는 best-effort: 실패해도 warning만 남기고 설정 import는 계속한다.
+install_openusage() {
+    curl -fsSL -o "$work_dir/OpenUsage.dmg" \
+        "https://github.com/$repo/releases/download/v$latest/OpenUsage-$latest.dmg" || return 1
+    mkdir -p "$work_dir/mnt" || return 1
+    hdiutil attach -nobrowse -readonly -mountpoint "$work_dir/mnt" "$work_dir/OpenUsage.dmg" >/dev/null || return 1
+    killall OpenUsage 2>/dev/null || true
+    rm -rf "$app" || return 1
+    ditto "$work_dir/mnt/OpenUsage.app" "$app" || return 1
+}
+
+# 최신 릴리스 버전 확인 (릴리스 페이지 redirect의 태그에서 추출)
+latest=""
+if release_url="$(curl -fsSL -o /dev/null -w '%{url_effective}' "https://github.com/$repo/releases/latest")"; then
+    case "$release_url" in
+        */tag/v*) latest="${release_url##*/tag/v}" ;;
+    esac
+fi
+
+installed=""
+if [ -d "$app" ]; then
+    installed="$(/usr/bin/plutil -extract CFBundleShortVersionString raw -o - "$app/Contents/Info.plist" 2>/dev/null || true)"
+fi
+
+if [ -z "$latest" ]; then
+    echo "[openusage][warning] release check failed; skip install"
+elif [ "$installed" = "$latest" ]; then
+    echo "[openusage] $latest already installed"
+else
+    echo "[openusage] install $latest (installed: ${installed:-none})"
+    work_dir="$(mktemp -d)"
+    if ! install_openusage; then
+        echo "[openusage][warning] install failed; skip" >&2
+    fi
+    hdiutil detach "$work_dir/mnt" >/dev/null 2>&1 || true
+    rm -rf "$work_dir"
+    work_dir=""
+fi
+
+# 설정 baseline 덮어쓰기
+if [ -f "$config" ]; then
+    echo "[openusage] import defaults"
+    killall OpenUsage 2>/dev/null || true
+    defaults import com.robinebers.openusage "$config"
+else
+    echo "[openusage][warning] config not found: $config"
+fi
+
+if [ -d "$app" ]; then
+    if ! open -g "$app"; then
+        echo "[openusage][warning] installed but could not launch automatically: $app" >&2
+    fi
+fi
+
+echo "[openusage][done]"

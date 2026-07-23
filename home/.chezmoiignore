@@ -4,6 +4,7 @@
 .chezmoiscripts/darwin/**
 Brewfile
 .config/cmux/**
+.config/openusage/**
 .config/rectangle/**
 .config/stats/**
 .config/tokscale/**
