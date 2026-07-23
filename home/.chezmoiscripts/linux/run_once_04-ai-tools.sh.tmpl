@@ -90,17 +90,6 @@ else
     echo "[ai-tools][codegraph-mcp] claude or codegraph not found, skipping MCP registration"
 fi
 
-# oh-my-codex
-# - Codex CLI 확장 프레임워크
-if ! command -v npm &>/dev/null; then
-    echo "[ai-tools][warning] npm not found; skipping optional oh-my-codex installation"
-elif ! command -v omx &>/dev/null; then
-    echo "[ai-tools][oh-my-codex] installing"
-    npm install -g oh-my-codex || echo "[ai-tools][warning] oh-my-codex install failed"
-else
-    echo "[ai-tools][oh-my-codex] already installed"
-fi
-
 # GitHub Copilot CLI (optional; Claude and Codex are the required AI CLIs)
 if ! command -v copilot &>/dev/null; then
     echo "[ai-tools][copilot] installing"

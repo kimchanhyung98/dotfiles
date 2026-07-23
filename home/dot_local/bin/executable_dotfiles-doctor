@@ -168,7 +168,6 @@ CLAUDE_SETTINGS="$HOME/.claude/settings.json"
 check_optional "Claude enabledPlugins config" "[ -f \"$CLAUDE_SETTINGS\" ] && grep -q '\"enabledPlugins\"' \"$CLAUDE_SETTINGS\""
 check_optional "Claude Codex plugin config" "[ -f \"$CLAUDE_SETTINGS\" ] && grep -q '\"codex@openai-codex\": true' \"$CLAUDE_SETTINGS\" && grep -q '\"openai-codex\"' \"$CLAUDE_SETTINGS\""
 check_optional "Claude remember plugin config" "[ -f \"$CLAUDE_SETTINGS\" ] && grep -q '\"remember@claude-plugins-official\": true' \"$CLAUDE_SETTINGS\""
-check_optional "oh-my-codex" "command -v omx"
 
 # Skill Directories (단일 출처 ~/.skills + 도구별 symlink)
 section "Skill Directories"

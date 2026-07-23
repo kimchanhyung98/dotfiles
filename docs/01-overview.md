@@ -15,7 +15,6 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 |--------|---------------------------------------------------------------------------------------------|
 | System | lucasgelfond/zerobrew, ghostty-org/ghostty                                                  |
 | Claude | jarrodwatts/claude-hud, VoltAgent/awesome-agent-skills, forrestchang/andrej-karpathy-skills |
-| Codex  | Yeachan-Heo/oh-my-codex                                                                     |
 
 ## 검증 스냅샷
 
@@ -29,7 +28,6 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 | jarrodwatts/claude-hud              | `10193cc` |
 | VoltAgent/awesome-agent-skills      | `feb81d6` |
 | forrestchang/andrej-karpathy-skills | `aa4467f` |
-| Yeachan-Heo/oh-my-codex             | `c25edb0` |
 
 ## 설계 원칙
 
