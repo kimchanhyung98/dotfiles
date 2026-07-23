@@ -5,6 +5,15 @@ if [ -z "${HOMEBREW_SHELLENV_LOADED:-}" ] && [ -x "{{ .homebrewPrefix }}/bin/bre
     eval "$({{ .homebrewPrefix }}/bin/brew shellenv)"
     export HOMEBREW_SHELLENV_LOADED=1
 fi
+
+# zerobrew를 Homebrew보다 앞에 둔다. zerobrew에 없는 명령은 뒤쪽 Homebrew 경로로 폴백된다.
+zerobrew_bin="${ZEROBREW_PREFIX:-/opt/zerobrew}/bin"
+if [ -d "$zerobrew_bin" ]; then
+    path=("$zerobrew_bin" "${path[@]}")
+    typeset -U path
+    export PATH
+fi
+unset zerobrew_bin
 {{ end }}
 
 case ":$PATH:" in

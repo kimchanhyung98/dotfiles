@@ -67,7 +67,7 @@ if ! ensure_zb_available; then
     echo "[prerequisites][zerobrew] installing"
     installer=$(mktemp)
     if curl -fsSL https://zerobrew.rs/install -o "$installer"; then
-        bash "$installer" || echo "[prerequisites][warning] zerobrew installation failed"
+        bash "$installer" --no-modify-path || echo "[prerequisites][warning] zerobrew installation failed"
     else
         echo "[prerequisites][warning] zerobrew download failed"
     fi

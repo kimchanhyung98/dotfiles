@@ -4,12 +4,41 @@
 # 패키지 설치 래퍼 (zerobrew 우선, 실패 시 Homebrew 폴백)
 pkg_install() {
     if command -v zb &>/dev/null; then
-        zb install "$@" || { command -v brew &>/dev/null && \brew install "$@"; }
+        zb install "$@" || { command -v brew &>/dev/null && command brew install "$@"; }
     elif command -v brew &>/dev/null; then
-        \brew install "$@"
+        command brew install "$@"
     else
         echo "pkg_install: brew or zb not found" >&2
         return 127
     fi
 }
+
+# 전체 update/upgrade는 zerobrew를 먼저 실행한 뒤 Homebrew 소유 패키지도 처리한다.
+# 대상 formula의 upgrade는 zerobrew 실패 시에만 폴백하고, cask는 Homebrew로 전달한다.
+if command -v brew &>/dev/null; then
+    brew() {
+        if command -v zb &>/dev/null; then
+            case "${1:-}" in
+                update)
+                    if ! zb "$@"; then
+                        echo "brew: zerobrew update failed; falling back to Homebrew" >&2
+                    fi
+                    ;;
+                upgrade)
+                    case " $* " in
+                        *" --cask "*) ;;
+                        *)
+                            if zb "$@"; then
+                                [ "$#" -eq 1 ] || return 0
+                            else
+                                echo "brew: zerobrew upgrade failed; falling back to Homebrew" >&2
+                            fi
+                            ;;
+                    esac
+                    ;;
+            esac
+        fi
+        command brew "$@"
+    }
+fi
 {{ end }}

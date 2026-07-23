@@ -22,4 +22,7 @@ for script in \
     run_chezmoi "$test_home" execute-template < "$script" > "$rendered"
     bash -n "$rendered"
     shellcheck -s bash -S warning "$rendered"
+    if [ "$(basename "$script")" = "run_once_before_01-prerequisites.sh.tmpl" ]; then
+        grep -Fq 'bash "$installer" --no-modify-path' "$rendered"
+    fi
 done

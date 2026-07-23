@@ -25,6 +25,10 @@ ensure_zb_available() {
     if command -v zb &>/dev/null; then
         return 0
     fi
+    if [ -n "${ZEROBREW_PREFIX:-}" ] && [ -x "$ZEROBREW_PREFIX/bin/zb" ]; then
+        export PATH="$ZEROBREW_PREFIX/bin:$PATH"
+        return 0
+    fi
     for candidate in "$HOME/.local/bin/zb" "/opt/zerobrew/bin/zb" "/usr/local/zerobrew/bin/zb"; do
         if [ -x "$candidate" ]; then
             candidate_dir="$(dirname "$candidate")"
@@ -63,18 +67,17 @@ bundle_is_satisfied() {
 }
 
 if ensure_zb_available; then
-    echo "[brew-packages][zerobrew] bundle install"
-    if ! zb bundle install --auto-init -f "$BREWFILE"; then
-        echo "[brew-packages][warning] zerobrew bundle failed; falling back to Homebrew"
-        run_homebrew_bundle
-    elif ! bundle_is_satisfied; then
-        echo "[brew-packages][warning] zerobrew completed but Brewfile is not fully satisfied; falling back to Homebrew"
-        run_homebrew_bundle
+    echo "[brew-packages][zerobrew] initialize and bundle install"
+    if zb init --no-modify-path && zb bundle install -f "$BREWFILE"; then
+        echo "[brew-packages][done]"
+        exit 0
     fi
+    echo "[brew-packages][warning] zerobrew bundle failed; falling back to Homebrew"
 else
     echo "[brew-packages][warning] zerobrew not found; using Homebrew"
-    run_homebrew_bundle
 fi
+
+run_homebrew_bundle
 
 if ! bundle_is_satisfied; then
     echo "[brew-packages][error] Brewfile is not fully satisfied after synchronization" >&2

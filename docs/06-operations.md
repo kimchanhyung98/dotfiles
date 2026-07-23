@@ -62,7 +62,11 @@ projects-doppler-sync
 
 ## 패키지 동기화
 
-macOS Brewfile 변경 시 zerobrew를 먼저 실행한다. `brew bundle check`에서 누락이 확인되거나 zerobrew가 실패하면 Homebrew로 폴백한다. 이미 설치된 `xcodes`는 해당 bundle 실행에서 제외하지만 나머지 package upgrade는 유지한다. 최종 check 실패는 apply 실패다.
+macOS Brewfile 변경 시 zerobrew를 먼저 실행하고, 성공하면 종료한다. zerobrew가 없거나 실패한 경우에만 Homebrew로 폴백한다. 이미 설치된 `xcodes`는 Homebrew bundle 실행에서 제외하지만 나머지 package upgrade는 유지한다. 최종 check 실패는 apply 실패다.
+
+`/opt/zerobrew/bin`은 PATH에서 Homebrew보다 앞에 온다. 같은 이름의 명령은 zerobrew 버전이 쓰이고 zerobrew에 없는 명령은 Homebrew로 폴백된다. 경로는 `ZEROBREW_PREFIX`로 바꿀 수 있다.
+
+대화형 셸의 `brew update`는 zerobrew와 Homebrew 메타데이터를 순서대로 갱신한다. 인자 없는 `brew upgrade`도 zerobrew를 먼저 실행한 뒤 기존 Homebrew 소유 패키지를 갱신한다. 대상을 지정한 `brew upgrade <formula>`는 zerobrew가 성공하면 종료하고 실패할 때만 Homebrew로 폴백하며, `brew upgrade --cask`는 Homebrew로 바로 전달한다. 다른 `brew` 하위 명령도 Homebrew로 그대로 전달된다.
 
 Brewfile에서 삭제된 package는 자동 제거하지 않는다. 제거 후보를 검토할 때만 수동으로 실행한다.
 
