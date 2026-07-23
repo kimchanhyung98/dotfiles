@@ -40,25 +40,58 @@ ensure_zb_available() {
 }
 
 run_homebrew_bundle() {
+    local bundle_file="${1:-$BREWFILE}"
     local brew_skip="${HOMEBREW_BUNDLE_BREW_SKIP:-}"
 
-    if ! brew tap dopplerhq/cli; then
-        echo "[brew-packages][error] failed to tap Doppler repository" >&2
-        exit 1
+    if grep -Fq 'brew "dopplerhq/cli/doppler"' "$bundle_file"; then
+        if ! brew tap dopplerhq/cli; then
+            echo "[brew-packages][error] failed to tap Doppler repository" >&2
+            exit 1
+        fi
+        if ! brew trust --formula dopplerhq/cli/doppler; then
+            echo "[brew-packages][error] failed to trust Doppler formula" >&2
+            exit 1
+        fi
     fi
-    if ! brew trust --formula dopplerhq/cli/doppler; then
-        echo "[brew-packages][error] failed to trust Doppler formula" >&2
-        exit 1
-    fi
-    if brew list --formula --versions xcodes >/dev/null 2>&1; then
+    if grep -Fq 'brew "xcodes"' "$bundle_file" &&
+        brew list --formula --versions xcodes >/dev/null 2>&1; then
         case " $brew_skip " in
             *" xcodes "*) ;;
             *) brew_skip="${brew_skip:+$brew_skip }xcodes" ;;
         esac
     fi
-    if ! HOMEBREW_BUNDLE_BREW_SKIP="$brew_skip" brew bundle --file="$BREWFILE"; then
+    if ! HOMEBREW_BUNDLE_BREW_SKIP="$brew_skip" brew bundle --file="$bundle_file"; then
         echo "[brew-packages][error] brew bundle failed"
         exit 1
+    fi
+}
+
+upgrade_zerobrew_formulas() {
+    local bundle_file="$1"
+    local allowed_formulas installed_formulas formula _version
+    local -a upgrade_formulas=()
+
+    allowed_formulas="$(sed -nE 's/^brew "([^"]+)".*$/\1/p' "$bundle_file")" || return 1
+    installed_formulas="$(zb list)" || return 1
+    if [ "$installed_formulas" = "No formulas installed." ]; then
+        return 0
+    fi
+
+    while read -r formula _version; do
+        case "$formula" in
+            "") continue ;;
+        esac
+        case "
+$allowed_formulas
+" in
+            *"
+$formula
+"*) upgrade_formulas+=("$formula") ;;
+        esac
+    done <<< "$installed_formulas"
+
+    if [ "${#upgrade_formulas[@]}" -gt 0 ]; then
+        zb upgrade "${upgrade_formulas[@]}"
     fi
 }
 
@@ -68,7 +101,18 @@ bundle_is_satisfied() {
 
 if ensure_zb_available; then
     echo "[brew-packages][zerobrew] initialize and bundle install"
-    if zb init --no-modify-path && zb upgrade && zb bundle install -f "$BREWFILE"; then
+    ZB_BREWFILE="$(mktemp)"
+    HOMEBREW_ONLY_BREWFILE="$(mktemp)"
+    trap 'rm -f "$ZB_BREWFILE" "$HOMEBREW_ONLY_BREWFILE"' EXIT
+    # ruby(zerobrew#286), xcodes, cask는 Homebrew가 소유한다.
+    sed -E -e '/^brew "(ruby|xcodes)"/d' -e '/^cask /d' \
+        "$BREWFILE" > "$ZB_BREWFILE"
+    sed -nE -e '/^brew "(ruby|xcodes)"/p' -e '/^cask /p' \
+        "$BREWFILE" > "$HOMEBREW_ONLY_BREWFILE"
+    if zb init --no-modify-path &&
+        upgrade_zerobrew_formulas "$ZB_BREWFILE" &&
+        zb bundle install -f "$ZB_BREWFILE"; then
+        run_homebrew_bundle "$HOMEBREW_ONLY_BREWFILE"
         echo "[brew-packages][done]"
         exit 0
     fi

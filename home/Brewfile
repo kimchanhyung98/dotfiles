@@ -1,5 +1,5 @@
 # Brewfile
-# chezmoi로 관리 — `zb bundle` 우선, `brew bundle` 폴백으로 동기화
+# chezmoi로 관리 — 일반 formula는 zerobrew 우선, ruby·xcodes·cask는 Homebrew, zerobrew 실패 시 전체 Homebrew 폴백
 
 # 시스템 CLI 도구
 brew "bash"               # Bash 셸
