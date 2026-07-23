@@ -62,7 +62,7 @@ projects-doppler-sync
 
 ## 패키지 동기화
 
-macOS Brewfile 변경 시 zerobrew를 먼저 실행하고, 성공하면 종료한다. zerobrew가 없거나 실패한 경우에만 Homebrew로 폴백한다. 이미 설치된 `xcodes`는 Homebrew bundle 실행에서 제외하지만 나머지 package upgrade는 유지한다. 최종 check 실패는 apply 실패다.
+macOS Brewfile 변경 시 zerobrew가 설치된 formula를 `zb upgrade`로 갱신하고 누락 formula를 `zb bundle install`로 추가하며, 성공하면 종료한다. zerobrew가 없거나 실패한 경우에만 Homebrew로 폴백한다. 이미 설치된 `xcodes`는 Homebrew bundle 실행에서 제외하지만 나머지 package upgrade는 유지한다. 최종 check 실패는 apply 실패다.
 
 `/opt/zerobrew/bin`은 PATH에서 Homebrew보다 앞에 온다. 같은 이름의 명령은 zerobrew 버전이 쓰이고 zerobrew에 없는 명령은 Homebrew로 폴백된다. 경로는 `ZEROBREW_PREFIX`로 바꿀 수 있다.
 
@@ -81,6 +81,7 @@ brew bundle cleanup --file="$(chezmoi source-path)/Brewfile"
 | Brewfile 최종 check 실패 | zerobrew와 Homebrew 후에도 항목 누락 | 출력된 cask/tap 문제를 해결하고 `chezmoi apply` 재실행 |
 | Doppler 로그인에 interactive terminal 필요 | 예약 update 등 비대화형 실행에서 최초 로그인 불가 | 터미널에서 `projects-doppler-sync` 실행 |
 | GitHub 사용자/API 조회 실패 | 잘못된 name, organization, network·rate limit 오류 | name을 확인한 뒤 `projects-bootstrap GITHUB_NAME` 재실행 |
+| zerobrew 명령이 이전 버전을 실행 | 버전 교체 중 symlink 교체 실패로 구버전 링크 잔존 | `zb uninstall <formula>` 후 `zb doctor --repair`, `zb install <formula>` 실행 |
 
 ## 운영 경계
 

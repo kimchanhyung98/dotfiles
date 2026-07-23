@@ -78,6 +78,9 @@ case "${1:-}" in
         test "${2:-}" = "--no-modify-path"
         printf 'zb init\n' >> "$CALL_LOG"
         ;;
+    upgrade)
+        printf 'zb upgrade\n' >> "$CALL_LOG"
+        ;;
     bundle)
         test "${2:-}" = "install"
         test "${3:-}" = "-f"
@@ -110,8 +113,9 @@ CALL_LOG="$call_log" \
     bash "$rendered" >/dev/null
 
 test "$(sed -n '1p' "$call_log")" = 'zb init'
-test "$(sed -n '2p' "$call_log")" = 'zb bundle'
-test "$(wc -l < "$call_log" | tr -d ' ')" = "2"
+test "$(sed -n '2p' "$call_log")" = 'zb upgrade'
+test "$(sed -n '3p' "$call_log")" = 'zb bundle'
+test "$(wc -l < "$call_log" | tr -d ' ')" = "3"
 test ! -f "$bundle_state"
 test -f "$outdated_state"
 
@@ -131,8 +135,9 @@ CALL_LOG="$call_log" \
     bash "$rendered" >/dev/null
 
 test "$(sed -n '1p' "$call_log")" = 'zb init'
-test "$(sed -n '2p' "$call_log")" = 'zb bundle'
-test "$(wc -l < "$call_log" | tr -d ' ')" = "2"
+test "$(sed -n '2p' "$call_log")" = 'zb upgrade'
+test "$(sed -n '3p' "$call_log")" = 'zb bundle'
+test "$(wc -l < "$call_log" | tr -d ' ')" = "3"
 
 : > "$call_log"
 PATH="/usr/bin:/bin" \
@@ -148,10 +153,11 @@ ZB_FAIL=1 \
     bash "$rendered" >/dev/null 2>&1
 
 test "$(sed -n '1p' "$call_log")" = 'zb init'
-test "$(sed -n '2p' "$call_log")" = 'zb bundle'
-test "$(sed -n '3p' "$call_log")" = 'brew tap'
-test "$(sed -n '4p' "$call_log")" = 'brew trust'
-test "$(sed -n '5p' "$call_log")" = 'brew bundle'
+test "$(sed -n '2p' "$call_log")" = 'zb upgrade'
+test "$(sed -n '3p' "$call_log")" = 'zb bundle'
+test "$(sed -n '4p' "$call_log")" = 'brew tap'
+test "$(sed -n '5p' "$call_log")" = 'brew trust'
+test "$(sed -n '6p' "$call_log")" = 'brew bundle'
 test -f "$tap_state"
 test -f "$trust_state"
 test -f "$bundle_state"

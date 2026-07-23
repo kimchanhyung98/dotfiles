@@ -68,7 +68,7 @@ bundle_is_satisfied() {
 
 if ensure_zb_available; then
     echo "[brew-packages][zerobrew] initialize and bundle install"
-    if zb init --no-modify-path && zb bundle install -f "$BREWFILE"; then
+    if zb init --no-modify-path && zb upgrade && zb bundle install -f "$BREWFILE"; then
         echo "[brew-packages][done]"
         exit 0
     fi
