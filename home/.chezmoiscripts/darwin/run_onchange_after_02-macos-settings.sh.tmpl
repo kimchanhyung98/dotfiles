@@ -84,6 +84,13 @@ defaults write com.apple.screencapture disable-shadow -bool true
 # 새 문서를 iCloud 대신 로컬 디스크에 저장
 defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
 
+# - Desktop
+# 기본 배경화면 설정 (모든 데스크탑에 적용)
+wallpaper="$HOME/Pictures/Wallpapers/tahoe-untitled.png"
+if [ -f "$wallpaper" ]; then
+  osascript -e 'tell application "System Events" to tell every desktop to set picture to "'"$wallpaper"'"' 2>/dev/null || true
+fi
+
 # 변경사항 적용을 위해 관련 프로세스 재시작
 killall Dock 2>/dev/null || true
 killall Finder 2>/dev/null || true
