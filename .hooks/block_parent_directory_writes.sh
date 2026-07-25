@@ -10,9 +10,9 @@ parent_dir="$(dirname "$project_root")"
 deny() { hook_deny "Blocked modifying files outside sibling project directories: '$parent_dir' and everything above it are write-protected by repository policy."; }
 
 extract_paths() {
-  printf '%s\n' "$payload" | jq -r '.. | objects | to_entries[] | select((.key | test("(^|_)(file_)?path$|^file$|^filename$"; "i")) and (.value | type == "string")) | .value'
+  printf '%s\n' "$payload" | jq -r '.tool_input | .. | objects | to_entries[] | select((.key | test("(^|_)(file_)?path$|^file$|^filename$"; "i")) and (.value | type == "string")) | .value'
   if [ "$tool_name" = "apply_patch" ]; then
-    printf '%s\n' "$payload" | jq -r '.. | strings' | sed -nE \
+    printf '%s\n' "$payload" | jq -r '.tool_input | .. | strings' | sed -nE \
       -e 's/^\*\*\* (Add|Update|Delete) File: (.*)$/\2/p' \
       -e 's/^\*\*\* Move to: (.*)$/\1/p' \
       -e 's/^--- a\/(.*)$/\1/p' \
