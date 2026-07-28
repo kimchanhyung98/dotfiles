@@ -2,7 +2,7 @@
 
 ## `dotfiles-doctor`
 
-`~/.local/bin/dotfiles-doctor`는 설치와 managed target 상태를 확인한다. AI CLI 중 Claude와 Codex만 required이며 누락 시 non-zero다. Copilot, CodeGraph, Antigravity, Hermes, 언어 runtime과 확장은 optional로 표시한다. zsh/git/vim과 Claude/Codex 설정·공통 skills 경로 같은 dotfiles 핵심 target은 계속 required다.
+`~/.local/bin/dotfiles-doctor`는 설치와 managed target 상태를 확인한다. AI CLI 중 Claude와 Codex만 required이며 누락 시 non-zero다. Copilot, CodeGraph, Antigravity, Hermes, Kimi Code, 언어 runtime과 확장은 optional로 표시한다. zsh/git/vim과 Claude/Codex 설정·공통 skills 경로 같은 dotfiles 핵심 target은 계속 required다.
 
 ```sh
 dotfiles-doctor

@@ -22,6 +22,7 @@ Claude Code와 Codex가 단일 출처 `~/.skills`를 공유한다. 지원하는 
 | Claude Code | `~/.claude/skills/` → `~/.skills/`                     | `.claude/skills/` → `.skills/`                   | symlink 공유 |
 | Codex       | `~/.agents/skills/` → `~/.skills/`                    | `.agents/skills/` → `.skills/`                   | symlink 공유 |
 | Copilot CLI | `~/.agents/skills/` → `~/.skills/` 재사용              | `.agents/skills/`, `.github/skills/`              | 별도 Copilot symlink 없음 |
+| Kimi Code   | `~/.agents/skills/` → `~/.skills/` 재사용              | `.agents/skills/`                                | 별도 Kimi symlink 없음 |
 
 **단일 출처 `~/.skills`**: 공통 스킬을 `~/.skills` 한 곳에만 두고, 지원 도구의 `skills` 디렉토리를 여기로 symlink하여 공유한다. chezmoi가
 `home/dot_claude/symlink_skills`·`home/dot_agents/symlink_skills`로 symlink를 관리하고,
@@ -53,6 +54,7 @@ Claude Code와 Codex가 단일 출처 `~/.skills`를 공유한다. 지원하는 
 | `dot_claude/symlink_CLAUDE.md` | `~/.claude/CLAUDE.md` → `~/AGENTS.md` | Claude Code | 사용자 전역 지침 |
 | `dot_codex/symlink_AGENTS.md` | `~/.codex/AGENTS.md` → `~/AGENTS.md` | Codex | 사용자 전역 지침 |
 | `dot_copilot/symlink_copilot-instructions.md` | `~/.copilot/copilot-instructions.md` → `~/AGENTS.md` | Copilot CLI | 개인 지침 |
+| `dot_kimi-code/symlink_AGENTS.md` | `~/.kimi-code/AGENTS.md` → `~/AGENTS.md` | Kimi Code | 사용자 전역 지침 |
 
 **Codex 계층 우선순위**: 사용자 전역 파일 뒤에 repository root부터 현재 디렉터리까지의 `AGENTS.md`가 순서대로 적용되며 더 가까운 파일이 구체화한다:
 
@@ -178,3 +180,32 @@ Copilot은 사용하지만 필수 AI baseline은 아니다. macOS는 Brewfile의
 | `~/.copilot/copilot-instructions.md` → `~/AGENTS.md` | Copilot CLI 개인 지침 |
 
 과거 `~/.copilot/skills` symlink는 복구하지 않는다. Copilot이 지원하는 `~/.agents/skills`가 이미 공통 단일 출처를 가리키기 때문이다. OpenCode 설정은 관리하지 않으며 legacy 경로는 제거 상태로 유지한다.
+
+## Kimi Code
+
+**설치 (스크립트)**
+
+| 스크립트                                    | 내용                                                                | 설치 대상                        |
+|-----------------------------------------|-------------------------------------------------------------------|------------------------------|
+| 10-ai-core (macOS), 04-ai-tools (Linux) | Kimi Code CLI (`curl -fsSL https://code.kimi.com/kimi-code/install.sh`) | `kimi` 바이너리 (`~/.kimi-code/bin`) |
+
+Moonshot AI의 터미널 AI 에이전트다. 설치 경로는 installer 기본값을 유지한다. 자동 업데이트가 같은 installer를 `KIMI_INSTALL_DIR` 없이 재실행하므로 경로를 옮기면
+갱신본과 실행본이 어긋난다. `KIMI_NO_MODIFY_PATH`는 installer가 chezmoi 소유의 `~/.zshrc`를 수정하지 못하게 설치 스크립트와 `60-tools.zsh` 양쪽에서 지정하며, PATH
+등록은 `60-tools.zsh`가 담당한다(같은 디렉토리의 `rg`/`fd` 캐시가 시스템 도구를 가리지 않도록 뒤에 추가).
+
+**설정 (dot_kimi-code/ → ~/.kimi-code/)**
+
+| 파일               | 배포 경로                    | 역할       | 상세                                                |
+|------------------|--------------------------|----------|---------------------------------------------------|
+| create_config.toml | `~/.kimi-code/config.toml` | 핵심 설정 | 기본 모델(`kimi-code/k3`, effort `max`), `default_permission_mode = "yolo"`, plan 모드 기본값, 텔레메트리 비활성, `.hooks/*.sh` 가드레일을 `[[hooks]]`로 연결 |
+| symlink_AGENTS.md | `~/.kimi-code/AGENTS.md` | 사용자 전역 지침 | `~/AGENTS.md`를 가리키는 symlink. Claude/Codex/Copilot과 동일한 단일 원본을 공유한다 |
+
+`config.toml`은 구독(OAuth) 경로에서 비밀 값을 담지 않는다. 토큰은 `~/.kimi-code/credentials/`(0700/0600)가 소유하고 config에는 참조만 남는다. 다만 CLI가 같은
+파일에 provider의 oauth 참조와 `[models."kimi-code/*"]` 카탈로그를 덮어쓰므로, `create_` 접두사로 파일이 없을 때만 배포하고 이후 소유권은 CLI에 있다. `tui.toml`,
+`mcp.json`, `sessions/`는 배포 대상이 아니다.
+
+Kimi는 프로젝트 레벨 설정 파일이 없어 `[[hooks]]`와 `[[permission.rules]]`를 둘 수 있는 곳이 이 파일뿐이다. 훅 계약이 Claude/Codex와 같아 `.hooks/*.sh`를 그대로
+재사용하며, `.hooks/`가 없는 저장소에서는 no-op으로 통과한다.
+
+스킬과 커스텀 에이전트는 `~/.agents/skills`·`~/.agents/agents`에서, 프로젝트는 `.agents/`와 루트 `AGENTS.md`에서 읽으므로 Kimi 전용 symlink나 프로젝트 파일은 두지
+않는다. 머신 종속 경로가 들어가는 `.kimi-code/local.toml`은 `.gitignore` 대상이다.
