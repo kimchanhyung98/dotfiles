@@ -11,7 +11,7 @@ set -eufo pipefail
 
 echo "[ai-tools][start]"
 
-export PATH="$HOME/.local/bin:$HOME/.claude/local/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.claude/local/bin:$PATH:$HOME/.kimi-code/bin"
 
 # Claude Code
 # - Anthropic Claude 터미널 AI 코딩 도우미
@@ -132,6 +132,20 @@ if ! command -v hermes &>/dev/null; then
     rm -f "$installer"
 else
     echo "[ai-tools][hermes] already installed ($(hermes --version 2>/dev/null || echo 'unknown'))"
+fi
+
+# Kimi Code CLI
+if ! command -v kimi &>/dev/null; then
+    echo "[ai-tools][kimi] installing"
+    installer=$(mktemp)
+    if curl -fsSL https://code.kimi.com/kimi-code/install.sh -o "$installer"; then
+        KIMI_NO_MODIFY_PATH=1 bash "$installer" || echo "[ai-tools][warning] Kimi Code install failed"
+    else
+        echo "[ai-tools][warning] Kimi Code download failed"
+    fi
+    rm -f "$installer"
+else
+    echo "[ai-tools][kimi] already installed ($(kimi --version 2>/dev/null || echo 'unknown'))"
 fi
 
 echo "[ai-tools][done]"

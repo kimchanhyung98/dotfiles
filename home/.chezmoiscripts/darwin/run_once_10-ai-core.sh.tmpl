@@ -10,7 +10,7 @@ set -eufo pipefail
 
 echo "[ai-core][start]"
 
-export PATH="$HOME/.local/bin:$HOME/.claude/local/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.claude/local/bin:$PATH:$HOME/.kimi-code/bin"
 
 # Claude Code
 if ! command -v claude &>/dev/null; then
@@ -101,6 +101,20 @@ if ! command -v hermes &>/dev/null; then
     rm -f "$installer"
 else
     echo "[ai-core][hermes] already installed ($(hermes --version 2>/dev/null || echo 'unknown'))"
+fi
+
+# Kimi Code CLI
+if ! command -v kimi &>/dev/null; then
+    echo "[ai-core][kimi] installing"
+    installer=$(mktemp)
+    if curl -fsSL https://code.kimi.com/kimi-code/install.sh -o "$installer"; then
+        KIMI_NO_MODIFY_PATH=1 bash "$installer" || echo "[ai-core][warning] Kimi Code installation failed"
+    else
+        echo "[ai-core][warning] Kimi Code download failed"
+    fi
+    rm -f "$installer"
+else
+    echo "[ai-core][kimi] already installed ($(kimi --version 2>/dev/null || echo 'unknown'))"
 fi
 
 echo "[ai-core][done]"

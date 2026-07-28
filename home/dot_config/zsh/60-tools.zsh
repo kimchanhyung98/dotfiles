@@ -28,3 +28,14 @@ fi
 if command -v zoxide &>/dev/null; then
     eval "$(zoxide init zsh)"
 fi
+
+# Kimi Code
+export KIMI_NO_MODIFY_PATH=1
+
+# - installer 기본 경로. rg/fd 캐시도 같은 디렉토리에 담기므로 PATH 뒤에 붙여 시스템 도구를 가리지 않게 한다.
+if [ -d "$HOME/.kimi-code/bin" ]; then
+    case ":$PATH:" in
+        *":$HOME/.kimi-code/bin:"*) ;;
+        *) export PATH="$PATH:$HOME/.kimi-code/bin" ;;
+    esac
+fi
