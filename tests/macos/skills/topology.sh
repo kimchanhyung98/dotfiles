@@ -16,6 +16,8 @@ for target in \
     .claude/skills \
     .codex/AGENTS.md \
     .copilot/copilot-instructions.md \
+    .kimi-code/AGENTS.md \
+    .kimi-code/config.toml \
     .agents/skills \
     .local/bin/mattpocock-skills-sync; do
     grep -Fxq "$target" <<<"$managed"
