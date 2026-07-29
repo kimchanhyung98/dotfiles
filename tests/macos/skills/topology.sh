@@ -18,6 +18,8 @@ for target in \
     .copilot/copilot-instructions.md \
     .kimi-code/AGENTS.md \
     .kimi-code/config.toml \
+    .omp/agent/AGENTS.md \
+    .omp/agent/config.yml \
     .agents/skills \
     .local/bin/mattpocock-skills-sync; do
     grep -Fxq "$target" <<<"$managed"
