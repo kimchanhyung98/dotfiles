@@ -148,4 +148,18 @@ else
     echo "[ai-tools][kimi] already installed ($(kimi --version 2>/dev/null || echo 'unknown'))"
 fi
 
+# omp
+if ! command -v omp &>/dev/null; then
+    echo "[ai-tools][omp] installing"
+    installer=$(mktemp)
+    if curl -fsSL https://omp.sh/install -o "$installer"; then
+        sh "$installer" --binary || echo "[ai-tools][warning] omp install failed"
+    else
+        echo "[ai-tools][warning] omp download failed"
+    fi
+    rm -f "$installer"
+else
+    echo "[ai-tools][omp] already installed ($(omp --version 2>/dev/null || echo 'unknown'))"
+fi
+
 echo "[ai-tools][done]"

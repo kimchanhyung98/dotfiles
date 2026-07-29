@@ -162,6 +162,7 @@ check_optional "ollama" "command -v ollama"
 check_optional "antigravity (agy)" "command -v agy"
 check_optional "hermes" "command -v hermes"
 check_optional "kimi" "command -v kimi"
+check_optional "omp" "command -v omp"
 
 # AI Extensions
 section "AI Extensions"
@@ -183,6 +184,7 @@ check_symlink "Claude instructions -> ~/AGENTS.md" "$HOME/.claude/CLAUDE.md" "..
 check_symlink "Codex instructions -> ~/AGENTS.md" "$HOME/.codex/AGENTS.md" "../AGENTS.md"
 check_symlink "Copilot instructions -> ~/AGENTS.md" "$HOME/.copilot/copilot-instructions.md" "../AGENTS.md"
 check_symlink "Kimi instructions -> ~/AGENTS.md" "$HOME/.kimi-code/AGENTS.md" "../AGENTS.md"
+check_symlink "omp instructions -> ~/AGENTS.md" "$HOME/.omp/agent/AGENTS.md" "../../AGENTS.md"
 
 # Dotfiles
 section "Dotfiles"

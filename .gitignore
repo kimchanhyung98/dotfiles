@@ -162,6 +162,7 @@ $RECYCLE.BIN/
 .goose/*
 .kilocode/*
 .kimi-code/*
+.omp/*
 .opencode/*
 .qwen/*
 .roo/*

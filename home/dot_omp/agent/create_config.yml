@@ -1,0 +1,100 @@
+# 역할별 모델
+modelRoles:
+  default: openai-codex/gpt-5.6-sol:xhigh
+  slow: anthropic/claude-opus-5:xhigh
+  smol: openai-codex/gpt-5.6-sol:medium
+  plan: anthropic/claude-fable-5:xhigh
+  advisor: anthropic/claude-opus-5:xhigh
+  vision: anthropic/claude-opus-5:medium
+  designer: "@vision"
+  commit: "@smol"
+  task: "@plan"
+  tiny: "@smol"
+
+# 모델 스위처가 순환하는 역할
+cycleOrder:
+  - default
+  - slow
+  - smol
+  - plan
+  - advisor
+
+# 모델 id가 여러 프로바이더에 있을 때의 우선순위
+modelProviderOrder:
+  - anthropic
+  - openai-codex
+  - kimi-code
+
+# 선택 가능한 모델
+enabledModels:
+  - anthropic/claude-fable-5
+  - anthropic/claude-opus-5
+  - openai-codex/gpt-5.6-sol
+  - openai-codex/gpt-5.6-terra
+  - kimi-code/k3
+
+# 매 턴 종료 후 두 번째 모델이 리뷰하고 조언을 주입한다. modelRoles.advisor가 필요하다.
+advisor:
+  enabled: true
+
+defaultThinkingLevel: high
+
+tools:
+  approvalMode: yolo
+
+# yolo는 모든 티어를 자동 승인하므로 차단은 이 규칙으로만 건다.
+bash:
+  patterns:
+    - match: "git push *"
+      approval: deny
+    - match: "sudo *"
+      approval: deny
+    - match: "rm -rf *"
+      approval: deny
+    - match: "npm install -g *"
+      approval: deny
+    - match: "brew install *"
+      approval: deny
+    - match: "pip install *"
+      approval: deny
+
+lsp:
+  diagnosticsOnEdit: true
+
+# 실패 시 역할별 대체 모델 체인. 명시하지 않은 역할은 default 체인을 상속한다.
+retry:
+  enabled: true
+  modelFallback: true
+  fallbackChains:
+    default:
+      - anthropic/claude-opus-5:xhigh
+      - kimi-code/k3:max
+    slow:
+      - openai-codex/gpt-5.6-sol:max
+      - kimi-code/k3:max
+    smol:
+      - anthropic/claude-opus-5:medium
+      - kimi-code/k3:max
+    plan:
+      - anthropic/claude-opus-5:xhigh
+      - openai-codex/gpt-5.6-sol:max
+      - kimi-code/k3:max
+    advisor:
+      - openai-codex/gpt-5.6-sol:max
+      - kimi-code/k3:max
+    vision:
+      - openai-codex/gpt-5.6-sol:high
+      - kimi-code/k3:max
+    designer:
+      - openai-codex/gpt-5.6-sol:high
+      - kimi-code/k3:max
+    commit:
+      - anthropic/claude-opus-5:medium
+      - kimi-code/k3:max
+    task:
+      - anthropic/claude-opus-5:xhigh
+      - openai-codex/gpt-5.6-sol:max
+      - kimi-code/k3:max
+    tiny:
+      - anthropic/claude-opus-5:medium
+      - kimi-code/k3:max
