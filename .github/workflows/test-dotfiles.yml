@@ -17,7 +17,7 @@ jobs:
       - name: Install test tools
         run: |
           brew install chezmoi jq shellcheck
-          npm install --global --prefix "$HOME/.local" @openai/codex
+          npm install --global --prefix "$HOME/.local" @openai/codex @moonshot-ai/kimi-code
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Run local checks
         run: make check
