@@ -209,3 +209,35 @@ Kimi는 프로젝트 레벨 설정 파일이 없어 `[[hooks]]`와 `[[permission
 
 스킬과 커스텀 에이전트는 `~/.agents/skills`·`~/.agents/agents`에서, 프로젝트는 `.agents/`와 루트 `AGENTS.md`에서 읽으므로 Kimi 전용 symlink나 프로젝트 파일은 두지
 않는다. 머신 종속 경로가 들어가는 `.kimi-code/local.toml`은 `.gitignore` 대상이다.
+
+## omp
+
+**설치 (스크립트)**
+
+| 스크립트                                    | 내용                                              | 설치 대상                     |
+|-----------------------------------------|-------------------------------------------------|---------------------------|
+| 10-ai-core (macOS), 04-ai-tools (Linux) | omp (`curl -fsSL https://omp.sh/install`, `--binary`) | `omp` 바이너리 (`~/.local/bin`) |
+
+Pi 기반 터미널 AI 에이전트다. installer는 bun이 있으면 bun 빌드 경로를 타고 bun 1.3.14 미만이면 실패하므로, `--binary`로 prebuilt 바이너리를 강제한다. 이 저장소는
+Bun을 별도로 설치하므로 지정하지 않으면 omp 설치가 bun 버전에 묶인다. 설치 위치는 installer 기본값 `~/.local/bin`이고 rc 파일은 건드리지 않는다.
+
+**설정 (dot_omp/agent/ → ~/.omp/agent/)**
+
+| 파일               | 배포 경로                        | 역할       | 상세                                                |
+|------------------|------------------------------|----------|---------------------------------------------------|
+| create_config.yml | `~/.omp/agent/config.yml`   | 핵심 설정 | 역할별 모델(`modelRoles`)과 fallback 체인, 선택 가능한 모델 목록(`enabledModels`), 프로바이더 우선순위, advisor, 승인 정책과 `bash.patterns` 차단 규칙, LSP 진단. `omp config set`과 `/settings`가 이 파일을 직접 쓰므로 `create_`로 파일이 없을 때만 배포하고 이후 소유권은 CLI에 있다 |
+| symlink_AGENTS.md | `~/.omp/agent/AGENTS.md`    | 사용자 전역 지침 | `~/AGENTS.md`를 가리키는 symlink. 경로가 한 단계 깊어 `../../AGENTS.md`다 |
+
+`models.yml`(커스텀 provider), `agent.db`(인증 저장소), `RULES.md`는 배포하지 않는다. 데이터 루트는 `PI_CODING_AGENT_DIR`로 옮길 수 있으나 기본값을 쓴다.
+
+**역할별 모델**: omp는 턴 성격에 따라 역할을 나눠 모델을 고른다. 내장 역할은 `default`, `smol`, `slow`, `vision`, `plan`, `designer`, `commit`, `tiny`, `task`, `advisor`이며,
+값은 `provider/modelId`로 고정하거나 `"@role"`로 다른 역할을 참조한다. 뒤에 `:minimal`~`:max` 접미사로 thinking 강도를 붙인다. `anthropic`, `openai-codex`, `kimi-code`는
+API key 없이 `/login`으로 붙는 구독 프로바이더라, 이 저장소가 Claude·Codex·Kimi에서 쓰는 모델을 그대로 역할에 배치한다.
+
+omp는 discovery provider로 다른 도구의 설정 경로를 그대로 읽는다. 사용자 지침은 우선순위가 `native`(`~/.omp/agent/AGENTS.md`) > `claude`(`~/.claude/CLAUDE.md`) >
+`agents`·`codex`(`~/.agents/AGENTS.md`, `~/.codex/AGENTS.md`) 순이고 **한 개만 살아남으므로**, 위 symlink가 나머지를 shadow한다. 셋 다 `~/AGENTS.md`를 가리켜 결과는 같다.
+스킬도 `claude`·`agents` provider가 `~/.claude/skills`·`~/.agents/skills`를 이미 읽어 omp 전용 symlink는 두지 않는다.
+
+omp 훅은 `pi.on(...)`을 등록하는 JS/TS 확장 모듈이라, Claude·Codex·Kimi가 공유하는 `.hooks/*.sh`(stdin JSON + exit code) 계약과 호환되지 않는다. 저장소 가드레일은
+스크립트를 재사용하는 대신 `bash.patterns`의 deny 규칙으로 다시 표현한다. `tools.approvalMode`가 `yolo`라 이 규칙이 유일한 차단 경로이며, glob 기반이므로 정규식을 쓰는
+훅보다 범위가 거칠다.

@@ -46,7 +46,7 @@ script phase는 파일명의 `before_`/`after_`가 우선한다. 번호는 같�
 
 | 순서 | 스크립트 | phase | 역할 | 실행 조건 | 상세 |
 |:--:|---|---|---|---|---|
-| 10 | ai-core | regular | 필수 Claude Code/Codex CLI, 선택 Antigravity/Hermes/Kimi Code/CodeGraph | 최초 1회 | Claude와 Codex는 공식 standalone installer를 사용하며 실패 시 non-zero다. npm이 있으면 CodeGraph를 설치하고 나머지 선택 도구 실패는 warning이다. |
+| 10 | ai-core | regular | 필수 Claude Code/Codex CLI, 선택 Antigravity/Hermes/Kimi Code/omp/CodeGraph | 최초 1회 | Claude와 Codex는 공식 standalone installer를 사용하며 실패 시 non-zero다. npm이 있으면 CodeGraph를 설치하고 나머지 선택 도구 실패는 warning이다. |
 | 11 | ai-claude | regular | CodeGraph MCP | 최초 1회 | Claude CLI 명령으로 사용자 범위 CodeGraph MCP를 `~/.claude.json`에 등록한다. 이 runtime 파일은 chezmoi가 직접 소유하지 않는다. |
 
 | 순서 | 스크립트 | phase | 역할 | 실행 조건 |
@@ -66,7 +66,7 @@ script phase는 파일명의 `before_`/`after_`가 우선한다. 번호는 같�
 | 01 | install-packages | before | Ubuntu CLI baseline | 최초 1회 | native는 Ubuntu 26.04 LTS만 허용하고 apt로 패키지를 설치한다. Codespaces는 `CODESPACES=true`로 감지한다. |
 | 02 | shell-baseline | regular | 기본 셸, 로케일, 타임존 | 설정 변경 시 | native Ubuntu만 zsh 기본 셸, en_US.UTF-8, Asia/Seoul 설정을 시도한다. Codespaces에서는 건너뛴다. |
 | 03 | git-baseline | regular | Git 사용자 설정, SSH 기초 | 설정 변경 시 | native Ubuntu는 GitHub known_hosts를 준비한다. Codespaces는 GitHub가 제공하는 repository 인증을 사용한다. |
-| 04 | ai-tools | regular | 필수 claude/codex, 선택 copilot/codegraph/antigravity/hermes/kimi | 최초 1회 | Claude/Codex는 standalone installer를 사용한다. npm이 없으면 npm 기반 선택 확장만 건너뛴다. Copilot은 공식 installer를 사용한다. |
+| 04 | ai-tools | regular | 필수 claude/codex, 선택 copilot/codegraph/antigravity/hermes/kimi/omp | 최초 1회 | Claude/Codex는 standalone installer를 사용한다. npm이 없으면 npm 기반 선택 확장만 건너뛴다. Copilot은 공식 installer를 사용한다. |
 | 05 | system-baseline | regular | 시스템 기초 설정 | 설정 변경 시 | `~/.profile`에 기본 editor와 `~/.local/bin` PATH를 중복 없이 추가한다. |
 
 ## 설치 phase
@@ -138,6 +138,7 @@ AI 도구는 설치 채널 정책에 따라 AI 스크립트에서 관리한다. 
 | Antigravity | 공식 | 공식 스크립트 (`curl -fsSL https://antigravity.google/cli/install.sh \| bash`)        | curl     |
 | Hermes      | 공식 | 공식 스크립트 (`curl -fsSL https://hermes-agent.nousresearch.com/install.sh \| bash`) | curl     |
 | Kimi Code   | 공식 | 공식 스크립트 (`curl -fsSL https://code.kimi.com/kimi-code/install.sh \| bash`)       | curl (`KIMI_NO_MODIFY_PATH=1`) |
+| omp         | 공식 | 공식 스크립트 (`curl -fsSL https://omp.sh/install \| sh`)                             | curl (`--binary`) |
 
 ## 외부 리소스
 
