@@ -1,5 +1,5 @@
 default_model = "kimi-code/k3"
-default_permission_mode = "yolo"
+default_permission_mode = "auto"
 default_plan_mode = true
 merge_all_available_skills = true
 telemetry = false
@@ -15,6 +15,10 @@ model = "k3"
 max_context_size = 1048576
 capabilities = [ "thinking", "always_thinking", "image_in", "video_in", "tool_use" ]
 display_name = "K3"
+support_efforts = [ "max" ]
+default_effort = "max"
+
+[models."kimi-code/k3".overrides]
 support_efforts = [ "max" ]
 default_effort = "max"
 
@@ -54,6 +58,10 @@ api_key = ""
 [[permission.rules]]
 decision = "allow"
 pattern = "Read"
+
+[[permission.rules]]
+decision = "allow"
+pattern = "AgentSwarm"
 
 [[permission.rules]]
 decision = "deny"

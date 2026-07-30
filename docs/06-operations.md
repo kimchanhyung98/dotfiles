@@ -25,9 +25,12 @@ launchd는 예약 시각에 Mac이 잠들어 있으면 깨어난 뒤 누락된 �
 
 ```sh
 chezmoi diff
-chezmoi update
+chezmoi update --force
 chezmoi verify
 ```
+
+launchd가 예약 실행하는 `dotfiles-update`도 같은 `--force`로 동작하며, managed file의 로컬 변경분(AI CLI가 런타임에 설정 파일을 다시 쓴 drift 포함)은 항상
+소스 저장소 상태로 덮어씌워진다.
 
 ## 프로젝트 준비
 

@@ -17,7 +17,7 @@ if [ -n "$source_root" ] && [ -n "$(git -C "$source_root" status --porcelain)" ]
 fi
 
 echo "[dotfiles-update] fetching and applying source updates"
-chezmoi update --no-tty
+chezmoi update --no-tty --force
 
 echo "[dotfiles-update] verifying managed targets"
 chezmoi verify

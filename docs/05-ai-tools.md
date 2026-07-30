@@ -197,11 +197,12 @@ Moonshot AI의 터미널 AI 에이전트다. 설치 경로는 installer 기본�
 
 | 파일               | 배포 경로                    | 역할       | 상세                                                |
 |------------------|--------------------------|----------|---------------------------------------------------|
-| create_config.toml | `~/.kimi-code/config.toml` | 핵심 설정 | 기본 모델(`kimi-code/k3`, effort `max`), `default_permission_mode = "yolo"`, plan 모드 기본값, 텔레메트리 비활성, `.hooks/*.sh` 가드레일을 `[[hooks]]`로 연결 |
+| config.toml | `~/.kimi-code/config.toml` | 핵심 설정 | 기본 모델(`kimi-code/k3`, effort `max`를 overrides로 고정), `default_permission_mode = "auto"`, `AgentSwarm` 자동 허용, plan 모드 기본값, 텔레메트리 비활성, `.hooks/*.sh` 가드레일을 `[[hooks]]`로 연결 |
 | symlink_AGENTS.md | `~/.kimi-code/AGENTS.md` | 사용자 전역 지침 | `~/AGENTS.md`를 가리키는 symlink. Claude/Codex/Copilot과 동일한 단일 원본을 공유한다 |
 
-`config.toml`은 구독(OAuth) 경로에서 비밀 값을 담지 않는다. 토큰은 `~/.kimi-code/credentials/`(0700/0600)가 소유하고 config에는 참조만 남는다. 다만 CLI가 같은
-파일에 provider의 oauth 참조와 `[models."kimi-code/*"]` 카탈로그를 덮어쓰므로, `create_` 접두사로 파일이 없을 때만 배포하고 이후 소유권은 CLI에 있다. `tui.toml`,
+`config.toml`은 구독(OAuth) 경로에서 비밀 값을 담지 않는다. 토큰은 `~/.kimi-code/credentials/`(0700/0600)가 소유하고 config에는 참조만 남는다. CLI가 런타임에 같은
+파일에 oauth 참조와 `[models."kimi-code/*"]` 카탈로그를 다시 쓰지만, chezmoi가 파일을 소유하며 `dotfiles-update`의 `chezmoi update --force`가 이런 로컬 drift를
+무시하고 저장소 상태로 덮어쓴다. K3의 effort `max`처럼 managed refresh가 덮어쓸 수 있는 값은 `[models."<alias>".overrides]`로 pin한다. `tui.toml`,
 `mcp.json`, `sessions/`는 배포 대상이 아니다.
 
 Kimi는 프로젝트 레벨 설정 파일이 없어 `[[hooks]]`와 `[[permission.rules]]`를 둘 수 있는 곳이 이 파일뿐이다. 훅 계약이 Claude/Codex와 같아 `.hooks/*.sh`를 그대로
