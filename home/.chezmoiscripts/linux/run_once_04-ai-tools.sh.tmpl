@@ -162,4 +162,14 @@ else
     echo "[ai-tools][omp] already installed ($(omp --version 2>/dev/null || echo 'unknown'))"
 fi
 
+# omp kiro provider (fallback 체인이 kiro/* 모델을 참조한다)
+if command -v omp &>/dev/null; then
+    if omp plugin list 2>/dev/null | grep -q 'pi-provider-kiro'; then
+        echo "[ai-tools][omp] pi-provider-kiro already installed"
+    else
+        echo "[ai-tools][omp] installing pi-provider-kiro"
+        omp plugin install npm:pi-provider-kiro || echo "[ai-tools][warning] pi-provider-kiro installation failed"
+    fi
+fi
+
 echo "[ai-tools][done]"

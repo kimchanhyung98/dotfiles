@@ -1,10 +1,15 @@
 # 역할별 모델
 modelRoles:
-  default: openai-codex/gpt-5.6-sol:xhigh
-  slow: anthropic/claude-opus-5:xhigh
-  smol: openai-codex/gpt-5.6-sol:medium
-  plan: anthropic/claude-fable-5:xhigh
-  advisor: anthropic/claude-opus-5:xhigh
+  # default: openai-codex/gpt-5.6-sol:high
+  default: kiro/gpt-5-6-sol:xhigh
+  # slow: anthropic/claude-opus-5:xhigh
+  slow: kiro/claude-opus-5:max
+  # smol: openai-codex/gpt-5.6-sol:medium
+  smol: kiro/gpt-5-6-sol:high
+  # plan: anthropic/claude-fable-5:xhigh
+  plan: kiro/claude-opus-5:max
+  # advisor: anthropic/claude-opus-5:xhigh
+  advisor: kiro/claude-opus-5:max
   vision: anthropic/claude-opus-5:medium
   designer: "@vision"
   commit: "@smol"
@@ -21,19 +26,12 @@ cycleOrder:
 
 # 모델 id가 여러 프로바이더에 있을 때의 우선순위
 modelProviderOrder:
+  - kiro
   - anthropic
-  - openai-codex
-  - kimi-code
+  # - openai-codex
+  # - kimi-code
 
-# 선택 가능한 모델
-enabledModels:
-  - anthropic/claude-fable-5
-  - anthropic/claude-opus-5
-  - openai-codex/gpt-5.6-sol
-  - openai-codex/gpt-5.6-terra
-  - kimi-code/k3
-
-# 매 턴 종료 후 두 번째 모델이 리뷰하고 조언을 주입한다. modelRoles.advisor가 필요하다.
+# 매 턴 종료 후 두 번째 모델이 리뷰하고 조언을 주입한다. (modelRoles.advisor 필요)
 advisor:
   enabled: true
 
@@ -61,40 +59,72 @@ bash:
 lsp:
   diagnosticsOnEdit: true
 
-# 실패 시 역할별 대체 모델 체인. 명시하지 않은 역할은 default 체인을 상속한다.
+# CLI가 첫 실행에서 직접 써넣는 값. chezmoi가 파일을 소유하므로 여기 두지 않으면 update마다 지워진다.
+symbolPreset: unicode
+theme:
+  dark: titanium
+setupVersion: 1
+
+# 실패 시 역할별 대체 모델 체인. 명시하지 않은 역할은 default 체인을 상속
 retry:
   enabled: true
   modelFallback: true
   fallbackChains:
     default:
+      - kiro/gpt-5-6-sol:xhigh
+      - kiro/claude-opus-5:xhigh
       - anthropic/claude-opus-5:xhigh
-      - kimi-code/k3:max
+      # - kimi-code/k3:max
     slow:
-      - openai-codex/gpt-5.6-sol:max
-      - kimi-code/k3:max
+      - kiro/claude-opus-5:max
+      - kiro/gpt-5-6-sol:max
+      # - openai-codex/gpt-5.6-sol:xhigh
+      # - kimi-code/k3:max
     smol:
+      - kiro/gpt-5-6-sol:high
+      - kiro/claude-opus-5:high
       - anthropic/claude-opus-5:medium
-      - kimi-code/k3:max
+      # - kimi-code/k3:max
     plan:
+      - kiro/claude-opus-5:max
+      - kiro/gpt-5-6-sol:max
+      - kiro/gpt-5-6-terra:max
       - anthropic/claude-opus-5:xhigh
-      - openai-codex/gpt-5.6-sol:max
-      - kimi-code/k3:max
+      # - openai-codex/gpt-5.6-sol:xhigh
+      # - kimi-code/k3:max
     advisor:
-      - openai-codex/gpt-5.6-sol:max
-      - kimi-code/k3:max
+      - kiro/claude-opus-5:max
+      - kiro/gpt-5-6-sol:max
+      - kiro/gpt-5-6-terra:max
+      # - openai-codex/gpt-5.6-sol:xhigh
+      # - kimi-code/k3:max
     vision:
-      - openai-codex/gpt-5.6-sol:high
-      - kimi-code/k3:max
+      - anthropic/claude-sonnet-5:high
+      # - openai-codex/gpt-5.6-sol:high
+      # - kimi-code/k3:max
     designer:
-      - openai-codex/gpt-5.6-sol:high
-      - kimi-code/k3:max
+      - anthropic/claude-sonnet-5:high
+      # - openai-codex/gpt-5.6-sol:medium
+      # - kimi-code/k3:max
     commit:
+      - kiro/gpt-5-6-sol:high
+      - kiro/claude-opus-5:high
+      - kiro/gpt-5-6-terra:xhigh
       - anthropic/claude-opus-5:medium
-      - kimi-code/k3:max
+      # - kimi-code/k3:max
     task:
+      - kiro/claude-opus-5:max
+      - kiro/gpt-5-6-sol:max
+      - kiro/gpt-5-6-terra:max
       - anthropic/claude-opus-5:xhigh
-      - openai-codex/gpt-5.6-sol:max
-      - kimi-code/k3:max
+      # - openai-codex/gpt-5.6-sol:xhigh
+      # - kimi-code/k3:max
     tiny:
+      - kiro/gpt-5-6-sol:high
+      - kiro/claude-opus-5:high
+      - kiro/gpt-5-6-terra:xhigh
       - anthropic/claude-opus-5:medium
-      - kimi-code/k3:max
+      # - kimi-code/k3:max
+
+dev:
+  autoqaConsent: granted

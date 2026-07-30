@@ -218,6 +218,7 @@ Kimi는 프로젝트 레벨 설정 파일이 없어 `[[hooks]]`와 `[[permission
 | 스크립트                                    | 내용                                              | 설치 대상                     |
 |-----------------------------------------|-------------------------------------------------|---------------------------|
 | 10-ai-core (macOS), 04-ai-tools (Linux) | omp (`curl -fsSL https://omp.sh/install`, `--binary`) | `omp` 바이너리 (`~/.local/bin`) |
+| 10-ai-core (macOS), 04-ai-tools (Linux) | pi-provider-kiro (`omp plugin install npm:pi-provider-kiro`) | omp 확장 (`~/.omp/plugins`) |
 
 Pi 기반 터미널 AI 에이전트다. installer는 bun이 있으면 bun 빌드 경로를 타고 bun 1.3.14 미만이면 실패하므로, `--binary`로 prebuilt 바이너리를 강제한다. 이 저장소는
 Bun을 별도로 설치하므로 지정하지 않으면 omp 설치가 bun 버전에 묶인다. 설치 위치는 installer 기본값 `~/.local/bin`이고 rc 파일은 건드리지 않는다.
@@ -226,7 +227,7 @@ Bun을 별도로 설치하므로 지정하지 않으면 omp 설치가 bun 버전
 
 | 파일               | 배포 경로                        | 역할       | 상세                                                |
 |------------------|------------------------------|----------|---------------------------------------------------|
-| create_config.yml | `~/.omp/agent/config.yml`   | 핵심 설정 | 역할별 모델(`modelRoles`)과 fallback 체인, 선택 가능한 모델 목록(`enabledModels`), 프로바이더 우선순위, advisor, 승인 정책과 `bash.patterns` 차단 규칙, LSP 진단. `omp config set`과 `/settings`가 이 파일을 직접 쓰므로 `create_`로 파일이 없을 때만 배포하고 이후 소유권은 CLI에 있다 |
+| config.yml | `~/.omp/agent/config.yml` | 핵심 설정 | 역할별 모델(`modelRoles`)과 fallback 체인, 프로바이더 우선순위, advisor, 승인 정책과 `bash.patterns` 차단 규칙, LSP 진단. `enabledModels`를 두지 않아 발견된 모든 프로바이더/모델이 선택기에 표시된다. CLI(`omp config set`, `/settings`)가 이 파일을 다시 써도 `chezmoi update --force`가 저장소 상태로 덮어쓴다. 그래서 CLI가 첫 실행에서 써넣는 `symbolPreset`·`theme`·`setupVersion`도 저장소에 함께 둔다 |
 | symlink_AGENTS.md | `~/.omp/agent/AGENTS.md`    | 사용자 전역 지침 | `~/AGENTS.md`를 가리키는 symlink. 경로가 한 단계 깊어 `../../AGENTS.md`다 |
 
 `models.yml`(커스텀 provider), `agent.db`(인증 저장소), `RULES.md`는 배포하지 않는다. 데이터 루트는 `PI_CODING_AGENT_DIR`로 옮길 수 있으나 기본값을 쓴다.
@@ -234,6 +235,16 @@ Bun을 별도로 설치하므로 지정하지 않으면 omp 설치가 bun 버전
 **역할별 모델**: omp는 턴 성격에 따라 역할을 나눠 모델을 고른다. 내장 역할은 `default`, `smol`, `slow`, `vision`, `plan`, `designer`, `commit`, `tiny`, `task`, `advisor`이며,
 값은 `provider/modelId`로 고정하거나 `"@role"`로 다른 역할을 참조한다. 뒤에 `:minimal`~`:max` 접미사로 thinking 강도를 붙인다. `anthropic`, `openai-codex`, `kimi-code`는
 API key 없이 `/login`으로 붙는 구독 프로바이더라, 이 저장소가 Claude·Codex·Kimi에서 쓰는 모델을 그대로 역할에 배치한다.
+
+**kiro fallback(임시 사용)**: kiro는 주 프로바이더의 쿼터 소진에 대응하기 위한 임시 경로다. `retry.fallbackChains`는 자기 쿼터(`anthropic`, `openai-codex`)를
+소모하기 전에 무료인 `kiro/*`를 먼저 시도한다. kiro는 omp 내장 프로바이더가 아니라 `pi-provider-kiro` 확장이며 omp 17.1.8 이상을 요구한다(17.1.3에서는
+`clampThinkingLevel` export 누락으로 설치가 실패한다). 자격증명은 `/login kiro` 없이 kiro-cli 로그인을 그대로 재사용하므로, kiro-cli가 없거나 로그아웃 상태면 해당 항목만
+실패하고 체인의 다음 모델로 넘어간다. kiro-cli 자체는 이 저장소가 설치하지 않는다. 모델 id는 카탈로그의 점을 하이픈으로 바꾼 형태라 `kiro/gpt-5-6-sol`이며
+`kiro/gpt-5.6-sol`은 해석되지 않는다. `kiro/gpt-5-6-sol`은 text-only로 등록되어 `vision`·`designer` 체인에서는 제외한다.
+
+**현재 상태**: omp 17.2.0 + pi-provider-kiro 0.9.3 조합에서는 `kiro/*`를 역할 기본 모델(`modelRoles`)이나 `--model`로 직접 선택할 수 있고,
+`retry.fallbackChains`에서도 정상 동작한다. OpenAI Codex의 `usage_limit_reached` 이후 `retry_fallback_applied`로 `kiro/gpt-5-6-sol`에 전환되고,
+Kiro 응답 뒤 `retry_fallback_succeeded`로 복구가 완료되는 경로를 실측했다. `omp usage`에 kiro가 나타나지 않는 것은 fallback 실패를 의미하지 않는다.
 
 omp는 discovery provider로 다른 도구의 설정 경로를 그대로 읽는다. 사용자 지침은 우선순위가 `native`(`~/.omp/agent/AGENTS.md`) > `claude`(`~/.claude/CLAUDE.md`) >
 `agents`·`codex`(`~/.agents/AGENTS.md`, `~/.codex/AGENTS.md`) 순이고 **한 개만 살아남으므로**, 위 symlink가 나머지를 shadow한다. 셋 다 `~/AGENTS.md`를 가리켜 결과는 같다.
