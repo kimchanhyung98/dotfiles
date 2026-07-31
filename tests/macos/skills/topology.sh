@@ -21,6 +21,10 @@ for target in \
     .omp/agent/AGENTS.md \
     .omp/agent/config.yml \
     .agents/skills \
+    .kiro/agents/yolo.json \
+    .kiro/settings/cli.json \
+    .kiro/skills \
+    .kiro/steering/AGENTS.md \
     .local/bin/mattpocock-skills-sync; do
     grep -Fxq "$target" <<<"$managed"
 done
