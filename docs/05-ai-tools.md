@@ -23,6 +23,7 @@ Claude Code와 Codex가 단일 출처 `~/.skills`를 공유한다. 지원하는 
 | Codex       | `~/.agents/skills/` → `~/.skills/`                    | `.agents/skills/` → `.skills/`                   | symlink 공유 |
 | Copilot CLI | `~/.agents/skills/` → `~/.skills/` 재사용              | `.agents/skills/`, `.github/skills/`              | 별도 Copilot symlink 없음 |
 | Kimi Code   | `~/.agents/skills/` → `~/.skills/` 재사용              | `.agents/skills/`                                | 별도 Kimi symlink 없음 |
+| Kiro CLI    | `~/.kiro/skills/` → `~/.skills/`                       | `.kiro/skills/`                                  | symlink 공유 |
 
 **단일 출처 `~/.skills`**: 공통 스킬을 `~/.skills` 한 곳에만 두고, 지원 도구의 `skills` 디렉토리를 여기로 symlink하여 공유한다. chezmoi가
 `home/dot_claude/symlink_skills`·`home/dot_agents/symlink_skills`로 symlink를 관리하고,
@@ -55,6 +56,7 @@ Claude Code와 Codex가 단일 출처 `~/.skills`를 공유한다. 지원하는 
 | `dot_codex/symlink_AGENTS.md` | `~/.codex/AGENTS.md` → `~/AGENTS.md` | Codex | 사용자 전역 지침 |
 | `dot_copilot/symlink_copilot-instructions.md` | `~/.copilot/copilot-instructions.md` → `~/AGENTS.md` | Copilot CLI | 개인 지침 |
 | `dot_kimi-code/symlink_AGENTS.md` | `~/.kimi-code/AGENTS.md` → `~/AGENTS.md` | Kimi Code | 사용자 전역 지침 |
+| `dot_kiro/steering/symlink_AGENTS.md` | `~/.kiro/steering/AGENTS.md` → `~/AGENTS.md` | Kiro CLI | 사용자 전역 지침(steering) |
 
 **Codex 계층 우선순위**: 사용자 전역 파일 뒤에 repository root부터 현재 디렉터리까지의 `AGENTS.md`가 순서대로 적용되며 더 가까운 파일이 구체화한다:
 
@@ -210,6 +212,45 @@ Kimi는 프로젝트 레벨 설정 파일이 없어 `[[permission.rules]]`를 �
 
 스킬과 커스텀 에이전트는 `~/.agents/skills`·`~/.agents/agents`에서, 프로젝트는 `.agents/`와 루트 `AGENTS.md`에서 읽으므로 Kimi 전용 symlink나 프로젝트 파일은 두지
 않는다. 머신 종속 경로가 들어가는 `.kimi-code/local.toml`은 `.gitignore` 대상이다.
+
+## Kiro CLI
+
+**설치 (스크립트)**
+
+| 스크립트 | 내용 | 설치 대상 |
+|---|---|---|
+| 10-ai-core (macOS), 04-ai-tools (Linux) | Kiro CLI (`curl -fsSL https://cli.kiro.dev/install`) | macOS `/Applications/Kiro CLI.app` + `~/.local/bin` symlink, Linux `~/.local/bin`(`unzip` 필요) |
+
+installer는 PATH를 수정하지 않고 안내만 하므로 `~/.local/bin` 등록은 기존 shell 설정이 담당한다. 기존 설치가 있을 때만 `/dev/tty`로 교체 여부를 묻기 때문에
+`command -v kiro-cli` 가드가 비대화 실행을 보장한다. macOS installer는 설치 직후 앱을 백그라운드(`open -g`)로 한 번 띄우고 3초 대기하므로 첫 `chezmoi apply`가
+그만큼 길어진다.
+
+**설정 (dot_kiro/ → ~/.kiro/)**
+
+| 파일 | 배포 경로 | 역할 | 상세 |
+|---|---|---|---|
+| settings/private_cli.json.tmpl | `~/.kiro/settings/cli.json` | 전역 설정 | 기본 에이전트·모델·effort, 무승인 시작 확인 제거, 텔레메트리·콘텐츠 공유 차단. `private_` 속성으로 0600을 보존 |
+| agents/yolo.json.tmpl | `~/.kiro/agents/yolo.json` | 무승인 에이전트 | 내장 `kiro_default` 복제 + `allowedTools: ["@builtin"]`. `toolsSettings`의 deny 목록이 유일한 차단 경로 |
+| symlink_skills | `~/.kiro/skills/` → `~/.skills/` | 스킬 | Claude/Codex와 같은 단일 출처 공유 |
+| steering/symlink_AGENTS.md | `~/.kiro/steering/AGENTS.md` → `~/AGENTS.md` | 사용자 전역 지침 | Kiro global steering 위치에서 공통 지침 재사용 |
+
+내장 에이전트는 편집할 수 없고 `allowedTools`가 에이전트 단위 필드라, 승인 프롬프트를 없애려면 커스텀 에이전트가 필요하다. `yolo`는 `kiro-cli agent create
+--from kiro_default`로 복제한 뒤 신뢰 설정을 얹은 것으로 Claude의 `bypassPermissions`와 같은 성격이며, `toolsSettings.*.denied*`가 승인 계층을 대신한다.
+`@builtin`에 AWS 도구가 포함되므로 production 계정에서는 최소 권한 credential을 쓴다. 복제해 온 `prompt`는 내장 기본 프롬프트의 스냅샷이라 CLI 업그레이드와
+함께 낡는다. 갱신은 `agent create`를 다시 실행해 옮기는 명시적 변경으로 한다.
+
+차단은 preToolUse 훅이 아니라 deny 목록이 전담한다. 저장소 `.hooks/`의 guard를 붙이려면 계약 변환기가 필요한데(Kiro는 exit 2 + STDERR, guard는 exit 0 +
+STDOUT JSON), 그 경로는 guard 실행 실패·스크립트 부재·payload 불일치가 모두 통과로 귀결되는 fail-open이다. deny 목록은 CLI 내부에서 평가되므로 그런 실패
+모드가 없다. 대신 guard가 하던 realpath 기반 판단은 글롭으로 재현되지 않아, 절대 경로를 통한 저장소 밖 쓰기는 `../**`와 홈 앵커 deny가 막는 범위까지만
+차단된다. `.hooks/`의 guard는 이 저장소의 프로젝트 설정(`.claude/settings.json`)만 쓰는 개발용 안전장치이며, chezmoi가 배포하는 전역 설정은 참조하지 않는다.
+
+`deniedPaths`는 Codex `[permissions.workspace.filesystem.":workspace_roots"]`의 secret deny와 같은 범위를 갖는다. `**/` 패턴이 session cwd 기준이라 같은 규칙을
+홈 앵커로도 병기해 다른 작업 디렉터리에서 홈 자격증명이 노출되는 것을 막고, 파일 도구별 설정은 상속되지 않으므로 read/write/grep/glob에 각각 명시한다.
+`kiro-cli agent validate`는 모르는 필드도 깨진 정규식도 exit 0으로 통과시키므로 검증은 `settings list --all`과 실제 동작 테스트로 한다. `deniedCommands`는
+Rust regex로 평가된다.
+
+`~/.kiro/sessions/`, `~/.kiro/.cli_bash_history`, 프로젝트 `.kiro/settings/lsp.json`은 런타임 데이터라 배포 대상이 아니다. 이 저장소는 project Kiro 설정을 두지
+않으므로 `.kiro/*`를 ignore한다. 기존 `~/.kiro/skills`가 실제 디렉터리면 run-once script가 먼저 제거한다 — 공통 원본 `~/.skills`는 건드리지 않는다.
 
 ## omp
 

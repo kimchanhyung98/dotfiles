@@ -162,6 +162,7 @@ check_optional "ollama" "command -v ollama"
 check_optional "antigravity (agy)" "command -v agy"
 check_optional "hermes" "command -v hermes"
 check_optional "kimi" "command -v kimi"
+check_optional "kiro-cli" "command -v kiro-cli"
 check_optional "omp" "command -v omp"
 
 # AI Extensions
@@ -176,6 +177,7 @@ section "Skill Directories"
 check_path "Shared skills (~/.skills)" "$HOME/.skills"
 check_symlink "Claude skills -> ~/.skills" "$HOME/.claude/skills" "../.skills"
 check_symlink "Codex skills (~/.agents) -> ~/.skills" "$HOME/.agents/skills" "../.skills"
+check_symlink "Kiro skills -> ~/.skills" "$HOME/.kiro/skills" "../.skills"
 
 # Agent Instructions
 section "Agent Instructions"
@@ -184,6 +186,7 @@ check_symlink "Claude instructions -> ~/AGENTS.md" "$HOME/.claude/CLAUDE.md" "..
 check_symlink "Codex instructions -> ~/AGENTS.md" "$HOME/.codex/AGENTS.md" "../AGENTS.md"
 check_symlink "Copilot instructions -> ~/AGENTS.md" "$HOME/.copilot/copilot-instructions.md" "../AGENTS.md"
 check_symlink "Kimi instructions -> ~/AGENTS.md" "$HOME/.kimi-code/AGENTS.md" "../AGENTS.md"
+check_symlink "Kiro instructions -> ~/AGENTS.md" "$HOME/.kiro/steering/AGENTS.md" "../../AGENTS.md"
 check_symlink "omp instructions -> ~/AGENTS.md" "$HOME/.omp/agent/AGENTS.md" "../../AGENTS.md"
 
 # Dotfiles
@@ -198,6 +201,7 @@ section "Config"
 check_path "ghostty" "$HOME/.config/ghostty/config"
 check_path "claude" "$HOME/.claude/settings.json"
 check_path "codex" "$HOME/.codex/config.toml"
+check_path "kiro" "$HOME/.kiro/settings/cli.json"
 check_optional "copilot" "[ -f '$HOME/.copilot/mcp-config.json' ]"
 
 # MCP

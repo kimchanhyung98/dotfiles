@@ -1,0 +1,17 @@
+{{- /* ~/.kiro/settings/cli.json — kiro-cli 전역 설정 (기본 에이전트, 모델, effort, 프라이버시) */ -}}
+{
+  "chat.defaultAgent": "yolo",
+  "chat.defaultModel": "claude-opus-5",
+  "chat.modelDefaults": {
+    "claude-opus-5": {
+      "output_config": {
+        "effort": "xhigh"
+      }
+    }
+  },
+  "chat.disableTrustAllConfirmation": true,
+  "chat.enableNotifications": false,
+  "cleanup.periodDays": 28,
+  "telemetry.enabled": false,
+  "codeWhisperer.shareCodeWhispererContentWithAWS": false
+}

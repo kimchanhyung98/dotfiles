@@ -1,0 +1,11 @@
+#!/bin/bash
+# Kiro CLI skills SSOT 전환 준비.
+# 기존 ~/.kiro/skills가 실제 디렉터리면 제거하고, 이후 chezmoi가 ~/.skills symlink를 생성한다.
+
+set -euo pipefail
+
+dir="$HOME/.kiro/skills"
+if [ -d "$dir" ] && [ ! -L "$dir" ]; then
+    echo "[skills-migrate][kiro] remove $dir"
+    rm -rf "$dir"
+fi
