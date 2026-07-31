@@ -84,7 +84,7 @@ esac
 exit 0
 EOF
     chmod +x "$HOME/.local/bin/dotfiles-test-tool"
-    for tool in claude codex copilot agy hermes kimi omp doppler; do
+    for tool in claude codex copilot agy hermes kimi kiro-cli omp doppler; do
         ln -sf dotfiles-test-tool "$HOME/.local/bin/$tool"
     done
 

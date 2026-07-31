@@ -148,6 +148,21 @@ else
     echo "[ai-tools][kimi] already installed ($(kimi --version 2>/dev/null || echo 'unknown'))"
 fi
 
+# Kiro CLI
+# installer는 기존 설치가 있을 때만 tty 확인을 요구하므로 command -v 가드가 비대화 실행을 보장한다
+if ! command -v kiro-cli &>/dev/null; then
+    echo "[ai-tools][kiro] installing"
+    installer=$(mktemp)
+    if curl -fsSL https://cli.kiro.dev/install -o "$installer"; then
+        bash "$installer" || echo "[ai-tools][warning] Kiro CLI install failed"
+    else
+        echo "[ai-tools][warning] Kiro CLI download failed"
+    fi
+    rm -f "$installer"
+else
+    echo "[ai-tools][kiro] already installed ($(kiro-cli --version 2>/dev/null || echo 'unknown'))"
+fi
+
 # omp
 if ! command -v omp &>/dev/null; then
     echo "[ai-tools][omp] installing"

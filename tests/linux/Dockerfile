@@ -15,6 +15,7 @@ RUN apt-get update -qq && \
         openssh-client \
         shellcheck \
         sudo \
+        unzip \
         vim \
         zoxide \
         zsh \
