@@ -66,39 +66,3 @@ pattern = "AgentSwarm"
 [[permission.rules]]
 decision = "deny"
 pattern = "Bash(rm -rf*)"
-
-[[hooks]]
-event = "PreToolUse"
-matcher = "Bash"
-command = 'h="$(git rev-parse --show-toplevel 2>/dev/null)/.hooks/block_git_origin_push.sh"; [ -f "$h" ] || exit 0; bash "$h"'
-timeout = 10
-
-[[hooks]]
-event = "PreToolUse"
-matcher = "Bash"
-command = 'h="$(git rev-parse --show-toplevel 2>/dev/null)/.hooks/block_global_system_commands.sh"; [ -f "$h" ] || exit 0; bash "$h"'
-timeout = 10
-
-[[hooks]]
-event = "PreToolUse"
-matcher = "Bash"
-command = 'h="$(git rev-parse --show-toplevel 2>/dev/null)/.hooks/block_global_package_install.sh"; [ -f "$h" ] || exit 0; bash "$h"'
-timeout = 10
-
-[[hooks]]
-event = "PreToolUse"
-matcher = "Bash"
-command = 'h="$(git rev-parse --show-toplevel 2>/dev/null)/.hooks/block_pipe_to_shell.sh"; [ -f "$h" ] || exit 0; bash "$h"'
-timeout = 10
-
-[[hooks]]
-event = "PreToolUse"
-matcher = "^(Edit|Write)$"
-command = 'h="$(git rev-parse --show-toplevel 2>/dev/null)/.hooks/block_dependency_folder_edits.sh"; [ -f "$h" ] || exit 0; bash "$h"'
-timeout = 10
-
-[[hooks]]
-event = "PreToolUse"
-matcher = "^(Edit|Write)$"
-command = 'h="$(git rev-parse --show-toplevel 2>/dev/null)/.hooks/block_parent_directory_writes.sh"; [ -f "$h" ] || exit 0; bash "$h"'
-timeout = 10

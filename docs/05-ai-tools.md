@@ -197,7 +197,7 @@ Moonshot AI의 터미널 AI 에이전트다. 설치 경로는 installer 기본�
 
 | 파일               | 배포 경로                    | 역할       | 상세                                                |
 |------------------|--------------------------|----------|---------------------------------------------------|
-| config.toml | `~/.kimi-code/config.toml` | 핵심 설정 | 기본 모델(`kimi-code/k3`, effort `max`를 overrides로 고정), `default_permission_mode = "auto"`, `AgentSwarm` 자동 허용, plan 모드 기본값, 텔레메트리 비활성, `.hooks/*.sh` 가드레일을 `[[hooks]]`로 연결 |
+| config.toml | `~/.kimi-code/config.toml` | 핵심 설정 | 기본 모델(`kimi-code/k3`, effort `max`를 overrides로 고정), `default_permission_mode = "auto"`, `AgentSwarm` 자동 허용, plan 모드 기본값, 텔레메트리 비활성, `[[permission.rules]]` 가드레일 |
 | symlink_AGENTS.md | `~/.kimi-code/AGENTS.md` | 사용자 전역 지침 | `~/AGENTS.md`를 가리키는 symlink. Claude/Codex/Copilot과 동일한 단일 원본을 공유한다 |
 
 `config.toml`은 구독(OAuth) 경로에서 비밀 값을 담지 않는다. 토큰은 `~/.kimi-code/credentials/`(0700/0600)가 소유하고 config에는 참조만 남는다. CLI가 런타임에 같은
@@ -205,8 +205,8 @@ Moonshot AI의 터미널 AI 에이전트다. 설치 경로는 installer 기본�
 무시하고 저장소 상태로 덮어쓴다. K3의 effort `max`처럼 managed refresh가 덮어쓸 수 있는 값은 `[models."<alias>".overrides]`로 pin한다. `tui.toml`,
 `mcp.json`, `sessions/`는 배포 대상이 아니다.
 
-Kimi는 프로젝트 레벨 설정 파일이 없어 `[[hooks]]`와 `[[permission.rules]]`를 둘 수 있는 곳이 이 파일뿐이다. 훅 계약이 Claude/Codex와 같아 `.hooks/*.sh`를 그대로
-재사용하며, `.hooks/`가 없는 저장소에서는 no-op으로 통과한다.
+Kimi는 프로젝트 레벨 설정 파일이 없어 `[[permission.rules]]`를 둘 수 있는 곳이 이 파일뿐이다. 차단은 이 규칙만 담당하고 `[[hooks]]`는 두지 않는다 — 전역 설정이
+저장소 로컬 `.hooks/*.sh`를 실행하면 작업 중인 아무 저장소의 스크립트나 실행하게 된다.
 
 스킬과 커스텀 에이전트는 `~/.agents/skills`·`~/.agents/agents`에서, 프로젝트는 `.agents/`와 루트 `AGENTS.md`에서 읽으므로 Kimi 전용 symlink나 프로젝트 파일은 두지
 않는다. 머신 종속 경로가 들어가는 `.kimi-code/local.toml`은 `.gitignore` 대상이다.
@@ -250,6 +250,5 @@ omp는 discovery provider로 다른 도구의 설정 경로를 그대로 읽는�
 `agents`·`codex`(`~/.agents/AGENTS.md`, `~/.codex/AGENTS.md`) 순이고 **한 개만 살아남으므로**, 위 symlink가 나머지를 shadow한다. 셋 다 `~/AGENTS.md`를 가리켜 결과는 같다.
 스킬도 `claude`·`agents` provider가 `~/.claude/skills`·`~/.agents/skills`를 이미 읽어 omp 전용 symlink는 두지 않는다.
 
-omp 훅은 `pi.on(...)`을 등록하는 JS/TS 확장 모듈이라, Claude·Codex·Kimi가 공유하는 `.hooks/*.sh`(stdin JSON + exit code) 계약과 호환되지 않는다. 저장소 가드레일은
-스크립트를 재사용하는 대신 `bash.patterns`의 deny 규칙으로 다시 표현한다. `tools.approvalMode`가 `yolo`라 이 규칙이 유일한 차단 경로이며, glob 기반이므로 정규식을 쓰는
-훅보다 범위가 거칠다.
+omp 훅은 `pi.on(...)`을 등록하는 JS/TS 확장 모듈이지만, 전역 설정은 저장소 로컬 `.hooks/*.sh`를 실행하지 않는다. 저장소 가드레일은 스크립트를 재사용하는 대신
+`bash.patterns`의 deny 규칙으로 다시 표현한다. `tools.approvalMode`가 `yolo`라 이 규칙이 유일한 차단 경로이며, glob 기반이므로 정규식보다 범위가 거칠다.
