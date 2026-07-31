@@ -128,3 +128,13 @@ retry:
 
 dev:
   autoqaConsent: granted
+
+disabledExtensions:
+  - mcp:context7:context7
+  - mcp:github:github
+  - mcp:gitlab:gitlab
+  - mcp:laravel-boost:laravel-boost
+  - mcp:linear:linear
+  - mcp:serena:serena
+  - mcp:supabase:supabase
+  - mcp:vercel:vercel
