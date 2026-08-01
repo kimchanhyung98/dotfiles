@@ -277,15 +277,8 @@ Bun을 별도로 설치하므로 지정하지 않으면 omp 설치가 bun 버전
 값은 `provider/modelId`로 고정하거나 `"@role"`로 다른 역할을 참조한다. 뒤에 `:minimal`~`:max` 접미사로 thinking 강도를 붙인다. `anthropic`, `openai-codex`, `kimi-code`는
 API key 없이 `/login`으로 붙는 구독 프로바이더라, 이 저장소가 Claude·Codex·Kimi에서 쓰는 모델을 그대로 역할에 배치한다.
 
-**kiro fallback(임시 사용)**: kiro는 주 프로바이더의 쿼터 소진에 대응하기 위한 임시 경로다. `retry.fallbackChains`는 자기 쿼터(`anthropic`, `openai-codex`)를
-소모하기 전에 무료인 `kiro/*`를 먼저 시도한다. kiro는 omp 내장 프로바이더가 아니라 `pi-provider-kiro` 확장이며 omp 17.1.8 이상을 요구한다(17.1.3에서는
-`clampThinkingLevel` export 누락으로 설치가 실패한다). 자격증명은 `/login kiro` 없이 kiro-cli 로그인을 그대로 재사용하므로, kiro-cli가 없거나 로그아웃 상태면 해당 항목만
-실패하고 체인의 다음 모델로 넘어간다. kiro-cli 자체는 이 저장소가 설치하지 않는다. 모델 id는 카탈로그의 점을 하이픈으로 바꾼 형태라 `kiro/gpt-5-6-sol`이며
-`kiro/gpt-5.6-sol`은 해석되지 않는다. `kiro/gpt-5-6-sol`은 text-only로 등록되어 `vision`·`designer` 체인에서는 제외한다.
-
-**현재 상태**: omp 17.2.0 + pi-provider-kiro 0.9.3 조합에서는 `kiro/*`를 역할 기본 모델(`modelRoles`)이나 `--model`로 직접 선택할 수 있고,
-`retry.fallbackChains`에서도 정상 동작한다. OpenAI Codex의 `usage_limit_reached` 이후 `retry_fallback_applied`로 `kiro/gpt-5-6-sol`에 전환되고,
-Kiro 응답 뒤 `retry_fallback_succeeded`로 복구가 완료되는 경로를 실측했다. `omp usage`에 kiro가 나타나지 않는 것은 fallback 실패를 의미하지 않는다.
+**역할별 모델과 fallback**: 역할·모델 매핑, 프로바이더 우선순위, fallback 순서는 운영 중 수시로 바뀌므로 문서나 테스트에 고정하지 않는다.
+현재 값은 `config.yml`을 단일 기준으로 확인한다. Kiro 확장은 설치해 두지만, 사용 여부와 순서 역시 이 설정 파일에서 관리한다.
 
 omp는 discovery provider로 다른 도구의 설정 경로를 그대로 읽는다. 사용자 지침은 우선순위가 `native`(`~/.omp/agent/AGENTS.md`) > `claude`(`~/.claude/CLAUDE.md`) >
 `agents`·`codex`(`~/.agents/AGENTS.md`, `~/.codex/AGENTS.md`) 순이고 **한 개만 살아남으므로**, 위 symlink가 나머지를 shadow한다. 셋 다 `~/AGENTS.md`를 가리켜 결과는 같다.
