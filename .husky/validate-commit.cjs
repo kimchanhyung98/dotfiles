@@ -21,17 +21,18 @@ try {
     process.exit(1);
 }
 
-// merge/revert/initial 커밋은 제외
-if (/^Merge /.test(commitMsg) || /^Revert "/.test(commitMsg) || commitMsg === 'Initial commit') {
+// merge/revert 커밋은 제외
+const commitHeader = commitMsg.split(/\r?\n/, 1)[0];
+if (/^Merge /.test(commitHeader) || /^Revert "/.test(commitHeader)) {
     process.exit(0);
 }
 
 // 패턴: `type(scope): subject` or `type: subject` (scope는 선택 사항, 소문자만 허용)
-const commitPattern = /^[a-z]+(?:\([a-z0-9_-]+\))?:\s+(\S.*)/;
-const commitMatch = commitMsg.match(commitPattern);
+const commitPattern = /^[a-z]+(?:\([a-z0-9_-]+\))?:[ \t]+(\S.*)$/;
+const commitMatch = commitHeader.match(commitPattern);
 
 if (!commitMatch) {
-    console.error(`* 잘못된 형식 : ${commitMsg}`);
+    console.error(`* 잘못된 형식 : ${commitHeader}`);
     console.error(`* 올바른 형식 : ${validPattern}`);
     console.error('');
     process.exit(1);

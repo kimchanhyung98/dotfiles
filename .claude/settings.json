@@ -18,10 +18,14 @@
       "Read(**/*.jks)",
       "Read(**/*.keystore)",
       "Read(**/*.tfvars)",
+      "Read(**/*.tfstate)",
+      "Read(**/*.tfstate.*)",
       "Read(**/id_rsa*)",
       "Read(**/id_ed25519*)",
-      "Read(**/.ssh/*)",
-      "Read(**/.aws/*)",
+      "Read(**/.ssh/**)",
+      "Read(**/.aws/**)",
+      "Read(**/.azure/**)",
+      "Read(**/.docker/config.json)",
       "Read(**/credentials.json)",
       "Read(**/.netrc)",
       "Read(**/.npmrc)",
@@ -142,7 +146,7 @@
   "advisorModel": "opus",
   "effortLevel": "xhigh",
   "companyAnnouncements": [
-    "\nWelcome to dotfiles!\nRun 'make init' on first launch."
+    "\nWelcome! Run 'make init' on first launch."
   ],
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true

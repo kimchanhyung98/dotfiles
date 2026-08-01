@@ -1,6 +1,7 @@
 <!--
 ## PR Title Format
-Please ensure your PR title follows the Conventional Commits format:
+Please ensure your PR title follows this repository's Conventional Commits-based format:
+<type>: <description>
 <type>(<scope>): <description>
 
 Example types (recommendations only; any lowercase type is accepted): feat, fix, docs, refactor, test, chore, perf, ci, build, style, revert
