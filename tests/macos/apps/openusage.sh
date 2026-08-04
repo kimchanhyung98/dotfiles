@@ -26,7 +26,7 @@ fi
 mkdir -p "$(dirname "$config")" "$fake_bin"
 cp "$plist" "$config"
 plutil -create xml1 "$info_plist"
-plutil -insert CFBundleShortVersionString -string 0.7.6 "$info_plist"
+plutil -insert CFBundleShortVersionString -string 0.9.0 "$info_plist"
 
 cat > "$fake_bin/command" <<'EOF'
 #!/bin/bash
@@ -39,7 +39,7 @@ case "$command_name" in
     curl)
         case "$*" in
             *releases/latest*)
-                printf '%s' 'https://github.com/robinebers/openusage/releases/tag/v0.7.6'
+                printf '%s' 'https://github.com/kimchanhyung98/openusage/releases/tag/v0.9.0'
                 exit 0
                 ;;
         esac
@@ -101,7 +101,7 @@ run_chezmoi "$test_home" execute-template \
 sed "s|app=\"/Applications/OpenUsage.app\"|app=\"$test_app\"|" "$rendered_source" > "$rendered"
 
 bash -n "$rendered"
-grep -Fq 'repo="robinebers/openusage"' "$rendered"
+grep -Fq 'repo="kimchanhyung98/openusage"' "$rendered"
 grep -Fq 'releases/latest' "$rendered"
 grep -Fq 'defaults import com.robinebers.openusage' "$rendered"
 grep -Fq 'hdiutil attach' "$rendered"
@@ -120,8 +120,8 @@ PATH="$fake_bin:/usr/bin:/bin" \
     bash "$rendered" > "$test_home/first-run.log" 2>&1
 
 test -d "$test_app"
-grep -Fq 'curl:-fsSL -o /dev/null -w %{url_effective} https://github.com/robinebers/openusage/releases/latest' "$call_log"
-grep -Fq 'https://github.com/robinebers/openusage/releases/download/v0.7.6/OpenUsage-0.7.6.dmg' "$call_log"
+grep -Fq 'curl:-fsSL -o /dev/null -w %{url_effective} https://github.com/kimchanhyung98/openusage/releases/latest' "$call_log"
+grep -Fq 'https://github.com/kimchanhyung98/openusage/releases/download/v0.9.0/OpenUsage-0.9.0.dmg' "$call_log"
 grep -Fq 'defaults:import com.robinebers.openusage' "$call_log"
 grep -Fq "open:-g $test_app" "$call_log"
 grep -Fq '[openusage][warning] installed but could not launch automatically' "$test_home/first-run.log"
@@ -136,9 +136,9 @@ HOME="$test_home" \
 PATH="$fake_bin:/usr/bin:/bin" \
     bash "$rendered" > "$test_home/second-run.log" 2>&1
 
-grep -Fq '[openusage] 0.7.6 already installed' "$test_home/second-run.log"
+grep -Fq '[openusage] 0.9.0 already installed' "$test_home/second-run.log"
 grep -Fq 'defaults:import com.robinebers.openusage' "$call_log"
-if grep -Fq 'OpenUsage-0.7.6.dmg' "$call_log"; then
+if grep -Fq 'OpenUsage-0.9.0.dmg' "$call_log"; then
     echo 'OpenUsage reinstalled the current version' >&2
     exit 1
 fi

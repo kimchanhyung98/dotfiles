@@ -13,7 +13,7 @@ echo "[openusage][start]"
 
 app="/Applications/OpenUsage.app"
 config="$HOME/.config/openusage/OpenUsage.plist"
-repo="robinebers/openusage"
+repo="kimchanhyung98/openusage"
 work_dir=""
 
 trap 'if [ -n "$work_dir" ]; then hdiutil detach "$work_dir/mnt" >/dev/null 2>&1 || true; rm -rf "$work_dir"; fi' EXIT
