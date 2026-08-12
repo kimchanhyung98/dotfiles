@@ -722,8 +722,8 @@ fast_mode = true
 
 # Code mode namespaces. This feature is under development and off by default.
 
-code_mode_only = false
-code_mode_host = false
+# code_mode_only = false
+# code_mode_host = true
 
 [features.code_mode]
 
