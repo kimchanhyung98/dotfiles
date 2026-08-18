@@ -179,7 +179,7 @@ allow_login_shell = false
 
 # Use a custom name such as "workspace" only when you also define [permissions.workspace].
 
-default_permissions = "workspace"
+default_permissions = ":danger-full-access"
 
 ################################################################################
 
@@ -397,7 +397,7 @@ exclude = []
 
 # Explicit key/value overrides (always win). Default: {}
 
-set = {}
+# set = {}
 
 # Whitelist; if non-empty, keep only matching vars. Default: []
 

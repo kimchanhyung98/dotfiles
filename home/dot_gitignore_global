@@ -9,26 +9,10 @@
 .Spotlight-V100
 .Trashes
 
-# IDE
-.idea/
-.vscode/
-*.code-workspace
-*.sublime-workspace
-*.swp
-*.swo
-*~
-
 # Environment
 .env
-.env.local
-.env.*.local
 
 # Dependencies
 node_modules/
 vendor/
 venv/
-
-# Build outputs
-dist/
-build/
-*.egg-info/
