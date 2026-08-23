@@ -112,7 +112,7 @@ Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록
 
 | 상태 | 플러그인 |
 |---|---|
-| 활성 | `code-review`, `code-simplifier`, `codex@openai-codex`, `context7`, `hookify`, `playwright`, `pr-review-toolkit`, `ralph-loop`, `remember`, `security-guidance`, `vercel` |
+| 활성 | `code-review`, `code-simplifier`, `codex@openai-codex`, `context7`, `diagram-design@diagram-design`, `hookify`, `playwright`, `pr-review-toolkit`, `ralph-loop`, `remember`, `security-guidance`, `vercel` |
 | 비활성 | LSP, 서비스 연동, 실험 기능 등 나머지 official plugin 항목 |
 
 **MCP 서버**
