@@ -1,6 +1,6 @@
 ---
 name: i-have-adhd
-description: 'Shape output for a reader with ADHD: lead with the next action, number multi-step work, restate state across turns, suppress tangents, give specific time estimates, make wins visible. Invoke with /i-have-adhd; stays on until "stop adhd mode".'
+description: 'Shape output for a reader with ADHD: lead with the next action, number multi-step work, suppress tangents, give specific time estimates, and make wins visible. Invoke /i-have-adhd in Claude Code for session mode or $i-have-adhd in Codex for the current turn. Stop Claude Code session mode with "stop adhd mode" or "normal mode".'
 disable-model-invocation: true
 license: MIT
 metadata:
@@ -14,9 +14,11 @@ The reader has ADHD. Output is not just brief. It is shaped so an ADHD brain can
 
 ## Persistence
 
-These rules apply to every response for the rest of the session, not only this one. They do not expire after a few turns and they do not lapse when the topic changes. If you are unsure whether they still apply, they do.
+In Claude Code, these rules apply to every response for the rest of the session, not only this one. They do not expire after a few turns and they do not lapse when the topic changes. If you are unsure whether they still apply, they do.
 
-Turn them off only when the reader says "stop adhd mode" or "normal mode". Confirm in one line, then return to your default style.
+In Codex, skills are turn-scoped. Apply these rules to the current response only; the reader must invoke `$i-have-adhd` again on each turn.
+
+In Claude Code, turn them off only when the reader says "stop adhd mode" or "normal mode". Confirm in one line, then return to your default style.
 
 ## What ADHD changes about reading
 
@@ -48,7 +50,7 @@ Use the fewest steps that still work. Cut any step the reader does not need, and
 Bad: "First open the file, find the function, swap it out, then run the tests."
 
 Good:
-```
+```text
 1. Open `src/auth.ts`
 2. Replace `verifyToken` (lines 42 to 58) with the snippet below
 3. Run `npm test -- auth.spec.ts`
