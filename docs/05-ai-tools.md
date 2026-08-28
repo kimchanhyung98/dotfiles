@@ -27,7 +27,7 @@ Claude Code와 Codex가 단일 출처 `~/.skills`를 공유한다. 지원하는 
 
 **단일 출처 `~/.skills`**: 공통 스킬을 `~/.skills` 한 곳에만 두고, 지원 도구의 `skills` 디렉토리를 여기로 symlink하여 공유한다. chezmoi가
 `home/dot_claude/symlink_skills`·`home/dot_agents/symlink_skills`로 symlink를 관리하고,
-`home/dot_skills`의 스킬과 `mattpocock-skills-sync`가 `~/.skills`의 각 하위 디렉토리를 소유한다. 이 패턴은 프로젝트 루트의 `.skills` + `.claude/skills`·`.agents/skills` symlink 구조와 동일하다.
+chezmoi는 `home/dot_skills`에 선언된 하위 디렉토리를, `mattpocock-skills-sync`는 선택 목록의 동기화 대상 디렉토리를 각각 소유한다. 이 패턴은 프로젝트 루트의 `.skills` + `.claude/skills`·`.agents/skills` symlink 구조와 동일하다.
 
 **기존 머신 정리**: symlink 전환 이전에 지원 스킬 경로가 실제 디렉토리였던 머신에서는, `run_once_before_00-skills-ssot-migrate` 스크립트가 dotfiles 배포
 전에 기존 skills 디렉토리를 삭제한다. 기존 실제 디렉토리가 남아 있으면 chezmoi가 해당 경로를 symlink로 교체할 수 없으므로, 삭제 후 dotfiles 배포 단계에서
@@ -37,7 +37,7 @@ Claude Code와 Codex가 단일 출처 `~/.skills`를 공유한다. 지원하는 
 
 **스킬 소스**:
 
-- **chezmoi 관리 스킬**: `home/dot_skills/<skill-name>/`에 추가해 `~/.skills/<skill-name>/`로 배포한다. `i-have-adhd`는 upstream commit `cbe69fb83c08a37cf54d5ec9ec6bb88c8bc9973c`에서 Claude/Codex용 `SKILL.md`·`agents/openai.yaml`과 MIT 라이선스만 가져온다. Claude Code에서는 `/i-have-adhd`, Codex에서는 `$i-have-adhd`로 명시 호출해야 한다.
+- **chezmoi 관리 스킬**: `home/dot_skills/<skill-name>/`에 추가해 `~/.skills/<skill-name>/`로 배포한다. `i-have-adhd`는 upstream commit `cbe69fb83c08a37cf54d5ec9ec6bb88c8bc9973c`의 `SKILL.md`를 Claude/Codex 호출 방식과 적용 범위에 맞게 조정하고, `agents/openai.yaml`과 MIT 라이선스를 가져온다. Claude Code에서는 `/i-have-adhd`로 세션 모드를 시작하고, Codex에서는 매 턴 `$i-have-adhd`를 명시 호출한다.
 - **mattpocock/skills**: 공통 engineering/productivity 후보 스킬은 repo에 직접 포함하지 않는다.
   `~/.local/bin/mattpocock-skills-sync`가 호환되는 upstream tag `v1.0.1`에서 선택한 15개 스킬만 `~/.skills`로 동기화한다.
   `run_onchange_after_06-mattpocock-skills`가 최초 적용 및 스크립트 변경 시 실행한다.
