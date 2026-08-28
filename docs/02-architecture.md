@@ -88,6 +88,8 @@ dotfiles/
     │
     ├── dot_agents/
     │   └── symlink_skills             # → ~/.skills
+    ├── dot_skills/
+    │   └── i-have-adhd/                # chezmoi-managed global skill
     │
     ├── Library/LaunchAgents/
     │   ├── ai.tokscale.submit.plist.tmpl
@@ -117,6 +119,7 @@ dotfiles/
 | `dot_claude/`               | `~/.claude/`                       | Claude Code 설정                                    |
 | `dot_codex/`                | `~/.codex/`                        | Codex CLI 설정                                      |
 | `dot_copilot/`              | `~/.copilot/`                      | Copilot CLI 사용자 MCP 설정                           |
+| `dot_skills/i-have-adhd/`   | `~/.skills/i-have-adhd/`           | ADHD 친화적 출력 형식을 명시 호출하는 전역 스킬                  |
 | `dot_<tool>/symlink_skills` | `~/.<tool>/skills/` → `~/.skills/` | 지원 스킬 경로를 단일 출처로 잇는 symlink (claude·agents)       |
 | 도구별 instruction symlink | `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.copilot/copilot-instructions.md` → `~/AGENTS.md` | 공통 지침을 각 도구의 공식 사용자 경로로 연결 |
 | `Library/LaunchAgents/`     | `~/Library/LaunchAgents/`          | tokscale 3일마다, dotfiles 매월 1·16일 calendar schedule |
