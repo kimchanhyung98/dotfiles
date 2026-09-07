@@ -155,7 +155,7 @@ Google Antigravity의 터미널 AI 에이전트다. 설치 시 `agy` 바이너�
 | 파일 | 배포 경로 | 역할 | 상세 |
 |---|---|---|---|
 | antigravity-cli/private_settings.json.tmpl | `~/.gemini/antigravity-cli/settings.json` | 핵심 설정 | 기본 모델(`gemini-3.8-flash-high`), 영구 자율 실행 권한 정책(`toolPermission: "always-proceed"`, `artifactReviewPolicy: "always-proceed"`), MCP/도구 자동 승인(`permissions.allow`), 피드백 설문 비활성화. `private_` 속성으로 `0600` 권한을 보존한다 |
-| config/mcp_config.json.tmpl | `~/.gemini/config/mcp_config.json` | 전역 MCP | Antigravity 전역 MCP 서버 설정. `codegraph`(`codegraph serve --mcp`), `context7`, `playwright`, `sequential-thinking` stdio MCP 서버 네 개를 등록한다 |
+| config/mcp_config.json.tmpl | `~/.gemini/config/mcp_config.json` | 전역 MCP | Copilot과 동일하게 `codegraph`(`codegraph serve --mcp`), `context7`, `playwright`, `sequential-thinking` stdio MCP 서버 네 개를 같은 명령·인자로 등록한다 |
 | config/skills.json.tmpl | `~/.gemini/config/skills.json` | 전역 스킬 | Antigravity 전역 스킬 로더 설정. `entries`에 `~/.skills`를 선언하여 dotfiles 공통 스킬 단일 출처를 모든 작업 영역에서 일관되게 로드한다 |
 | symlink_GEMINI.md | `~/.gemini/GEMINI.md` | 공통 지침 | `~/AGENTS.md`를 가리키는 심링크. Claude(`CLAUDE.md`), Codex(`AGENTS.md`)와 동일한 단일 출처 지침을 제공한다 |
 
@@ -199,7 +199,7 @@ Copilot은 사용하지만 필수 AI baseline은 아니다. macOS는 Brewfile의
 
 | 경로 | 역할 |
 |---|---|
-| `~/.copilot/mcp-config.json` | context7, Playwright, sequential-thinking 사용자 MCP 설정 |
+| `~/.copilot/mcp-config.json` | Antigravity와 동일한 CodeGraph, context7, Playwright, sequential-thinking 사용자 MCP 설정 |
 | `~/.agents/skills` | Copilot CLI가 인식하는 공통 skill 경로. Codex와 같은 `~/.skills` symlink 재사용 |
 | `~/.copilot/copilot-instructions.md` → `~/AGENTS.md` | Copilot CLI 개인 지침 |
 

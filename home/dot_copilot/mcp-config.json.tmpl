@@ -1,6 +1,12 @@
 {{- /* ~/.copilot/mcp-config.json — Copilot CLI user-level MCP servers */ -}}
 {
   "mcpServers": {
+    "codegraph": {
+      "type": "local",
+      "command": "codegraph",
+      "args": ["serve", "--mcp"],
+      "tools": ["*"]
+    },
     "context7": {
       "type": "local",
       "command": "npx",
