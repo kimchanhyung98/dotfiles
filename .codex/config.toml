@@ -1,6 +1,6 @@
 #:schema https://developers.openai.com/codex/config-schema.json
 
-# Recommended variant derived from config2.toml for codex-cli 0.144.0.
+# https://developers.openai.com/codex/config-sample
 
 # Codex example configuration (config.toml)
 #
@@ -20,7 +20,7 @@
 
 # Primary model used by Codex. Recommended example for most users: "gpt-5.6".
 
-model = "gpt-5.6-sol"
+model = "gpt-6-astra"
 
 # Communication style for supported models. Allowed values: none | friendly | pragmatic
 
@@ -38,9 +38,9 @@ model = "gpt-5.6-sol"
 
 # oss_provider = "ollama"
 
-# Preferred service tier. Built-in examples: fast | flex; model catalogs can add more.
+# Preferred service tier. Use fast or another tier supported by the active model.
 
-# service_tier = "flex"
+# service_tier = "fast"
 
 # Optional manual model metadata. When unset, Codex uses model or preset defaults.
 
@@ -66,12 +66,13 @@ model = "gpt-5.6-sol"
 
 ################################################################################
 
-# Reasoning effort: minimal | low | medium | high | xhigh | max | ultra (model-dependent)
+# Reasoning effort: minimal | low | medium | high | xhigh
 
-model_reasoning_effort = "high"
+model_reasoning_effort = "xhigh"
 
-# Optional plan-mode override: none | minimal | low | medium | high | xhigh | max | ultra (model-dependent)
+# Optional override used when Codex runs in plan mode: none | minimal | low | medium | high | xhigh
 
+# Local override: ultra is model-dependent and is not listed in the sample above.
 plan_mode_reasoning_effort = "ultra"
 
 # Reasoning summary: auto | concise | detailed | none
@@ -170,8 +171,8 @@ allow_login_shell = false
 
 # - danger-full-access (no sandbox; extremely risky)
 
-# Disabled because default_permissions selects the custom profile below.
-# sandbox_mode = "danger-full-access"
+# Disabled because default_permissions selects the full-access profile below.
+# sandbox_mode = "read-only"
 
 # Named permissions profile to apply by default. Built-ins:
 
@@ -189,7 +190,7 @@ default_permissions = ":danger-full-access"
 
 # Where to persist CLI login credentials: file (default) | keyring | auto
 
-cli_auth_credentials_store = "file"
+cli_auth_credentials_store = "auto"
 
 # Base URL for ChatGPT auth flow (not OpenAI API).
 
@@ -213,17 +214,41 @@ cli_auth_credentials_store = "file"
 
 mcp_oauth_credentials_store = "auto"
 
-# Optional fixed port for MCP OAuth callback: 1-65535. Default: unset.
+# Shared wait for optional MCP servers before building the initial tool catalog.
+
+# Default: 1000 ms. Set to 0 to wait for each server's startup_timeout_sec instead.
+
+# mcp_optional_startup_grace_ms = 1000
+
+# Optional global fixed port for MCP OAuth callback: 1-65535. Default: unset.
+
+# A server-specific oauth.callback_port overrides this global listener port.
 
 # mcp_oauth_callback_port = 4321
 
-# Optional redirect URI override for MCP OAuth login (for example, remote devbox ingress).
+# Optional callback URL override for MCP OAuth login (for example, remote devbox ingress).
 
-# Codex appends a server-specific callback ID before OAuth login.
+# Newly added pre-registered clients use this URL unchanged when the authorization server
 
-# Register the full derived URI with your provider, not just the base host or unsuffixed path.
+# advertises issuer support and provides a metadata issuer. Without issuer support,
 
-# Custom callback paths are supported. `mcp_oauth_callback_port` still controls the listener port.
+# Codex appends a server-specific callback ID. Existing clients without a saved
+
+# callback keep that suffix.
+
+# Without issuer support, any pre-registered MCP server callback must already
+
+# end in the correct callback ID. Otherwise, Codex ignores that callback and uses
+
+# this global URL (or its default) with the server-specific callback ID appended.
+
+# Malformed callback URLs and mismatched authorization response issuers fail.
+
+# If issuer support is advertised, missing metadata or response issuers also fail.
+
+# Custom callback paths are supported. Callback URL ports don't select the
+
+# listener port; configure oauth.callback_port or mcp_oauth_callback_port.
 
 # mcp_oauth_callback_url = "https://devbox.example.internal/callback"
 
@@ -273,6 +298,10 @@ show_raw_agent_reasoning = false
 
 disable_paste_burst = false
 
+# Track Windows onboarding acknowledgement (Windows only). Default: false
+
+# windows_wsl_setup_acknowledged = false
+
 # Check for updates on startup. Default: true
 
 check_for_update_on_startup = true
@@ -311,9 +340,13 @@ web_search = "live"
 
 [agents]
 
-# Maximum concurrently open agent threads. Default: 6
+# Enable or disable multi-agent tools. Default: true
 
-max_threads = 12
+# enabled = true
+
+# Maximum concurrently open spawned-agent threads, excluding the primary thread. When unset, Codex chooses the default.
+
+max_concurrent_threads_per_session = 12
 
 # Maximum nested spawn depth. Root session starts at depth 0. Default: 1
 
@@ -322,6 +355,14 @@ max_depth = 2
 # Default timeout per worker for spawn_agents_on_csv jobs. When unset, the tool defaults to 1800 seconds.
 
 # job_max_runtime_seconds = 1800
+
+# Default model for spawned agents. An explicit spawn model takes precedence.
+
+# default_subagent_model = "gpt-5.6-terra"
+
+# Default reasoning effort for spawned agents. An explicit spawn effort takes precedence.
+
+# default_subagent_reasoning_effort = "high"
 
 # Record a model-visible message when an agent turn is interrupted. Default: true
 
@@ -340,6 +381,14 @@ max_depth = 2
 # Skills (per-skill overrides)
 
 ################################################################################
+
+# Token budget for the available-skills catalog. Default: 2% of the model context
+
+# window. Explicit values must be positive and are capped at 10000 tokens.
+
+# [skills]
+
+# max_context_tokens = 2000
 
 # Disable or re-enable a specific skill without deleting it.
 
@@ -387,25 +436,33 @@ max_depth = 2
 
 inherit = "all"
 
-# Skip default excludes for names containing KEY/SECRET/TOKEN (case-insensitive). Default: false
+# Skip automatic filtering for names containing KEY/SECRET/TOKEN. Default: true.
+
+# Set false to remove those variables before applying explicit filters.
 
 ignore_default_excludes = false
 
-# Case-insensitive glob patterns to remove (e.g., "AWS**", "AZURE**"). Default: []
+# Explicit key/value overrides. Include filters can still remove them. Default: {}
 
-exclude = []
-
-# Explicit key/value overrides (always win). Default: {}
-
-# set = {}
-
-# Whitelist; if non-empty, keep only matching vars. Default: []
-
-include_only = []
+set = {}
 
 # Experimental: run via user shell profile. Default: false
 
 experimental_use_profile = false
+
+# Canonical case-insensitive filters. "include" entries create an allowlist.
+
+# Excludes apply before explicit set values and the include allowlist.
+
+# Don't combine filters with legacy exclude or
+
+# include_only arrays in the same configuration layer.
+
+[shell_environment_policy.filters]
+
+"AWS_*" = "exclude"
+
+"AZURE_*" = "exclude"
 
 ################################################################################
 
@@ -414,6 +471,12 @@ experimental_use_profile = false
 ################################################################################
 
 # Enable the feature before configuring sandboxed networking rules.
+
+# A profile's network.enabled allows direct network access; its domain rules
+
+# apply only when the network proxy feature is enabled.
+
+# Web search, apps, connectors, and MCP servers use separate controls.
 
 # [features.network_proxy]
 
@@ -446,6 +509,8 @@ experimental_use_profile = false
 # "~/code/app" = true
 
 # "~/code/shared-lib" = true
+
+#
 
 [permissions.workspace]
 extends = ":workspace"
@@ -608,6 +673,12 @@ show_tooltips = true
 
 alternate_screen = "auto"
 
+# Working directory for resumed or forked sessions: current | session.
+
+# Leave unset to choose when the current and saved session directories differ.
+
+resume_cwd = "session"
+
 # Ordered list of footer status-line item IDs. When unset, Codex uses:
 
 # ["model-with-reasoning", "context-remaining", "current-dir"].
@@ -656,7 +727,7 @@ terminal_title = ["spinner", "project"]
 
 # [tui.model_availability_nux]
 
-# "gpt-5.4" = 1
+# "gpt-5.6-terra" = 1
 
 # Enable or disable analytics for this machine. When unset, Codex uses its default behavior.
 
@@ -682,7 +753,7 @@ enabled = false
 
 # "hide_gpt-5.1-codex-max_migration_prompt" = true
 
-# model_migrations = { "gpt-5.3-codex" = "gpt-5.4" }
+# model_migrations = { "gpt-5.4" = "gpt-5.6-terra" }
 
 ################################################################################
 
@@ -710,7 +781,7 @@ multi_agent = true
 
 # personality = true
 
-# network_proxy = false
+# network_proxy = true # required to enforce permission-profile domain rules
 
 fast_mode = true
 
@@ -718,12 +789,18 @@ fast_mode = true
 
 # skill_mcp_dependency_install = true
 
-# prevent_idle_sleep = false
+prevent_idle_sleep = true
+
+memories = true
+
+# Local addition: experimental context management with notes and searchable history.
+# Requires ChatGPT sign-in on Plus, Pro, or Pro Lite.
+
+[features.context_management]
+
+experimental_mode = true
 
 # Code mode namespaces. This feature is under development and off by default.
-
-# code_mode_only = false
-# code_mode_host = true
 
 [features.code_mode]
 
@@ -764,6 +841,9 @@ enabled = true
 [plugins."build-web-apps@openai-curated"]
 enabled = true
 
+[plugins."game-studio@openai-curated-remote"]
+enabled = true
+
 [plugins."openai-developers@openai-curated"]
 enabled = true
 
@@ -779,11 +859,11 @@ enabled = true
 
 # Enable memories with [features].memories, then tune memory behavior here.
 
-# [memories]
+[memories]
 
-# generate_memories = true
+generate_memories = true
 
-# use_memories = true
+use_memories = true
 
 # disable_on_external_context = false # legacy alias: no_memories_if_mcp_or_web_search
 
@@ -855,6 +935,10 @@ enabled = true
 
 # oauth_resource = "https://docs.example.com/" # optional OAuth resource
 
+# [mcp_servers.docs.tools.search]
+
+# output_token_limit = 30000 # positive token budget, before the 20% serialization allowance
+
 # --- Example: Streamable HTTP transport ---
 
 # [mcp_servers.github]
@@ -871,6 +955,8 @@ enabled = true
 
 # env_http_headers = { "X-Auth" = "AUTH_ENV" } # optional headers populated from env vars
 
+# http_headers_helper = "company-auth mcp-headers" # local command that prints a JSON header map
+
 # startup_timeout_sec = 10.0 # optional
 
 # tool_timeout_sec = 60.0 # optional
@@ -880,6 +966,16 @@ enabled = true
 # disabled_tools = ["delete_issue"] # optional deny-list
 
 # scopes = ["repo"] # optional OAuth scopes
+
+# [mcp_servers.github.oauth]
+
+# client_id = "my-pre-registered-client" # OAuth client registered with the provider
+
+# callback_url = "http://127.0.0.1/callback" # saved registered callback for this client
+
+# callback_port = 4321 # server-specific listener port; overrides the global setting
+
+# For http://127.0.0.1:4321/callback, set callback_port = 4321 as well.
 
 ################################################################################
 
@@ -932,6 +1028,8 @@ enabled = true
 # # stream_idle_timeout_ms = 300000 # default 300_000 (5m)
 
 # # supports_websockets = true # optional
+
+# # supports_standalone_web_search = true # optional; search is under development and off by default
 
 # # experimental_bearer_token = "sk-example" # optional dev-only direct bearer token
 
@@ -1072,13 +1170,13 @@ default_tools_approval_mode = "writes"
 
 # For example, a CI profile could live at $CODEX_HOME/ci.config.toml:
 
-# model = "gpt-5.4"
+# model = "gpt-5.6-terra"
 
 # approval_policy = "on-request"
 
 # sandbox_mode = "read-only"
 
-# service_tier = "flex" # or another supported service tier id
+# service_tier = "fast" # or another supported service tier id
 
 # oss_provider = "ollama"
 

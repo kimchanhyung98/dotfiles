@@ -2,7 +2,7 @@
 
 ## 공통 원칙
 
-- **인증 정보 소유권**: API 키나 토큰은 Git/chezmoi source에 직접 기재하지 않고 각 도구의 runtime credential 저장소가 소유한다. 현재 Codex의 file credential 저장 정책은 보안 결정이 필요해 [최종 감사](review/2026-07-18-final-audit.md)에 별도로 기록했다.
+- **인증 정보 소유권**: API 키나 토큰은 Git/chezmoi source에 직접 기재하지 않고 각 도구의 runtime credential 저장소가 소유한다. Codex는 `cli_auth_credentials_store = "auto"`로 사용 가능한 OS keychain을 우선 사용하고, 사용할 수 없으면 파일 저장소로 돌아간다.
 - **권한 경계**: Claude의 `bypassPermissions`는 승인 계층을 건너뛰므로 deny 목록과 command hook은 보조 guardrail이지 OS 보안 경계가 아니다. Codex custom `workspace` profile은 sandbox가 적용되는 도구의 filesystem/network 범위를 제한한다. 무승인 정책의 잔여 위험은 [최종 감사](review/2026-07-18-final-audit.md)를 따른다.
 - **설정 소유권**: chezmoi가 소유하는 설정은 source 파일로 관리하고, `~/.claude.json`처럼 도구가 직접 갱신하는 runtime 파일은 ignore한 뒤 CLI 명령으로 필요한 항목만 등록한다.
 
@@ -163,11 +163,19 @@ Google Antigravity의 터미널 AI 에이전트다. 설치 시 `agy` 바이너�
 
 | 파일               | 배포 경로                  | 역할    | 상세                                                                                                                                                   |
 |------------------|------------------------|-------|------------------------------------------------------------------------------------------------------------------------------------------------------|
-| config.toml.tmpl | `~/.codex/config.toml` | 핵심 설정 | 기본 모델(`gpt-5.6-sol`), `approval_policy = "never"`, custom `workspace` 권한 profile, 기본 프롬프트(karpathy 4원칙), MCP 서버를 단일 파일에서 관리. CodeGraph도 MCP 서버로 등록한다. |
+| `config.toml.tmpl` | `~/.codex/config.toml` | 핵심 설정 | 공식 샘플의 전체 섹션·주석을 보존하고 기본 모델(`gpt-6-astra`), 추론 강도(`xhigh`), 권한, agents, TUI, 기능 설정의 사용자 변경을 추적한다. |
 
-현재 `cli_auth_credentials_store = "file"`은 source의 비밀 값은 아니지만 `$CODEX_HOME/auth.json` runtime 파일을 사용한다. network 허용 profile과 함께 둘 때의 credential 노출 위험 및 keyring 전환 절차는 [최종 감사](review/2026-07-18-final-audit.md)에 기록했다.
+`approval_policy = "on-request"`와 `default_permissions = ":danger-full-access"`를 유지한다. 정의된 custom `workspace` profile은 명시적으로 선택할 때만 적용된다. 인증 저장소는 `auto`이며, chezmoi는 인증 파일이나 keychain 내용을 관리하지 않는다.
 
-스킬은 `~/.agents/skills` → `~/.skills` symlink로 공유한다. karpathy 지침은 config.toml의 모델 지침으로 적용한다. CodeGraph는
+`features.context_management.experimental_mode = true`로 노트와 검색 가능한 기록을 사용하는 실험적 context management를 활성화한다. ChatGPT Plus/Pro/Pro Lite 로그인이 필요하다. `features.prevent_idle_sleep = true`는 turn 실행 중 절전을 방지하고, `features.memories = true`와 `[memories]`는 대화 간 로컬 기억 생성·사용을 활성화한다. `tui.resume_cwd = "session"`으로 재개·분기 시 저장된 작업 디렉터리를 사용한다.
+
+`agents.max_concurrent_threads_per_session = 12`는 주 에이전트를 제외한 동시 서브에이전트 수를 제한한다. 기존 `max_threads` alias 대신 공식 샘플의 키를 사용하고, `max_depth = 2`는 유지한다. 이 저장소의 `.codex/config.toml`도 전체 샘플 형식으로 관리하며, 두 파일의 공통 설정은 함께 갱신한다.
+
+[공식 샘플](https://developers.openai.com/codex/config-sample)을 기준으로 주석·예제·섹션 순서를 유지한다. TOML을 파싱한 뒤 재직렬화하거나 활성 옵션만 남기는 방식으로 축약하지 않는다. 샘플 기본값과 다른 사용자 선택은 유지하고, 샘플에 없는 추가 옵션은 별도 주석으로 구분한다.
+
+`chezmoi diff ~/.codex/config.toml`로 적용 내용을 먼저 확인한다. 일반 템플릿 배포는 로컬 MCP·플러그인·프로젝트 trust·hooks 상태를 자동 병합하지 않으므로, 기존 파일이 있으면 해당 값과 주석을 보존하며 필요한 부분만 반영한다. 이 저장소가 현재 chezmoi source가 아니라면 `chezmoi --source "$PWD/home" diff ~/.codex/config.toml`로 이 checkout과 비교한다. 인증 정보나 기기별 runtime 값은 Git에 추가하지 않는다.
+
+스킬은 `~/.agents/skills` → `~/.skills` symlink로 공유한다. karpathy 지침은 공통 `AGENTS.md`로 적용한다. CodeGraph는
 `codegraph serve --mcp`로 연결하며,
 프로젝트별 인덱스는 해당 프로젝트에서 `codegraph init -i`로 생성한다.
 

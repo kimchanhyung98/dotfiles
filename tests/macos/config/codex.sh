@@ -9,11 +9,10 @@ source "$tests_root/lib/chezmoi-test.sh"
 test_home="$(mktemp -d)"
 trap 'rm -rf "$test_home"' EXIT
 configure_chezmoi_test_home "$test_home"
-rendered="$test_home/config.toml"
-run_chezmoi "$test_home" execute-template \
-    < "$repo_dir/home/dot_codex/config.toml.tmpl" > "$rendered"
-
-codex_home="$test_home/codex-home"
+codex_home="$test_home/.codex"
 mkdir -p "$codex_home"
-cp "$rendered" "$codex_home/config.toml"
-CODEX_HOME="$codex_home" codex --strict-config mcp-server </dev/null
+run_chezmoi "$test_home" apply --include=files "$codex_home/config.toml"
+cmp "$repo_dir/home/dot_codex/config.toml.tmpl" "$codex_home/config.toml"
+
+cd "$test_home"
+env CODEX_HOME="$codex_home" codex app-server --strict-config --stdio </dev/null
