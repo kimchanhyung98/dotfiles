@@ -86,6 +86,14 @@ dotfiles/
     │   ├── mcp-config.json.tmpl
     │   └── symlink_copilot-instructions.md # → ~/AGENTS.md
     │
+    ├── dot_gemini/
+    │   ├── antigravity-cli/
+    │   │   └── private_settings.json.tmpl # 0600 권한 보존
+    │   ├── config/
+    │   │   ├── mcp_config.json.tmpl
+    │   │   └── skills.json.tmpl
+    │   └── symlink_GEMINI.md          # → ~/AGENTS.md
+    │
     ├── dot_agents/
     │   └── symlink_skills             # → ~/.skills
     ├── dot_skills/
@@ -119,9 +127,10 @@ dotfiles/
 | `dot_claude/`               | `~/.claude/`                       | Claude Code 설정                                    |
 | `dot_codex/`                | `~/.codex/`                        | Codex CLI 설정                                      |
 | `dot_copilot/`              | `~/.copilot/`                      | Copilot CLI 사용자 MCP 설정                           |
+| `dot_gemini/`               | `~/.gemini/`                       | Antigravity CLI 설정 (자율 실행 권한 정책, MCP, 스킬)       |
 | `dot_skills/i-have-adhd/`   | `~/.skills/i-have-adhd/`           | ADHD 친화적 출력 형식을 명시 호출하는 전역 스킬                  |
 | `dot_<tool>/symlink_skills` | `~/.<tool>/skills/` → `~/.skills/` | 지원 스킬 경로를 단일 출처로 잇는 symlink (claude·agents)       |
-| 도구별 instruction symlink | `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.copilot/copilot-instructions.md` → `~/AGENTS.md` | 공통 지침을 각 도구의 공식 사용자 경로로 연결 |
+| 도구별 instruction symlink | `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.copilot/copilot-instructions.md`, `~/.gemini/GEMINI.md` → `~/AGENTS.md` | 공통 지침을 각 도구의 공식 사용자 경로로 연결 |
 | `Library/LaunchAgents/`     | `~/Library/LaunchAgents/`          | tokscale 3일마다, dotfiles 매월 1·16일 calendar schedule |
 | `dot_local/bin/`            | `~/.local/bin/`                    | doctor, 프로젝트 clone/Doppler, 유지보수, 스킬 동기화 command |
 

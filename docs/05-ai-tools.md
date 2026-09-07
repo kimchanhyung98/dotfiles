@@ -148,8 +148,22 @@ Claude Code 플러그인은 `settings.json`의 `enabledPlugins` 필드에 등록
 |-----------------------------------------|--------------------------------------------------------------------------|-----------------------------|
 | 10-ai-core (macOS), 04-ai-tools (Linux) | Antigravity CLI (`curl -fsSL https://antigravity.google/cli/install.sh`) | `agy` 바이너리 (`~/.local/bin`) |
 
-Google Antigravity의 터미널 AI 에이전트다. 설치 시 `agy` 바이너리가 `~/.local/bin`에 등록된다. chezmoi가 배포하는 설정 파일은 없으며, 인증과 초기 설정은 `agy` 첫 실행
-시 진행한다.
+Google Antigravity의 터미널 AI 에이전트다. 설치 시 `agy` 바이너리가 `~/.local/bin`에 등록된다. 인증과 초기 설정은 `agy` 첫 실행 시 진행한다.
+
+**설정 (dot_gemini/ → ~/.gemini/)**
+
+| 파일 | 배포 경로 | 역할 | 상세 |
+|---|---|---|---|
+| antigravity-cli/private_settings.json.tmpl | `~/.gemini/antigravity-cli/settings.json` | 핵심 설정 | 기본 모델(`gemini-3.8-flash-high`), 영구 자율 실행 권한 정책(`toolPermission: "always-proceed"`, `artifactReviewPolicy: "always-proceed"`), MCP/도구 자동 승인(`permissions.allow`), 피드백 설문 비활성화. `private_` 속성으로 `0600` 권한을 보존한다 |
+| config/mcp_config.json.tmpl | `~/.gemini/config/mcp_config.json` | 전역 MCP | Antigravity 전역 MCP 서버 설정. `codegraph`(`codegraph serve --mcp`), `context7`, `playwright`, `sequential-thinking` stdio MCP 서버 네 개를 등록한다 |
+| config/skills.json.tmpl | `~/.gemini/config/skills.json` | 전역 스킬 | Antigravity 전역 스킬 로더 설정. `entries`에 `~/.skills`를 선언하여 dotfiles 공통 스킬 단일 출처를 모든 작업 영역에서 일관되게 로드한다 |
+| symlink_GEMINI.md | `~/.gemini/GEMINI.md` | 공통 지침 | `~/AGENTS.md`를 가리키는 심링크. Claude(`CLAUDE.md`), Codex(`AGENTS.md`)와 동일한 단일 출처 지침을 제공한다 |
+
+영구 설정(`private_settings.json.tmpl`)에 `toolPermission: "always-proceed"`와 `artifactReviewPolicy: "always-proceed"`를 명시하여 터미널 대화형 세션뿐만 아니라 스크립트, 서브프로세스, headless 등 모든 실행 경로에서 일관되게 무승인 자율 실행(bypass)을 적용한다. alias 기반 `--dangerously-skip-permissions`는 deny 규칙까지 오버라이드하고 실행 환경마다 다르게 동작하므로 별도로 등록하지 않는다. `command(*)`가 전면 허용된 무승인 환경에서는 내부 파일 deny만으로 호스트 자격증명 경계를 보장할 수 없으므로, 격리가 필요한 작업은 컨테이너·VM 등 외부 보안 경계를 전제로 한다.
+
+스킬은 `~/.gemini/config/skills.json`의 `entries`에서 `~/.skills`를 직접 지정하고, 에이전트 지침은 `~/.gemini/GEMINI.md` 심링크(`~/AGENTS.md` 대상)로 연결하여 Claude/Codex와 동일한 출처를 공유한다. MCP 서버는 `~/.gemini/config/mcp_config.json`과 `agy mcp` 명령을 통해 관리하며, 플러그인은 `.agents/plugins/` 번들 또는 `agy plugin` 명령(`agy plugin import claude` 지원)을 통해 필요 시 점진적으로 확장할 수 있다.
+
+
 
 ## Codex
 

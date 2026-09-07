@@ -1,0 +1,17 @@
+{{- /* ~/.gemini/antigravity-cli/settings.json — Antigravity CLI 핵심 설정 (기본 모델, 영구 자율 실행 권한 정책, 설문 비활성화) */ -}}
+{
+  "model": "gemini-3.8-flash-high",
+  "toolPermission": "always-proceed",
+  "artifactReviewPolicy": "always-proceed",
+  "permissions": {
+    "allow": [
+      "command(*)",
+      "read_file(*)",
+      "write_file(*)",
+      "read_url(*)",
+      "execute_url(*)",
+      "mcp(*)"
+    ]
+  },
+  "showFeedbackSurvey": false
+}
