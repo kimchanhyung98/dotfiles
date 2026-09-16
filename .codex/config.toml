@@ -663,7 +663,7 @@ notifications = false
 
 # Enables welcome/status/spinner animations. Default: true
 
-animations = true
+animations = false
 
 # Show onboarding tooltips in the welcome screen. Default: true
 
@@ -695,7 +695,7 @@ status_line = ["model-with-reasoning", "context-remaining", "git-branch", "curre
 
 # and task-progress.
 
-terminal_title = ["spinner", "project"]
+terminal_title = ["project"]
 
 # Syntax-highlighting theme (kebab-case). Use /theme in the TUI to preview and save.
 
