@@ -667,11 +667,13 @@ animations = false
 
 # Show onboarding tooltips in the welcome screen. Default: true
 
-show_tooltips = true
+show_tooltips = false
 
 # Control alternate screen usage (auto skips it in Zellij to preserve scrollback).
 
 alternate_screen = "auto"
+
+fullscreen_transcript = false
 
 # Working directory for resumed or forked sessions: current | session.
 
