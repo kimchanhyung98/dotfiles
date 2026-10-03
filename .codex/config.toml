@@ -769,7 +769,7 @@ enabled = false
 
 # shell_tool = true
 
-# apps = true
+apps = true
 
 hooks = true
 
