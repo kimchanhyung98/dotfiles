@@ -79,3 +79,15 @@ Core workflow:
 ## 6. Jev MCP
 
 Inspect the available Jev MCP tools and their descriptions, then choose and use the tools appropriate for the task. Cross-check the results against the actual code, evidence, and tests.
+
+## 7. Documentation Writing
+
+When writing or editing documentation, aim for "80% of the way to ASD-STE100 Simplified Technical English," as suggested in [Karpathy's post](https://x.com/karpathy/status/2105819303471976479). Treat this as a readability goal, not a measured compliance score.
+
+- Write documentation in Korean. Prioritize natural Korean phrasing and technical accuracy.
+- Use short, direct sentences with clear subjects and active verbs. Keep one idea per sentence and one topic per paragraph.
+- Use the same term for the same concept. Preserve technical terms and define them when needed.
+- Put one action in each procedural step. State prerequisites and conditions before the action.
+- Preserve facts, numbers, units, conditions, exceptions, and uncertainty. Do not remove meaning to shorten the text.
+- Prefer technical accuracy and natural phrasing over strict dictionary or sentence-length limits.
+- For Korean documentation, apply these clarity principles using natural Korean grammar. Do not impose English vocabulary or word-count rules.
