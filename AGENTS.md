@@ -1,93 +1,108 @@
 # AGENTS.md
 
-Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
+LLM의 흔한 코딩 실수를 줄이기 위한 행동 지침. 필요 시 프로젝트별 지침과 함께 적용.
 
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+**절충점:** 속도보다 신중함 우선. 사소한 작업은 상황에 맞게 판단.
 
-## 1. Think Before Coding
+## 1. 코딩 전 검토
 
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
+**임의 추정 금지. 불명확한 점과 선택에 따른 장단점 공개.**
 
-Before implementing:
+구현 전 확인 사항:
 
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
-- If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
+- 가정 명시. 확신이 없으면 질문
+- 여러 해석이 가능하면 선택지 제시. 임의 선택 금지
+- 더 단순한 방법이 있으면 제안. 필요한 경우 근거를 들어 이의 제기
+- 불명확한 점이 있으면 중단. 해당 사항을 밝히고 질문
 
-## 2. Simplicity First
+## 2. 단순함 우선
 
-**Minimum code that solves the problem. Nothing speculative.**
+**문제를 해결하는 최소한의 코드 작성. 추측에 따른 기능 추가 금지.**
 
-- No features beyond what was asked.
-- No abstractions for single-use code.
-- No "flexibility" or "configurability" that wasn't requested.
-- No error handling for impossible scenarios.
-- If you write 200 lines and it could be 50, rewrite it.
+- 요청 범위를 벗어나는 기능 추가 금지
+- 한 번만 사용할 코드를 위한 추상화 금지
+- 요청하지 않은 유연성·설정 기능 추가 금지
+- 발생할 수 없는 상황에 대한 오류 처리 추가 금지
+- 50줄로 작성할 수 있는 코드를 200줄로 작성한 경우 재작성
 
-Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+자체 점검: 선임 엔지니어가 지나치게 복잡하다고 평가할 코드라면 단순화.
 
-## 3. Surgical Changes
+## 3. 필요한 부분만 수정
 
-**Touch only what you must. Clean up only your own mess.**
+**필요한 부분만 수정. 자신의 변경으로 생긴 문제만 정리.**
 
-When editing existing code:
+기존 코드 수정 시:
 
-- Don't "improve" adjacent code, comments, or formatting.
-- Don't refactor things that aren't broken.
-- Match existing style, even if you'd do it differently.
-- If you notice unrelated dead code, mention it - don't delete it.
+- 인접 코드·주석·서식의 임의 개선 금지
+- 문제가 없는 코드의 리팩터링 금지
+- 선호하는 방식과 달라도 기존 스타일 준수
+- 무관한 미사용 코드 발견 시 알림. 임의 삭제 금지
 
-When your changes create orphans:
+자신의 변경으로 미사용 항목이 생긴 경우:
 
-- Remove imports/variables/functions that YOUR changes made unused.
-- Don't remove pre-existing dead code unless asked.
+- 이번 변경으로 미사용 상태가 된 import·변수·함수 제거
+- 기존 미사용 코드는 요청 없이 제거 금지
 
-The test: Every changed line should trace directly to the user's request.
+판단 기준: 변경한 모든 줄과 사용자 요청의 직접적인 연관성 확인.
 
-## 4. Goal-Driven Execution
+## 4. 목표 중심 실행
 
-**Define success criteria. Loop until verified.**
+**성공 기준 정의. 검증될 때까지 반복.**
 
-Transform tasks into verifiable goals:
+작업을 검증 가능한 목표로 구체화:
 
-- "Add validation" → "Write tests for invalid inputs, then make them pass"
-- "Fix the bug" → "Write a test that reproduces it, then make it pass"
-- "Refactor X" → "Ensure tests pass before and after"
+- "입력 검증 추가" → "잘못된 입력을 다루는 테스트 작성 후 통과"
+- "버그 수정" → "버그 재현 테스트 작성 후 통과"
+- "X 리팩터링" → "변경 전후 테스트 통과 확인"
 
-For multi-step tasks, state a brief plan:
+여러 단계의 작업은 간단한 계획 제시:
 
 ```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
+1. [단계] → 검증: [확인 항목]
+2. [단계] → 검증: [확인 항목]
+3. [단계] → 검증: [확인 항목]
 ```
 
-Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+- 명확한 성공 기준: 독립적인 작업·검증 반복 가능
+- "작동하게 만들기"처럼 모호한 기준: 지속적인 추가 확인 필요
 
-## 5. Browser Automation
+## 5. 브라우저 자동화
 
-Use `agent-browser` for web automation. Run `agent-browser --help` for all commands.
+웹 자동화에 `agent-browser` 사용. 전체 명령 확인은 `agent-browser --help` 실행.
 
-Core workflow:
+기본 작업 순서:
 
-1. `agent-browser open <url>` - Navigate to page
-2. `agent-browser snapshot -i` - Get interactive elements with refs (@e1, @e2)
-3. `agent-browser click @e1` / `fill @e2 "text"` - Interact using refs
-4. Re-snapshot after page changes
+1. `agent-browser open <url>` — 페이지 이동
+2. `agent-browser snapshot -i` — 참조 식별자(@e1, @e2)가 있는 상호작용 요소 확인
+3. `agent-browser click @e1` / `fill @e2 "text"` — 참조 식별자를 사용한 조작
+4. 페이지 변경 후 스냅샷 재생성
 
 ## 6. Jev MCP
 
-Inspect the available Jev MCP tools and their descriptions, then choose and use the tools appropriate for the task. Cross-check the results against the actual code, evidence, and tests.
+직접 확인 후에도 구현 선택·근거 해석이 불명확하고, 판단에 따라 다음 행동이 달라질 때 Jev decision model 사용.
 
-## 7. Documentation Writing
+1. 사용 가능한 도구·설명·입력 형식 확인 후 목적에 맞게 선택
+2. 질문·판단 기준·관련 코드·테스트 결과 등 필요한 근거 전달
+3. 판정을 실제 코드·근거·테스트와 교차 검증. 테스트·사용자 승인 대체 금지
 
-When writing or editing documentation, aim for "80% of the way to ASD-STE100 Simplified Technical English," as suggested in [Karpathy's post](https://x.com/karpathy/status/2105819303471976479). Treat this as a readability goal, not a measured compliance score.
+검색·계산·명시적 규칙으로 확정 가능한 판단은 직접 처리. 도구 사용 불가 시 사유를 알리고 직접 검증.
 
-- Write documentation in Korean. Prioritize natural Korean phrasing and technical accuracy.
-- Use short, direct sentences with clear subjects and active verbs. Keep one idea per sentence and one topic per paragraph.
-- Use the same term for the same concept. Preserve technical terms and define them when needed.
-- Put one action in each procedural step. State prerequisites and conditions before the action.
-- Preserve facts, numbers, units, conditions, exceptions, and uncertainty. Do not remove meaning to shorten the text.
-- Prefer technical accuracy and natural phrasing over strict dictionary or sentence-length limits.
-- For Korean documentation, apply these clarity principles using natural Korean grammar. Do not impose English vocabulary or word-count rules.
+## 7. 문서 작성
+
+문서 작성·수정 시 ASD-STE100의 명료성 원칙을 약 80% 수준으로 적용. 80%는 측정된 준수 점수가 아닌 가독성 목표.
+
+- 문서는 한국어로 작성. 자연스러운 표현과 기술적 정확성 우선
+- 주어가 명확하고 능동적인 짧은 문장 사용. 한 문장에 한 가지 생각, 한 문단에 한 가지 주제 배치
+- 같은 개념에 같은 용어 사용. 기술 용어 보존 및 필요 시 정의
+- 절차의 각 단계에 한 가지 동작 배치. 동작보다 먼저 전제 조건·적용 조건 제시
+- 사실·수치·단위·조건·예외·불확실성 보존. 문장 단축을 위한 의미 삭제 금지
+- 엄격한 어휘·문장 길이 제한보다 기술적 정확성과 자연스러운 표현 우선
+- 한국어 문법에 맞게 명료성 원칙 적용. 영어 어휘·단어 수 규칙의 강제 적용 금지
+
+## 8. 작업 맥락 관리
+
+- 기존 작업 문서 우선. 없으면 장기·중단·인계 작업만 저장소 루트의 `.tasks/Ymd/<작업명>.md`에 기록
+- 시작·재개 시 해당 파일 확인. 중단·인계·완료 시 같은 파일 갱신
+- 기록 항목: 목표·현재 상태·변경 요약·검증/미검증·남은 문제·다음 행동 하나
+- 사용자 판단 필요 시 질문·권장안·선택에 따른 차이 제시. 새 정보 없이 같은 질문·조사 반복 금지. 독립적으로 진행 가능한 작업은 계속 수행
+- 상세 코드·로그·PR은 경로·링크로 참조. 중복 문서 생성 금지

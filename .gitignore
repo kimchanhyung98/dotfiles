@@ -81,6 +81,12 @@ docker-compose.local.yml
 *.swp
 *.swo
 
+# Temporary
+.docs
+.task
+.tasks
+.temp
+
 # Log
 *.log
 *.log.*
@@ -210,7 +216,6 @@ agent-os/
 
 # etc
 .cmux/
-.docs
 .omx/
 .remember
 .serena

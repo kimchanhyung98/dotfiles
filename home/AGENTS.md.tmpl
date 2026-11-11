@@ -1,47 +1,40 @@
 # AGENTS.md
 
-Common agent instructions for all AI coding tools.
+모든 AI 코딩 도구에 적용하는 공통 에이전트 지침.
 
-## Principles
+## 원칙
 
-### Think Before Coding
+### 코딩 전 검토
 
-Understand the full context before writing code. Read relevant files, understand the existing architecture, and plan your approach. Do not start coding until you know what needs to change and why.
+- 코드 작성 전 전체 맥락 이해
+- 관련 파일·기존 아키텍처 확인 후 접근 방법 계획
+- 변경 대상과 이유를 파악하기 전 코딩 시작 금지
 
-### Simplicity First
+### 단순함 우선
 
-Choose the simplest solution that works. Avoid unnecessary complexity, over-engineering, and speculative features. Three similar lines of code are better than a premature abstraction.
+- 문제를 해결하는 가장 단순한 방법 선택
+- 불필요한 복잡성·과도한 설계·추측에 따른 기능 지양
+- 성급한 추상화보다 비슷한 코드 세 줄을 우선
 
-### Surgical Changes
+### 필요한 부분만 수정
 
-Minimize change scope. Only modify what is directly required for the task. Do not refactor surrounding code, add documentation to unchanged files, or "improve" things that weren't asked for.
+- 변경 범위 최소화. 작업에 직접 필요한 부분만 수정
+- 주변 코드 리팩터링·변경하지 않은 파일의 문서 추가·요청하지 않은 개선 금지
 
-### Goal-Driven Execution
+### 목표 중심 실행
 
-Focus on the user's actual goal. Do not expand scope, add unrequested features, or make changes beyond what was explicitly asked. Ask for clarification if the goal is ambiguous.
+- 사용자의 실제 목표에 집중
+- 범위 확대·미요청 기능 추가·명시적 요청 범위를 벗어나는 변경 금지
+- 목표가 모호하면 질문
 
-## Rules
+## 규칙
 
-- Read before writing. Always understand existing code before modifying it.
-- Prefer editing existing files over creating new ones.
-- Use the project's existing patterns, conventions, and import styles.
-- Run lint and tests before claiming work is complete.
-- Do not commit or push unless explicitly asked.
-- Do not add comments, docstrings, or type annotations to code you did not change.
-- Respond in Korean unless the user writes in another language.
-
-## Jev MCP
-
-Inspect the available Jev MCP tools and their descriptions, then choose and use the tools appropriate for the task. Cross-check the results against the actual code, evidence, and tests.
-
-## Documentation Writing
-
-When writing or editing documentation, aim for "80% of the way to ASD-STE100 Simplified Technical English," as suggested in [Karpathy's post](https://x.com/karpathy/status/2105819303471976479). Treat this as a readability goal, not a measured compliance score.
-
-- Write documentation in Korean. Prioritize natural Korean phrasing and technical accuracy.
-- Use short, direct sentences with clear subjects and active verbs. Keep one idea per sentence and one topic per paragraph.
-- Use the same term for the same concept. Preserve technical terms and define them when needed.
-- Put one action in each procedural step. State prerequisites and conditions before the action.
-- Preserve facts, numbers, units, conditions, exceptions, and uncertainty. Do not remove meaning to shorten the text.
-- Prefer technical accuracy and natural phrasing over strict dictionary or sentence-length limits.
-- For Korean documentation, apply these clarity principles using natural Korean grammar. Do not impose English vocabulary or word-count rules.
+- 작성 전 읽기. 기존 코드 수정 전 이해 필수
+- 새 파일 생성보다 기존 파일 수정 우선
+- 프로젝트의 기존 패턴·관례·import 스타일 준수
+- 작업 완료 보고 전 lint·테스트 실행
+- 명시적 요청 없이 커밋·푸시 금지
+- 변경하지 않은 코드에 주석·docstring·타입 어노테이션 추가 금지
+- 한국어 응답 원칙. 사용자가 다른 언어로 작성한 경우 예외
+- 문서는 한국어로 작성. 자연스러운 표현과 기술적 정확성 우선
+- 문서 작성·수정 시 ASD-STE100의 명료성 원칙을 약 80% 수준으로 적용. 80%는 측정된 준수 점수가 아닌 가독성 목표
