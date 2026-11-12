@@ -7,7 +7,7 @@ exit 0
 
 set -euo pipefail
 
-export PATH="{{ .homebrewPrefix }}/bin:$PATH"
+export PATH="${ZEROBREW_PREFIX:-/opt/zerobrew}/bin:{{ .homebrewPrefix }}/bin:$PATH"
 
 if ! command -v orca >/dev/null 2>&1; then
     echo "[orca-plugins][error] Orca CLI not found; install stablyai/orca/orca first" >&2
