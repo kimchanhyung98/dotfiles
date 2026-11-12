@@ -9,6 +9,7 @@ source "$tests_root/lib/chezmoi-test.sh"
 test_home="$(mktemp -d)"
 trap 'rm -rf "$test_home"' EXIT
 homebrew_prefix="$test_home/homebrew"
+zerobrew_prefix="$test_home/zerobrew"
 fake_bin="$homebrew_prefix/bin"
 call_log="$test_home/calls.log"
 plugin_state="$test_home/plugins.json"
@@ -87,7 +88,7 @@ run_sync() {
     local mode="$1" expected_status="$2" actual_status=0
     : > "$call_log"
     rm -f "$test_home/runtime-started"
-    HOME="$test_home" PATH="/usr/bin:/bin" \
+    HOME="$test_home" PATH="/usr/bin:/bin" ZEROBREW_PREFIX="$zerobrew_prefix" \
         ORCA_TEST_ROOT="$test_home" ORCA_TEST_MODE="$mode" \
         bash "$rendered" > "$output_log" 2>&1 || actual_status=$?
     if [ "$expected_status" = nonzero ]; then
@@ -108,6 +109,24 @@ if grep -Eq '^(open|sleep):' "$call_log"; then
     echo 'An available Orca runtime was unnecessarily opened or delayed' >&2
     exit 1
 fi
+
+# 시스템과 Homebrew에 jq가 없어도 zerobrew에 설치한 jq로 동작한다.
+minimal_bin="$test_home/minimal-bin"
+mkdir -p "$minimal_bin" "$zerobrew_prefix/bin"
+for command_name in cat grep mv; do
+    ln -s "$(command -v "$command_name")" "$minimal_bin/$command_name"
+done
+mv "$fake_bin/jq" "$zerobrew_prefix/bin/jq"
+reset_plugins
+: > "$call_log"
+if ! HOME="$test_home" PATH="$minimal_bin" ZEROBREW_PREFIX="$zerobrew_prefix" \
+    ORCA_TEST_ROOT="$test_home" ORCA_TEST_MODE=normal \
+    /bin/bash "$rendered" > "$output_log" 2>&1; then
+    cat "$output_log" >&2
+    exit 1
+fi
+test "$(grep -c '^orca:plugin install ' "$call_log")" -eq 7
+mv "$zerobrew_prefix/bin/jq" "$fake_bin/jq"
 
 cat > "$plugin_state" <<'EOF'
 {"ok":true,"result":{"plugins":[
@@ -179,18 +198,18 @@ configure_chezmoi_test_home "$fixture_home" "$homebrew_prefix"
 cp "$rendered" "$fixture_source/run_onchange_after_10-orca-plugins.sh"
 reset_plugins
 actual_status=0
-HOME="$fixture_home" XDG_CONFIG_HOME="$fixture_home/.config" \
+HOME="$fixture_home" XDG_CONFIG_HOME="$fixture_home/.config" ZEROBREW_PREFIX="$zerobrew_prefix" \
     ORCA_TEST_ROOT="$test_home" ORCA_TEST_MODE=approval \
     "$chezmoi_bin" --source "$fixture_source" apply > "$output_log" 2>&1 || actual_status=$?
 test "$actual_status" -ne 0
 : > "$call_log"
-HOME="$fixture_home" XDG_CONFIG_HOME="$fixture_home/.config" \
+HOME="$fixture_home" XDG_CONFIG_HOME="$fixture_home/.config" ZEROBREW_PREFIX="$zerobrew_prefix" \
     ORCA_TEST_ROOT="$test_home" ORCA_TEST_MODE=normal \
     "$chezmoi_bin" --source "$fixture_source" apply > "$output_log" 2>&1
 test "$(grep -c '^orca:plugin install ' "$call_log")" -eq 1
 grep -Fq 'orca:plugin install stablyai.orca-docx --catalog official --environment local' "$call_log"
 : > "$call_log"
-HOME="$fixture_home" XDG_CONFIG_HOME="$fixture_home/.config" \
+HOME="$fixture_home" XDG_CONFIG_HOME="$fixture_home/.config" ZEROBREW_PREFIX="$zerobrew_prefix" \
     ORCA_TEST_ROOT="$test_home" ORCA_TEST_MODE=normal \
     "$chezmoi_bin" --source "$fixture_source" apply > "$output_log" 2>&1
 test ! -s "$call_log"
