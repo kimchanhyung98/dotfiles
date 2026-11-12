@@ -16,7 +16,8 @@ process에서 실행한다. `tests/lib/`는 공통 helper, `tests/fixtures/`는 
 
 `make test`는 macOS에서 macOS 로컬 테스트와 Linux·Codespaces Docker 테스트를
 실행한다. Linux에서는 macOS를 생략하고 현재 호스트에서 Linux 테스트를 실행한다.
-Linux 로컬 테스트는 임시 HOME과 현재 checkout의 `home/`에서 복사한 테스트 소스를 쓴다.
+Linux 로컬 테스트는 임시 HOME을 쓴다. 적용 검사는 현재 checkout의 `home/`에서
+복사한 테스트 소스를 사용하며, 정적 검사는 checkout의 `home/`을 직접 읽는다.
 다만 actual apply가 패키지, 로그인 셸, locale, timezone 같은 시스템 설정을 바꿀
 수 있으므로 준비된 Ubuntu 26.04 환경이나 CI에서 실행한다.
 
@@ -24,13 +25,15 @@ Linux 로컬 테스트는 임시 HOME과 현재 checkout의 `home/`에서 복사
 Codex 설정 검사는 저장소의 `.codex/config.toml`과도 비교한다. Git 훅과
 `install.sh` 같은 저장소 도구는 이 테스트 스위트의 대상이 아니다.
 
-공통 검사에는 Bash, Git, chezmoi, jq, Zsh가 필요하다. macOS suite에는
-ShellCheck, Codex CLI, Kimi CLI도 필요하다. Antigravity와 Kiro CLI 검사는
+공통 검사에는 Bash, Git, chezmoi, jq, Zsh가 필요하다. Linux 검사를 Docker 없이
+직접 실행하거나 macOS suite를 실행하려면 ShellCheck도 필요하다. macOS suite에는
+Codex CLI, Kimi CLI도 필요하다. Antigravity와 Kiro CLI 검사는
 해당 CLI가 설치된 경우에만 추가한다.
 
-테스트 소스는 `home/`을 복사하되 `.chezmoiexternal.toml`을 제외한다. chezmoi
-캐시도 임시 HOME 안에 두므로 외부 다운로드와 사용자 캐시에 의존하지 않는다.
-실제 배포 소스의 외부 리소스 설정은 유지한다. 필요한 도구와 패키지를 준비한
+chezmoi 적용 검사는 `home/`을 임시 소스로 복사하되 `.chezmoiexternal.toml`을 제외한다.
+chezmoi 캐시도 임시 HOME 안에 두므로 외부 다운로드와 사용자 캐시에 의존하지 않는다.
+실제 배포 소스의 외부 리소스 설정은 유지한다. 정적·템플릿 검사는 checkout의
+`home/`을 직접 읽기도 한다. 필요한 도구와 패키지를 준비한
 뒤 테스트는 네트워크 없이 실행할 수 있다. 도구·패키지 설치와 Docker 이미지
 빌드에는 네트워크가 필요하다.
 

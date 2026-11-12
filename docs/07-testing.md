@@ -69,10 +69,11 @@ tests/{environment}/{function}/{name}.sh
 status, 생성된 파일, 렌더링 결과처럼 사용자가 관찰할 수 있는 동작을 확인한다.
 간단한 구조 규칙은 [`tests/README.md`](../tests/README.md)에 정리한다.
 
-테스트는 `home/`을 임시 소스로 복사하되 `.chezmoiexternal.toml`을 제외하고,
+chezmoi 적용 검사는 `home/`을 임시 소스로 복사하되 `.chezmoiexternal.toml`을 제외하고,
 chezmoi 캐시도 임시 HOME 안에 둔다. 외부 아카이브 다운로드와 기존 사용자
 캐시에 의존하지 않고 관리 파일·스크립트를 검증한다. 실제 배포 소스의 외부
-리소스 설정은 변경하지 않는다.
+리소스 설정은 변경하지 않는다. 정적·템플릿 검사는 checkout의 `home/`을 직접
+읽기도 한다.
 
 필요한 도구와 패키지를 준비한 뒤에는 테스트를 네트워크 없이 실행할 수 있다.
 도구·패키지 설치와 Docker 이미지 빌드는 다운로드를 위해 네트워크가 필요하다.
@@ -126,7 +127,7 @@ non-root image를 만들고 같은 검사를 container에서 실행한다.
 apply 단계의 외부 API와 AI CLI는 fixture command로 대체하므로, 이 suite는 외부
 installer나 서비스 가용성을 검증하지 않는다.
 
-Linux 로컬 경로는 HOME·테스트 소스·캐시를 임시 경로에 둔다. 패키지, login shell,
+Linux 로컬 적용 검사는 HOME·테스트 소스·캐시를 임시 경로에 둔다. 패키지, login shell,
 locale, timezone 같은 system baseline은 실제 OS에 적용될 수 있으므로 준비된
 Ubuntu 26.04 테스트 환경이나 CI에서 실행한다.
 
