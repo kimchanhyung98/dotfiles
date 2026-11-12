@@ -1,0 +1,68 @@
+#!/bin/bash
+# 현재 사용 중인 Orca 플러그인 중 누락된 항목만 설치한다.
+
+{{ if ne .chezmoi.os "darwin" }}
+exit 0
+{{ end }}
+
+set -euo pipefail
+
+export PATH="{{ .homebrewPrefix }}/bin:$PATH"
+
+if ! command -v orca >/dev/null 2>&1; then
+    echo "[orca-plugins][error] Orca CLI not found; install stablyai/orca/orca first" >&2
+    exit 1
+fi
+
+# 플러그인 CLI는 실행 중인 로컬 Orca에 연결한다.
+if ! installed_json="$(orca plugin list --environment local --json 2>/dev/null)"; then
+    open -g /Applications/Orca.app
+    ready=false
+    for ((attempt = 0; attempt < 15; attempt++)); do
+        sleep 1
+        if installed_json="$(orca plugin list --environment local --json 2>/dev/null)"; then
+            ready=true
+            break
+        fi
+    done
+    if [ "$ready" != true ]; then
+        echo "[orca-plugins][error] local Orca is not ready; start the app and retry chezmoi apply" >&2
+        exit 1
+    fi
+fi
+
+installed_plugins="$(printf '%s' "$installed_json" | jq -er '.result.plugins | map(.pluginKey) | join("\n")')"
+plugins=(
+    stablyai.orca-oled-theme
+    stablyai.orca-material-icons
+    stablyai.orca-http
+    stablyai.orca-systemd
+    stablyai.orca-docx
+    stablyai.orca-spreadsheet
+    stablyai.orca-image-markup
+)
+
+status=0
+for plugin in "${plugins[@]}"; do
+    if grep -Fxq "$plugin" <<< "$installed_plugins"; then
+        echo "[orca-plugins] already installed: $plugin"
+        continue
+    fi
+
+    if orca plugin install "$plugin" --catalog official --environment local; then
+        echo "[orca-plugins] installed: $plugin"
+    else
+        install_status=$?
+        if [ "$install_status" -eq 3 ]; then
+            echo "[orca-plugins][warning] approval needed for $plugin; review the Orca command above" >&2
+            if [ "$status" -eq 0 ]; then
+                status=3
+            fi
+        else
+            echo "[orca-plugins][error] install failed: $plugin (exit $install_status)" >&2
+            status=1
+        fi
+    fi
+done
+
+exit "$status"

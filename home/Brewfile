@@ -61,6 +61,7 @@ cask "font-d2coding"  # D2 Coding 개발 폰트 (Naver)
 # 터미널 에뮬레이터
 cask "cmux"         # Ghostty 기반 macOS 터미널 (AI 에이전트 워크플로우)
 cask "ghostty"      # GPU 가속 터미널
+cask "stablyai/orca/orca"  # AI 코딩 에이전트·워크트리 관리
 
 # 개발 앱
 cask "copilot-cli"         # GitHub Copilot CLI

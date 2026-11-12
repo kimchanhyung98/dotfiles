@@ -53,6 +53,16 @@ run_homebrew_bundle() {
             exit 1
         fi
     fi
+    if grep -Fq 'cask "stablyai/orca/orca"' "$bundle_file"; then
+        if ! brew tap stablyai/orca; then
+            echo "[brew-packages][error] failed to tap Orca repository" >&2
+            exit 1
+        fi
+        if ! brew trust --cask stablyai/orca/orca; then
+            echo "[brew-packages][error] failed to trust Orca cask" >&2
+            exit 1
+        fi
+    fi
     if grep -Fq 'brew "xcodes"' "$bundle_file" &&
         brew list --formula --versions xcodes >/dev/null 2>&1; then
         case " $brew_skip " in
