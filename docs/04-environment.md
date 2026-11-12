@@ -42,3 +42,37 @@ Linux: `Ctrl+Shift+,`). 자동 파일 감시는 제공하지 않으며, 일부 �
 | macOS | font-thicken, macos-option-as-alt                                                                          | 레티나 선명도, Option 키를 Alt로 매핑 (macOS 전용)               |
 
 Ghostty는 macOS에서 Brewfile의 Homebrew cask로 설치한다. Ubuntu/Codespaces 지원 범위에는 Ghostty 바이너리 설치가 포함되지 않지만 공통 설정 파일은 배포한다.
+
+## Orca
+
+macOS에서 공식 `stablyai/orca/orca` cask로 앱과 CLI를 설치한다. `run_onchange_after_10-orca-plugins.sh.tmpl`은 최초 적용과 스크립트 변경 시 다음 플러그인을 공식 카탈로그에서 설치한다. 앱 내장 플러그인은 목록에 넣지 않는다.
+
+| 플러그인 ID | 용도 |
+|---|---|
+| `stablyai.orca-oled-theme` | OLED 테마 |
+| `stablyai.orca-material-icons` | Material 파일 아이콘 |
+| `stablyai.orca-http` | HTTP 파일 지원 |
+| `stablyai.orca-systemd` | systemd 파일 지원 |
+| `stablyai.orca-docx` | Word 문서 뷰어 |
+| `stablyai.orca-spreadsheet` | 스프레드시트 편집기 |
+| `stablyai.orca-image-markup` | 이미지 주석 도구 |
+
+`orca plugin list --environment local --json`으로 설치 목록을 확인한 뒤 누락된 항목만 설치한다. 새 설치는 공식 카탈로그의 현재 버전을 사용한다. 이미 설치된 항목은 버전과 비활성화 상태를 유지하며, 목록 밖 플러그인은 삭제하지 않는다. 플러그인 설치와 사용할 테마 선택은 별개다.
+
+플러그인 CLI에는 실행 중인 Orca가 필요하다. 연결에 실패하면 앱을 백그라운드로 열고, 1초 간격으로 최대 15회 다시 연결한다. 계속 실패하면 apply를 실패 처리한다.
+
+테마·아이콘·구문 같은 콘텐츠 전용 플러그인은 별도 승인 없이 설치된다. Orca가 승인을 요구하면 권한 목록과 fingerprint가 포함된 재실행 명령을 출력한다. 스크립트는 자동 승인하지 않고 나머지 플러그인을 계속 처리한다. 승인 대기만 있으면 종료 코드 3, 일반 설치 오류가 있으면 종료 코드 1로 끝난다. CLI가 안내한 권한을 확인하고 승인 명령을 실행한 뒤 `chezmoi apply`를 다시 실행한다. 실패한 스크립트는 완료로 기록되지 않으므로 누락 항목을 다시 시도한다.
+
+그 밖의 설정 관리 범위는 다음과 같다.
+
+| 항목 | 지원 방식 | 현재 관리 여부 |
+|---|---|---|
+| 단축키 | `~/.orca/keybindings.json` 파일을 chezmoi로 배포 가능 | 관리하지 않음 |
+| 터미널 폰트·테마·커서 | Settings → Terminal → Import from Ghostty로 기존 Ghostty 설정 가져오기 | 수동 가져오기. 지속 동기화 아님 |
+| 일반 앱 설정 | Orca Settings에서 변경 | 관리하지 않음 |
+
+로컬 Orca 1.4.257에서 일반 앱 설정을 부분적으로 내보내거나 적용하는 CLI는 확인되지 않았다. 설정은 Application Support 아래 프로필 SQLite DB에 있으며 세션 등 다른 상태도 같은 프로필에 저장된다. DB 전체 복사나 `profile state rollback`을 설정 배포에 사용하지 않는다.
+
+Orca가 등록하는 Claude 훅·테마와 Codex 훅 신뢰 상태도 로컬 값이다. 현재 Claude/Codex 템플릿을 그대로 덮어쓰면 이 값이 빠질 수 있으므로, 적용 전 diff를 확인하고 필요한 로컬 값을 보존한다. [AI 설정 적용 지침](05-ai-tools.md)을 따른다.
+
+근거: [공식 cask](https://github.com/stablyai/homebrew-orca/blob/main/Casks/orca.rb), [플러그인 CLI](https://github.com/stablyai/orca/blob/main/src/cli/specs/plugin-install.ts), [설정](https://github.com/stablyai/orca/blob/main/docs/site/content/docs/settings.mdx), [Ghostty 가져오기](https://github.com/stablyai/orca/blob/main/docs/site/content/docs/terminal.mdx).
