@@ -33,9 +33,9 @@ dotfiles-update
 
 ## 실행 로그
 
-`install.sh`와 `dotfiles-update`는 실행마다 `${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/logs/`에 로그를 만든다. 파일명은 각각 `install-YYYYmmdd-HHMMSS-PID.log`, `update-YYYYmmdd-HHMMSS-PID.log`다. 로그 파일 권한은 `0600`이다.
+`install.sh`와 `dotfiles-update`는 실행마다 `${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/logs/`에 로그를 만든다. 파일명은 각각 `install-YYYYmmdd-HHMMSS-PID.log`, `update-YYYYmmdd-HHMMSS-PID.log`다. 새로 만든 로그 파일 권한은 `0600`이다.
 
-로그에는 stdout/stderr, 시작·종료 시각, 종료 코드가 남으며 콘솔 출력도 유지한다. launchd 예약 실행과 수동 `dotfiles-update` 실행을 모두 기록한다. 직접 실행한 `chezmoi init`, `chezmoi apply`, `chezmoi update` 등은 이 로그에 포함되지 않는다.
+stdout과 stderr를 합쳐 로그와 콘솔에 출력하며, 로그에는 시작·종료 시각과 종료 코드도 남긴다. launchd 예약 실행과 수동 `dotfiles-update` 실행을 모두 기록한다. 직접 실행한 `chezmoi init`, `chezmoi apply`, `chezmoi update` 등은 이 로그에 포함되지 않는다.
 
 ## 프로젝트 준비
 
