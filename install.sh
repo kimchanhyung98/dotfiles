@@ -6,6 +6,37 @@
 
 set -eufo pipefail
 
+log_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/logs"
+log_file="$log_dir/install-$(date +%Y%m%d-%H%M%S)-$$.log"
+(
+    umask 077
+    mkdir -p "$log_dir"
+    : > "$log_file"
+)
+exec 5>&1 6>&2
+log_pipe="$log_file.pipe"
+mkfifo -m 600 "$log_pipe"
+tee -a "$log_file" < "$log_pipe" &
+log_pid=$!
+exec > "$log_pipe" 2>&1
+rm "$log_pipe"
+
+finish_log() {
+    local exit_code=$?
+    if [ "$exit_code" -ne 0 ]; then
+        echo "[install][error] Installation failed. Please re-run the script." >&2
+    fi
+    printf '[install][end] %s exit_code=%s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$exit_code"
+    exec 1>&5 2>&6 5>&- 6>&-
+    wait "$log_pid" || true
+    exit "$exit_code"
+}
+trap finish_log EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+printf '[install][start] %s log=%s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$log_file"
+
 # 출력 색상 정의
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -58,8 +89,6 @@ if [[ "$IS_CODESPACES" == "false" ]] && ! { exec 3</dev/tty; } 2>/dev/null; then
     exit 1
 fi
 
-trap 'echo "[install][error] Installation failed. Please re-run the script." >&2' EXIT
-
 echo_info "Detected OS: $OS"
 
 echo_info "Starting dotfiles installation..."
@@ -97,5 +126,3 @@ fi
 
 echo_info "Dotfiles installation complete!"
 echo_info "Please restart your terminal to apply changes."
-
-trap - EXIT
