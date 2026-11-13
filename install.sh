@@ -16,7 +16,10 @@ log_file="$log_dir/install-$(date +%Y%m%d-%H%M%S)-$$.log"
 exec 5>&1 6>&2
 log_pipe="$log_file.pipe"
 mkfifo -m 600 "$log_pipe"
-tee -a "$log_file" < "$log_pipe" &
+(
+    trap '' HUP INT TERM
+    exec tee -a "$log_file" < "$log_pipe"
+) &
 log_pid=$!
 exec > "$log_pipe" 2>&1
 rm "$log_pipe"
