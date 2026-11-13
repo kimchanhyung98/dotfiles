@@ -7,6 +7,8 @@
 
 native macOS/Ubuntu에서는 `chezmoi init --apply kimchanhyung98` 또는 repository의 `install.sh`를 대화형 터미널에서 실행한다. bootstrap script를 `curl | bash`로 실행해도 `install.sh`가 `/dev/tty`를 chezmoi 입력으로 연결한다. GitHub Codespaces의 자동 dotfiles 설치는 예외로, `install.sh`가 `--no-tty`를 사용한다.
 
+`install.sh`는 콘솔 출력을 유지하면서 실행별 진단 로그를 남긴다. 저장 경로와 기록 범위는 [실행 로그](06-operations.md#실행-로그)를 따른다. 직접 실행한 `chezmoi init --apply`는 이 로그에 포함되지 않는다.
+
 최초 config에는 다음 세 값을 모두 직접 입력해야 한다.
 
 - 이름(`name`, GitHub username 및 Git 작성자명)
@@ -90,7 +92,7 @@ script phase는 파일명의 `before_`/`after_`가 우선한다. 번호는 같�
    - tokscale-launchd, dotfiles-update-launchd, openusage, orca-plugins, manual-install
 ```
 
-`app-settings`와 두 LaunchAgent 등록 스크립트는 앞 phase에서 배포된 target을 사용한다. 예약 작업은 성공 시각이나 cache를 기록하지 않으며 calendar가 다음 실행 시각을 결정한다. external의 `168h`는 예약 주기가 아니라 chezmoi command가 상태를 읽을 때 refresh 여부를 판단하는 cache 최소 age다.
+`app-settings`와 두 LaunchAgent 등록 스크립트는 앞 phase에서 배포된 target을 사용한다. 예약 작업은 다음 실행 시각을 결정하기 위한 성공 시각이나 cache를 따로 저장하지 않으며 calendar가 실행 시각을 결정한다. dotfiles 실행 로그는 진단용이며 예약 시각 계산에 사용하지 않는다. external의 `168h`는 예약 주기가 아니라 chezmoi command가 상태를 읽을 때 refresh 여부를 판단하는 cache 최소 age다.
 
 ### Linux
 

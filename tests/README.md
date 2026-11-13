@@ -22,10 +22,13 @@ Linux 로컬 테스트는 임시 HOME을 쓴다. 적용 검사는 현재 checkou
 수 있으므로 준비된 Ubuntu 26.04 환경이나 CI에서 실행한다.
 
 주 테스트 대상은 `home/` 아래의 chezmoi 관리 소스와 그 렌더·적용 결과다.
-Codex 설정 검사는 저장소의 `.codex/config.toml`과도 비교한다. Git 훅과
-`install.sh` 같은 저장소 도구는 이 테스트 스위트의 대상이 아니다.
+Codex 설정 검사는 저장소의 `.codex/config.toml`과도 비교한다. `install.sh`와
+`dotfiles-update`는 가짜 외부 명령으로 로그 생성·권한, 콘솔 출력 보존과 실패
+종료 상태를 검사한다. 실제 패키지를 설치하지 않는다. Git 훅은 이 테스트
+스위트의 대상이 아니다.
 
-공통 검사에는 Bash, Git, chezmoi, jq, Zsh가 필요하다. Linux 검사를 Docker 없이
+공통 검사에는 Bash, Git, chezmoi, jq, Zsh와 터미널 기록 명령 `script`가 필요하다.
+Linux 검사를 Docker 없이
 직접 실행하거나 macOS suite를 실행하려면 ShellCheck도 필요하다. macOS suite에는
 Codex CLI, Kimi CLI도 필요하다. Antigravity와 Kiro CLI 검사는
 해당 CLI가 설치된 경우에만 추가한다.

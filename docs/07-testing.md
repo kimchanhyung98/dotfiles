@@ -41,6 +41,7 @@ make check
 - ShellCheck가 설치된 경우 severity error 검사
 - Codex·omp 설정 렌더링과 배포 결과
 - 반복 가능한 dotfiles update와 dirty source 차단
+- 최초 설치·반복 업데이트의 로그, 터미널 입력, 실패 종료 코드 보존
 - GitHub project bootstrap과 Doppler `.env` fixture
 - skills migration과 pinned mattpocock skills 동기화
 
@@ -176,7 +177,7 @@ Ubuntu job은 runner에서 직접 실행하며 Docker job은 없다. Docker 경�
 
 ## 필요한 도구
 
-공통 검사는 Bash, Git, chezmoi, jq, Zsh를 사용하며 ShellCheck가 있으면 추가
+공통 검사는 Bash, Git, chezmoi, jq, Zsh, `script`를 사용하며 ShellCheck가 있으면 추가
 검사를 수행한다. macOS 통합 검사는 이 도구와 ShellCheck, Codex CLI, Kimi CLI,
 macOS 기본 도구인 `expect`, `plutil` 등을 사용한다. Codex와 Kimi CLI는 필수다.
 Antigravity와 Kiro CLI는 설치된 경우에만 해당 CLI 검사를 추가한다. macOS에서 Linux 통합

@@ -15,22 +15,27 @@ macOS에서 두 LaunchAgent가 독립적으로 실행된다.
 - tokscale: 3일마다 14:00
 - dotfiles: 매월 1일과 16일 14:00
 
-두 작업 모두 launchd calendar로 실행한다. 성공 시각, 마지막 실행 timestamp, cache를 저장하지 않으며 성공이나 실패가 다음 calendar 실행일을 바꾸지 않는다.
+두 작업 모두 launchd calendar로 실행한다. 다음 예약 시각을 결정하기 위한 성공 시각, 마지막 실행 시각, cache는 따로 저장하지 않는다. 성공이나 실패가 다음 calendar 실행일을 바꾸지 않는다. dotfiles 실행 로그는 진단용이며 예약 시각 계산에 사용하지 않는다.
 
 tokscale 래퍼는 submit의 선택적 GitHub star 프롬프트에 `n`을 한 번 전달하여 비대화형으로 실행한다.
 
 launchd는 예약 시각에 Mac이 잠들어 있으면 깨어난 뒤 누락된 실행을 한 번으로 합쳐 실행한다.
 
-예약 시점과 무관하게 직접 검토·갱신하려면 다음 명령을 사용한다.
+예약 시점과 무관하게 변경분을 검토한 뒤 갱신·검증하려면 다음 명령을 사용한다. 수동 `dotfiles-update` 실행도 로그를 남긴다.
 
 ```sh
 chezmoi diff
-chezmoi update --force
-chezmoi verify
+dotfiles-update
 ```
 
-launchd가 예약 실행하는 `dotfiles-update`도 같은 `--force`로 동작하며, managed file의 로컬 변경분(AI CLI가 런타임에 설정 파일을 다시 쓴 drift 포함)은 항상
+`dotfiles-update`는 내부에서 `chezmoi update --no-tty --force`와 `chezmoi verify`를 실행한다. managed file의 로컬 변경분(AI CLI가 런타임에 설정 파일을 다시 쓴 drift 포함)은 항상
 소스 저장소 상태로 덮어씌워진다.
+
+## 실행 로그
+
+`install.sh`와 `dotfiles-update`는 실행마다 `${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/logs/`에 로그를 만든다. 파일명은 각각 `install-YYYYmmdd-HHMMSS-PID.log`, `update-YYYYmmdd-HHMMSS-PID.log`다. 새로 만든 로그 파일 권한은 `0600`이다.
+
+stdout과 stderr를 합쳐 로그와 콘솔에 출력하며, 로그에는 시작·종료 시각과 종료 코드도 남긴다. launchd 예약 실행과 수동 `dotfiles-update` 실행을 모두 기록한다. 직접 실행한 `chezmoi init`, `chezmoi apply`, `chezmoi update` 등은 이 로그에 포함되지 않는다.
 
 ## 프로젝트 준비
 
@@ -93,4 +98,4 @@ brew bundle cleanup --file="$(chezmoi source-path)/Brewfile"
 - `refreshPeriod`는 scheduler가 아니라 external cache age다.
 - `@latest` tokscale 사용은 의도된 정책이다.
 - 시스템 timezone이 Asia/Seoul이 아닌 머신은 예약 시각 보장 범위 밖이다.
-- 자동 dotfiles update는 dirty source에서 중단하며 실행·성공 timestamp를 기록하지 않는다.
+- 자동 dotfiles update는 dirty source에서 중단한다. 실행 로그는 남기지만 다음 예약 시각을 결정하는 상태는 저장하지 않는다.
