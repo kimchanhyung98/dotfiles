@@ -25,6 +25,12 @@ test "$*" = 'init --apply kimchanhyung98'
 test -t 0
 printf 'fixture stdout\n'
 printf 'fixture stderr\n' >&2
+if [ -n "$INSTALL_SIGNAL" ]; then
+    kill -0 -- "-$PPID"
+    trap '' "$INSTALL_SIGNAL"
+    kill "-$INSTALL_SIGNAL" -- "-$PPID"
+    exit 0
+fi
 exit "$INSTALL_EXIT_CODE"
 EOF
 cat > "$fake_bin/curl" <<'EOF'
@@ -34,6 +40,7 @@ exit 99
 EOF
 cat > "$fake_bin/run-install" <<'EOF'
 #!/usr/bin/env bash
+set -m
 status=0
 /bin/bash "$INSTALL_COMMAND" < /dev/null || status=$?
 printf '%s\n' "$status" > "$INSTALL_STATUS"
@@ -42,7 +49,7 @@ chmod +x "$fake_bin"/*
 
 run_install() {
     local expected_status="$1" console_log="$2"
-    local state_home="${3-$test_state}" runner_command
+    local state_home="${3-$test_state}" signal="${4:-}" runner_command
     local -a script_args
     if [ "$host_os" = Darwin ]; then
         script_args=(-q /dev/null "$fake_bin/run-install")
@@ -54,7 +61,7 @@ run_install() {
     env -i HOME="$test_home" XDG_STATE_HOME="$state_home" \
         PATH="$fake_bin:/usr/bin:/bin" TERM=dumb \
         INSTALL_COMMAND="$command_path" INSTALL_STATUS="$test_root/status" \
-        INSTALL_EXIT_CODE="$expected_status" \
+        INSTALL_EXIT_CODE="$expected_status" INSTALL_SIGNAL="$signal" \
         "$script_bin" "${script_args[@]}" < /dev/null > "$console_log" 2>&1
     test "$(cat "$test_root/status")" -eq "$expected_status"
 }
@@ -69,6 +76,8 @@ assert_log() {
         grep -Fq "$output" "$log_file"
         grep -Fq "$output" "$console_log"
     done
+    tr -d '\r' < "$console_log" | sed $'1s/^\\^D\b\b//' > "$test_root/normalized-console.log"
+    cmp "$test_root/normalized-console.log" "$log_file"
     case "$host_os" in
         Darwin) mode="$(stat -f '%Lp' "$log_file")" ;;
         Linux) mode="$(stat -c '%a' "$log_file")" ;;
@@ -95,6 +104,16 @@ for log_file in "${logs[@]}"; do
         echo 'Failed installation was reported as complete' >&2
         exit 1
     fi
+done
+
+for signal_case in HUP:129 INT:130 TERM:143; do
+    signal="${signal_case%:*}"
+    expected_status="${signal_case#*:}"
+    signal_state="$test_root/state-$signal"
+    run_install "$expected_status" "$test_root/$signal.log" "$signal_state" "$signal"
+    logs=("$signal_state"/dotfiles/logs/install-*.log)
+    test "${#logs[@]}" -eq 1
+    assert_log "${logs[0]}" "$test_root/$signal.log" "$expected_status"
 done
 
 run_install 0 "$test_root/default-state.log" ''

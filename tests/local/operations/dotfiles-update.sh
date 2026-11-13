@@ -36,8 +36,11 @@ case "${1:-}" in
         printf 'fixture:%s:stderr\n' "$1" >&2
         case "$UPDATE_SCENARIO:$1" in
             update-failure:update) exit 23 ;;
-            update-signal:update)
-                kill -TERM "$PPID"
+            update-signal-*:update)
+                signal="${UPDATE_SCENARIO#update-signal-}"
+                kill -0 -- "-$PPID"
+                trap '' "$signal"
+                kill "-$signal" -- "-$PPID"
                 exit 0
                 ;;
             verify-failure:verify) exit 37 ;;
@@ -54,8 +57,10 @@ run_update() {
     local log_file mode
     : > "$call_log"
     attempts=$((attempts + 1))
+    set -m
     PATH="$fake_bin:$PATH" SOURCE_REPO="$source_repo" CALL_LOG="$call_log" UPDATE_SCENARIO="$scenario" \
         /bin/bash "$command_path" > "$console_log" 2>&1 || actual_status=$?
+    set +m
     test "$actual_status" -eq "$expected_status"
     test -d "$log_dir"
     logs=("$log_dir"/update-*.log)
@@ -89,9 +94,11 @@ grep -Fxq 'update --no-tty --force' "$call_log"
 grep -Fxq 'fixture:update:stdout' "$console_log"
 grep -Fxq 'fixture:update:stderr' "$console_log"
 
-run_update 143 update-signal
-test "$(wc -l < "$call_log" | tr -d ' ')" -eq 1
-grep -Fxq 'update --no-tty --force' "$call_log"
+for signal_case in HUP:129 INT:130 TERM:143; do
+    run_update "${signal_case#*:}" "update-signal-${signal_case%:*}"
+    test "$(wc -l < "$call_log" | tr -d ' ')" -eq 1
+    grep -Fxq 'update --no-tty --force' "$call_log"
+done
 
 run_update 37 verify-failure
 test "$(wc -l < "$call_log" | tr -d ' ')" -eq 2
