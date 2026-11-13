@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# shellcheck source=tests/lib/chezmoi-test.sh
+source "$(dirname "${BASH_SOURCE[0]}")/chezmoi-test.sh"
+
 linux_apply_dotfiles() {
     local fixture_root="$1"
     local fake_bin="$fixture_root/bin"
@@ -9,6 +12,9 @@ linux_apply_dotfiles() {
     local skill_root
     local tool
     local apply_log="$fixture_root/chezmoi-apply.log"
+
+    chezmoi_source_dir="${CHEZMOI_TEST_SOURCE_DIR:-$(chezmoi source-path)}"
+    configure_chezmoi_test_home "$HOME"
 
     mkdir -p "$fake_bin" "$skills_repo" "$HOME/.local/bin"
 

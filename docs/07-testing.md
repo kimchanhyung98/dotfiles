@@ -37,10 +37,9 @@ make check
 
 검사 범위:
 
-- working tree와 staged diff의 whitespace 오류
 - 일반 Bash·Zsh script와 JSON 문법
 - ShellCheck가 설치된 경우 severity error 검사
-- branch name validator의 허용·거부 동작
+- Codex·omp 설정 렌더링과 배포 결과
 - 반복 가능한 dotfiles update와 dirty source 차단
 - GitHub project bootstrap과 Doppler `.env` fixture
 - skills migration과 pinned mattpocock skills 동기화
@@ -48,6 +47,9 @@ make check
 외부 API와 repository는 임시 fixture와 가짜 command로 대체하며 실제 사용자
 HOME은 변경하지 않는다. `make init`은 npm dependency와 Husky를 준비하는 개발
 환경 명령으로, 테스트 항목이 아니다.
+
+변경분의 공백 검사는 별도로 `git diff --check`를 실행한다. 브랜치명 검사는
+pre-push hook과 별도 GitHub Actions workflow가 담당한다.
 
 ## 테스트 구조
 
@@ -67,6 +69,16 @@ tests/{environment}/{function}/{name}.sh
 status, 생성된 파일, 렌더링 결과처럼 사용자가 관찰할 수 있는 동작을 확인한다.
 간단한 구조 규칙은 [`tests/README.md`](../tests/README.md)에 정리한다.
 
+chezmoi 적용 검사는 `home/`을 임시 소스로 복사하되 `.chezmoiexternal.toml`을 제외하고,
+chezmoi 캐시도 임시 HOME 안에 둔다. 외부 아카이브 다운로드와 기존 사용자
+캐시에 의존하지 않고 관리 파일·스크립트를 검증한다. 실제 배포 소스의 외부
+리소스 설정은 변경하지 않는다. 정적·템플릿 검사는 checkout의 `home/`을 직접
+읽기도 한다.
+
+필요한 도구와 패키지를 준비한 뒤에는 테스트를 네트워크 없이 실행할 수 있다.
+도구·패키지 설치와 Docker 이미지 빌드는 다운로드를 위해 네트워크가 필요하다.
+외부 아카이브와 서비스의 실제 가용성은 별도 검증 대상이다.
+
 ## macOS 통합 검사
 
 ```sh
@@ -76,10 +88,10 @@ make test-macos
 macOS suite는 임시 HOME에서 다음을 확인한다.
 
 - 최초 chezmoi config의 대화형 필수 입력과 headless 실행 거부
-- `install.sh`의 controlling terminal 계약과 chezmoi 호출 인자
 - managed template 렌더링과 apply dry-run
-- Claude·Codex repository 설정과 managed template의 일치
+- AI 도구 설정 렌더 결과와 Codex 템플릿·배포 파일의 일치
 - cmux, Rectangle, Stats와 Brewfile 관련 설정
+- Orca 플러그인의 누락 설치, 기존 상태 보존, 앱 연결과 승인·오류 처리
 - tokscale 3일마다 및 dotfiles 매월 1·16일 오후 2시 launchd 계약
 - state/cache gate가 없는 예약 작업과 tokscale submit wrapper
 - project bootstrap과 Doppler 실패가 dotfiles 실패로 전이되지 않는 계약
@@ -90,13 +102,16 @@ macOS suite는 임시 HOME에서 다음을 확인한다.
 설정은 변경하지 않는다. Codex 검사는 버전이 아니라 렌더된 설정의 일치와 CLI의
 strict config 로딩 성공 여부를 확인한다.
 
+Orca 검사는 가짜 `orca`, `open`, `sleep` 명령을 사용한다. 실제 Homebrew 앱 설치,
+GUI 시작, 공식 카탈로그 다운로드와 플러그인 승인은 이 검사에 포함되지 않는다.
+
 ## Ubuntu 통합 검사
 
 ```sh
 make test-linux
 ```
 
-Linux host에서는 현재 checkout의 `home/`을 source로 사용하고 임시 HOME에 actual
+Linux host에서는 현재 checkout의 `home/`에서 만든 임시 테스트 소스로 actual
 apply와 verify를 수행한다. macOS에서는 `tests/linux/Dockerfile`로 Ubuntu 26.04
 non-root image를 만들고 같은 검사를 container에서 실행한다.
 
@@ -112,9 +127,9 @@ non-root image를 만들고 같은 검사를 container에서 실행한다.
 apply 단계의 외부 API와 AI CLI는 fixture command로 대체하므로, 이 suite는 외부
 installer나 서비스 가용성을 검증하지 않는다.
 
-Linux 로컬 경로는 HOME만 임시로 격리한다. 패키지, login shell, locale,
-timezone 같은 system baseline은 실제 OS에 적용될 수 있으므로 준비된 Ubuntu
-26.04 테스트 환경이나 CI에서 실행한다.
+Linux 로컬 적용 검사는 HOME·테스트 소스·캐시를 임시 경로에 둔다. 패키지, login shell,
+locale, timezone 같은 system baseline은 실제 OS에 적용될 수 있으므로 준비된
+Ubuntu 26.04 테스트 환경이나 CI에서 실행한다.
 
 ## Codespaces 통합 검사
 
@@ -126,7 +141,6 @@ Linux 로컬 경로로 실행한다.
 
 - GitHub 환경 변수 기반 non-interactive config 생성
 - 필수 identity 값 누락 거부
-- `install.sh`의 `--no-tty` chezmoi 호출
 - actual apply와 verify
 - login shell과 timezone 변경 제외
 - SSH bootstrap, project clone과 Doppler 설정 제외
@@ -143,6 +157,10 @@ Linux와 Codespaces는 같은 image를 쓰지만 각각 새 container에서 실�
 suite의 HOME과 시스템 변경이 다른 suite에 남지 않는다. 로컬에는
 `dotfiles-test` image와 build cache가 남아 다음 실행에서 재사용된다.
 
+Docker 검사는 Linux/Codespaces apply와 macOS 전용 항목 제외를 확인한다.
+macOS Homebrew cask 설치와 Orca GUI·플러그인 동작은 실제 macOS에서 별도로
+검증해야 한다. Linux의 headless Orca 실행은 이 검증을 대신하지 못한다.
+
 ## GitHub Actions
 
 `.github/workflows/test-dotfiles.yml`은 pull request와 `main` branch push에서
@@ -151,17 +169,17 @@ suite의 HOME과 시스템 변경이 다른 suite에 남지 않는다. 로컬에
 | job | 실행 범위 |
 |---|---|
 | macOS | `make check`, `make test-macos` |
-| Ubuntu 26.04 | `make test`로 공통 검사와 Linux 로컬 통합 검사 |
-| Ubuntu 26.04 container 단계 | Docker에서 Linux와 Codespaces suite |
+| Ubuntu 26.04 | `make test` 후 `CODESPACES=true make test-linux`로 공통·Linux·Codespaces 검사 |
 
-두 job을 합쳐 공통 검사, macOS, Ubuntu 26.04 로컬·Docker, Codespaces 경로를
-검증한다. 브랜치명과 PR 제목 workflow는 별도로 유지한다.
+Ubuntu job은 runner에서 직접 실행하며 Docker job은 없다. Docker 경로는 macOS의
+`make test-linux`가 담당한다. 브랜치명과 PR 제목 workflow는 별도로 유지한다.
 
 ## 필요한 도구
 
-공통 검사는 Bash, Git, Node.js, jq, Zsh를 사용하며 ShellCheck가 있으면 추가
-검사를 수행한다. macOS 통합 검사는 chezmoi, jq, Zsh, ShellCheck, Codex CLI와
-macOS 기본 도구인 `expect`, `perl`, `plutil`을 사용한다. macOS에서 Linux 통합
+공통 검사는 Bash, Git, chezmoi, jq, Zsh를 사용하며 ShellCheck가 있으면 추가
+검사를 수행한다. macOS 통합 검사는 이 도구와 ShellCheck, Codex CLI, Kimi CLI,
+macOS 기본 도구인 `expect`, `plutil` 등을 사용한다. Codex와 Kimi CLI는 필수다.
+Antigravity와 Kiro CLI는 설치된 경우에만 해당 CLI 검사를 추가한다. macOS에서 Linux 통합
 검사를 실행할 때는 실행 중인 Docker daemon이 필요하다. Linux 로컬 통합 검사는
 non-root Ubuntu 26.04, chezmoi와 ShellCheck를 전제로 하며, 패키지나 system
 baseline 적용이 필요하면 `sudo`를 사용한다.

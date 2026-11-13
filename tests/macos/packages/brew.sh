@@ -53,6 +53,9 @@ case "${1:-}" in
             grep -q '^brew "ruby"' "$bundle_file"
             grep -q '^brew "xcodes"' "$bundle_file"
             grep -q '^cask "ghostty"' "$bundle_file"
+            grep -q '^cask "stablyai/orca/orca"' "$bundle_file"
+            test -f "${TAP_STATE}.orca"
+            test -f "${TRUST_STATE}.orca"
             if grep -q '^brew "git"' "$bundle_file"; then
                 grep -q '^brew "dopplerhq/cli/doppler"' "$bundle_file"
                 test -f "$TRUST_STATE"
@@ -79,18 +82,38 @@ case "${1:-}" in
         test "${XCODES_INSTALLED:-1}" = "1"
         ;;
     tap)
-        test "${2:-}" = "dopplerhq/cli"
-        printf 'brew tap\n' >> "$CALL_LOG"
-        if [ ! -f "$TAP_STATE" ]; then
-            rm -f "$TRUST_STATE"
-            touch "$TAP_STATE"
-        fi
+        case "${2:-}" in
+            dopplerhq/cli)
+                printf 'brew tap\n' >> "$CALL_LOG"
+                if [ ! -f "$TAP_STATE" ]; then
+                    rm -f "$TRUST_STATE"
+                    touch "$TAP_STATE"
+                fi
+                ;;
+            stablyai/orca)
+                printf 'brew tap orca\n' >> "$CALL_LOG"
+                test "${ORCA_FAIL:-}" != "tap"
+                touch "${TAP_STATE}.orca"
+                ;;
+            *) exit 1 ;;
+        esac
         ;;
     trust)
-        test "${2:-}" = "--formula"
-        test "${3:-}" = "dopplerhq/cli/doppler"
-        printf 'brew trust\n' >> "$CALL_LOG"
-        touch "$TRUST_STATE"
+        case "${3:-}" in
+            dopplerhq/cli/doppler)
+                test "${2:-}" = "--formula"
+                printf 'brew trust\n' >> "$CALL_LOG"
+                touch "$TRUST_STATE"
+                ;;
+            stablyai/orca/orca)
+                test "${2:-}" = "--cask"
+                test -f "${TAP_STATE}.orca"
+                printf 'brew trust orca\n' >> "$CALL_LOG"
+                test "${ORCA_FAIL:-}" != "trust"
+                touch "${TRUST_STATE}.orca"
+                ;;
+            *) exit 1 ;;
+        esac
         ;;
     *) exit 1 ;;
 esac
@@ -167,8 +190,10 @@ test "$(sed -n '1p' "$call_log")" = 'zb init'
 test "$(sed -n '2p' "$call_log")" = 'zb list'
 test "$(sed -n '3p' "$call_log")" = 'zb upgrade git pkgconf'
 test "$(sed -n '4p' "$call_log")" = 'zb bundle'
-test "$(sed -n '5p' "$call_log")" = 'brew bundle homebrew-only'
-test "$(wc -l < "$call_log" | tr -d ' ')" = "5"
+test "$(sed -n '5p' "$call_log")" = 'brew tap orca'
+test "$(sed -n '6p' "$call_log")" = 'brew trust orca'
+test "$(sed -n '7p' "$call_log")" = 'brew bundle homebrew-only'
+test "$(wc -l < "$call_log" | tr -d ' ')" = "7"
 test ! -f "$bundle_state"
 test -f "$homebrew_only_state"
 test -f "$outdated_state"
@@ -195,8 +220,10 @@ XCODES_INSTALLED=0 \
 test "$(sed -n '1p' "$call_log")" = 'zb init'
 test "$(sed -n '2p' "$call_log")" = 'zb list'
 test "$(sed -n '3p' "$call_log")" = 'zb bundle'
-test "$(sed -n '4p' "$call_log")" = 'brew bundle homebrew-only'
-test "$(wc -l < "$call_log" | tr -d ' ')" = "4"
+test "$(sed -n '4p' "$call_log")" = 'brew tap orca'
+test "$(sed -n '5p' "$call_log")" = 'brew trust orca'
+test "$(sed -n '6p' "$call_log")" = 'brew bundle homebrew-only'
+test "$(wc -l < "$call_log" | tr -d ' ')" = "6"
 test -f "$homebrew_only_state"
 
 # 설치 목록이 비어 있지 않아도 Brewfile과 교집합이 없으면 upgrade를 건너뛴다.
@@ -218,8 +245,10 @@ ZB_LIST_DISJOINT=1 \
 test "$(sed -n '1p' "$call_log")" = 'zb init'
 test "$(sed -n '2p' "$call_log")" = 'zb list'
 test "$(sed -n '3p' "$call_log")" = 'zb bundle'
-test "$(sed -n '4p' "$call_log")" = 'brew bundle homebrew-only'
-test "$(wc -l < "$call_log" | tr -d ' ')" = "4"
+test "$(sed -n '4p' "$call_log")" = 'brew tap orca'
+test "$(sed -n '5p' "$call_log")" = 'brew trust orca'
+test "$(sed -n '6p' "$call_log")" = 'brew bundle homebrew-only'
+test "$(wc -l < "$call_log" | tr -d ' ')" = "6"
 test -f "$homebrew_only_state"
 
 : > "$call_log"
@@ -243,7 +272,9 @@ test "$(sed -n '3p' "$call_log")" = 'zb upgrade git pkgconf'
 test "$(sed -n '4p' "$call_log")" = 'zb bundle'
 test "$(sed -n '5p' "$call_log")" = 'brew tap'
 test "$(sed -n '6p' "$call_log")" = 'brew trust'
-test "$(sed -n '7p' "$call_log")" = 'brew bundle full'
+test "$(sed -n '7p' "$call_log")" = 'brew tap orca'
+test "$(sed -n '8p' "$call_log")" = 'brew trust orca'
+test "$(sed -n '9p' "$call_log")" = 'brew bundle full'
 test -f "$tap_state"
 test -f "$trust_state"
 test -f "$bundle_state"
@@ -268,9 +299,51 @@ CALL_LOG="$call_log" \
 
 test "$(sed -n '1p' "$call_log")" = 'brew tap'
 test "$(sed -n '2p' "$call_log")" = 'brew trust'
-test "$(sed -n '3p' "$call_log")" = 'brew bundle full'
+test "$(sed -n '3p' "$call_log")" = 'brew tap orca'
+test "$(sed -n '4p' "$call_log")" = 'brew trust orca'
+test "$(sed -n '5p' "$call_log")" = 'brew bundle full'
 test -f "$bundle_state"
 test ! -f "$outdated_state"
+
+# Orca tap 또는 trust가 실패하면 두 설치 경로 모두 bundle 전에 중단한다.
+chmod +x "$fake_bin/zb"
+for zb_fail in 0 1; do
+    for orca_fail in tap trust; do
+        : > "$call_log"
+        rm -f "$bundle_state" "$homebrew_only_state" "$tap_state" "$trust_state" \
+            "${tap_state}.orca" "${trust_state}.orca"
+        if PATH="/usr/bin:/bin" \
+            HOME="$test_home" \
+            ZEROBREW_PREFIX="$test_home/absent-zerobrew" \
+            HOMEBREW_PREFIX="$homebrew_prefix" \
+            BUNDLE_STATE="$bundle_state" \
+            HOMEBREW_ONLY_STATE="$homebrew_only_state" \
+            TAP_STATE="$tap_state" \
+            TRUST_STATE="$trust_state" \
+            OUTDATED_STATE="$outdated_state" \
+            CALL_LOG="$call_log" \
+            ZB_FAIL="$zb_fail" \
+            ORCA_FAIL="$orca_fail" \
+                bash "$rendered" >/dev/null 2>&1; then
+            echo "Orca $orca_fail failure did not stop package synchronization" >&2
+            exit 1
+        fi
+        grep -Fxq 'brew tap orca' "$call_log"
+        if [ "$orca_fail" = "trust" ]; then
+            grep -Fxq 'brew trust orca' "$call_log"
+        elif grep -Fxq 'brew trust orca' "$call_log"; then
+            echo 'Orca trust ran after tap failed' >&2
+            exit 1
+        fi
+        if grep -q '^brew bundle ' "$call_log"; then
+            echo 'Homebrew bundle ran after Orca setup failed' >&2
+            exit 1
+        fi
+        test ! -f "$bundle_state"
+        test ! -f "$homebrew_only_state"
+    done
+done
+
 grep -Fq 'brew "pkgconf"' "$repo_dir/home/Brewfile"
 if grep -Fq 'brew "pkg-config"' "$repo_dir/home/Brewfile"; then
     echo 'deprecated pkg-config formula remains in Brewfile' >&2
