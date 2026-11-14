@@ -36,7 +36,7 @@ script phase는 파일명의 `before_`/`after_`가 우선한다. 번호는 같�
 | 01 | prerequisites | before | Xcode CLI, Homebrew, zerobrew, Rosetta, GitHub SSH host keys | 최초 1회 | Xcode Command Line Tools와 Homebrew를 준비하고, 셸 설정을 변경하지 않도록 zerobrew installer를 실행한다. Apple Silicon이면 Rosetta 2를 설치하고 GitHub SSH host key를 검증해 등록한다. |
 | 02 | macos-settings | after | Dock, Finder, Keyboard, Trackpad, Screenshot | 설정 변경 시 | managed target 배포 뒤 `defaults` 명령으로 macOS 설정을 적용한다. |
 | 03 | brew-packages | regular | Brewfile 기반 패키지 설치·upgrade | Brewfile 변경 시 | zerobrew 대상 formula를 먼저 동기화하고 `ruby`·`xcodes`·cask는 Homebrew로 처리한다. zerobrew가 없거나 실패하면 전체 Brewfile을 `brew bundle`로 폴백하며, 최종 check 실패는 non-zero다. 자동 cleanup은 하지 않는다. |
-| 05 | app-settings | after | Rectangle, Stats 설정 import | 설정 변경 시 | Rectangle import 파일을 앱 지원 경로에 복사하고, Stats plist는 remote credential을 보존한 뒤 import한다. Stats의 버전·확인 시각은 배포 파일에서 제외하며, 선언하지 않은 로컬 값은 `defaults import`가 보존한다. |
+| 05 | app-settings | after | Rectangle, Stats 설정 import | 설정 변경 시 | Rectangle import 파일을 앱 지원 경로에 복사하고, Stats plist는 remote credential을 보존한 뒤 import한다. Stats의 버전·확인·지원 시각은 배포 파일에서 제외하며, 선언하지 않은 로컬 값은 `defaults import`가 보존한다. |
 | 05 | runtime | regular | Bun | 최초 1회 | Node.js는 Brewfile에서 관리하고 Bun은 공식 installer로 별도 설치한다. |
 | 07 | tokscale-launchd | after | tokscale LaunchAgent 등록·갱신 | 설정 변경 시 | 3일마다 로컬 14:00에 실행한다. |
 | 08 | dotfiles-update-launchd | after | dotfiles update LaunchAgent 등록·갱신 | 설정 변경 시 | 매월 1일과 16일 로컬 14:00에 실행한다. |
