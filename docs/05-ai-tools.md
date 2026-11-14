@@ -221,7 +221,7 @@ Moonshot AI의 터미널 AI 에이전트다. 설치 경로는 installer 기본�
 
 | 파일               | 배포 경로                    | 역할       | 상세                                                |
 |------------------|--------------------------|----------|---------------------------------------------------|
-| config.toml | `~/.kimi-code/config.toml` | 핵심 설정 | 기본 모델(`kimi-code/k3`, effort `max`를 overrides로 고정), `default_permission_mode = "auto"`, `AgentSwarm` 자동 허용, plan 모드 기본값, 텔레메트리 비활성, `[[permission.rules]]` 가드레일 |
+| config.toml | `~/.kimi-code/config.toml` | 핵심 설정 | 기본 모델(`kimi-code/k3.1-pro`, effort `high`), `default_permission_mode = "auto"`, `AgentSwarm` 자동 허용, plan 모드 기본값, 텔레메트리 비활성, `[[permission.rules]]` 가드레일 |
 | symlink_AGENTS.md | `~/.kimi-code/AGENTS.md` | 사용자 전역 지침 | `~/AGENTS.md`를 가리키는 symlink. Claude/Codex/Copilot과 동일한 단일 원본을 공유한다 |
 
 `config.toml`은 구독(OAuth) 경로에서 비밀 값을 담지 않는다. 토큰은 `~/.kimi-code/credentials/`(0700/0600)가 소유하고 config에는 참조만 남는다. CLI가 런타임에 같은
