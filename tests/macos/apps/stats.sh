@@ -8,6 +8,7 @@ source "$tests_root/lib/chezmoi-test.sh"
 
 test_home="$(mktemp -d)"
 export STATS_TEST_DOMAIN="$test_home/preferences"
+export STATS_TEST_KILLALL_LOG="$test_home/killall.log"
 trap '/usr/bin/defaults delete "$STATS_TEST_DOMAIN" >/dev/null 2>&1 || true; rm -rf "$test_home"' EXIT
 configure_chezmoi_test_home "$test_home"
 fake_bin="$test_home/bin"
@@ -31,7 +32,7 @@ EOF
 cat > "$fake_bin/killall" <<'EOF'
 #!/bin/bash
 set -euo pipefail
-test "$#" -eq 1 && test "$1" = Stats
+printf '%s\n' "$#" "$@" >> "$STATS_TEST_KILLALL_LOG"
 EOF
 chmod +x "$fake_bin/defaults" "$fake_bin/killall"
 
@@ -54,6 +55,7 @@ EOF
 plutil -convert xml1 -o "$test_home/current.plist" "$test_home/current.json"
 /usr/bin/defaults import "$STATS_TEST_DOMAIN" "$test_home/current.plist"
 HOME="$test_home" PATH="$fake_bin:$PATH" bash "$rendered" > "$test_home/apply.log"
+test "$(cat "$STATS_TEST_KILLALL_LOG")" = "$(printf '1\nStats')"
 /usr/bin/defaults export "$STATS_TEST_DOMAIN" "$test_home/result.plist"
 plutil -convert json -o "$test_home/result.json" "$test_home/result.plist"
 jq -e '
@@ -73,7 +75,9 @@ jq -e '
 
 # 신규 설치에는 과거 실행 기록을 만들지 않고 선언한 설정만 적용한다.
 /usr/bin/defaults delete "$STATS_TEST_DOMAIN"
+: > "$STATS_TEST_KILLALL_LOG"
 HOME="$test_home" PATH="$fake_bin:$PATH" bash "$rendered" > "$test_home/apply.log"
+test "$(cat "$STATS_TEST_KILLALL_LOG")" = "$(printf '1\nStats')"
 /usr/bin/defaults export "$STATS_TEST_DOMAIN" "$test_home/fresh.plist"
 plutil -convert json -o "$test_home/fresh.json" "$test_home/fresh.plist"
 jq -e '
