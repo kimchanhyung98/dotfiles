@@ -48,11 +48,11 @@ if [ "$update_pid" = "$(ps -o pgid= -p $$ | tr -d '[:space:]')" ]; then
                 rm -f "$reload_script"
                 launchctl remove "$reload_label" 2>/dev/null || true
             }
-            trap cleanup EXIT
             while kill -0 "$update_pid" 2>/dev/null; do
                 sleep 1
             done
             /bin/bash "$reload_script"
+            cleanup
         ' dotfiles-update-reload "$update_pid" "$reload_script" "$reload_label"; then
         rm -f "$reload_script"
         echo "[dotfiles-update-launchd][error] could not schedule reload" >&2
