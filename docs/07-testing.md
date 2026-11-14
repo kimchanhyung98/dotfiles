@@ -92,8 +92,10 @@ macOS suite는 임시 HOME에서 다음을 확인한다.
 - managed template 렌더링과 apply dry-run
 - AI 도구 설정 렌더 결과와 Codex 템플릿·배포 파일의 일치
 - cmux, Rectangle, Stats와 Brewfile 관련 설정
+- 원격 변경 없는 반복 업데이트에서 macOS 설정 복원, 배경화면 지정과 관련 프로세스 재시작
 - Orca 플러그인의 누락 설치, 기존 상태 보존, 앱 연결과 승인·오류 처리
-- tokscale 3일마다 및 dotfiles 매월 1·16일 오후 2시 launchd 계약
+- tokscale 3일마다 14시 및 dotfiles 매월 1·16일 12시 launchd 계약
+- 예약 업데이트 종료 후 LaunchAgent 재등록, 실패 기록과 임시 작업 정리
 - state/cache gate가 없는 예약 작업과 tokscale submit wrapper
 - project bootstrap과 Doppler 실패가 dotfiles 실패로 전이되지 않는 계약
 - 공통 skills·instruction symlink topology

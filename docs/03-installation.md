@@ -1,7 +1,7 @@
 # 설치
 
 > **실행 조건 표기**: `최초 1회`는 chezmoi `run_once_` 스크립트로, 최초 적용 시 1회 실행되며 스크립트 내용(템플릿 렌더 결과)이 바뀌면 다음 `chezmoi apply`에서 다시
-> 실행된다(각 설치 블록은 `command -v` 가드로 멱등성을 보장). `설정 변경 시`는 `run_onchange_`로, 내용이 변경될 때만 재실행된다.
+> 실행된다(각 설치 블록은 `command -v` 가드로 멱등성을 보장). `설정 변경 시`는 `run_onchange_`로, 내용이 변경될 때만 재실행된다. `매번 적용 시`는 `run_`에 `once_`나 `onchange_`를 붙이지 않아 소스 변경 없이도 실행된다.
 
 ## 최초 설치 입력 계약
 
@@ -34,12 +34,12 @@ script phase는 파일명의 `before_`/`after_`가 우선한다. 번호는 같�
 | 순서 | 스크립트 | phase | 역할 | 실행 조건 | 상세 |
 |:--:|---|---|---|---|---|
 | 01 | prerequisites | before | Xcode CLI, Homebrew, zerobrew, Rosetta, GitHub SSH host keys | 최초 1회 | Xcode Command Line Tools와 Homebrew를 준비하고, 셸 설정을 변경하지 않도록 zerobrew installer를 실행한다. Apple Silicon이면 Rosetta 2를 설치하고 GitHub SSH host key를 검증해 등록한다. |
-| 02 | macos-settings | after | Dock, Finder, Keyboard, Trackpad, Screenshot | 설정 변경 시 | managed target 배포 뒤 `defaults` 명령으로 macOS 설정을 적용한다. |
+| 02 | macos-settings | after | Dock, Finder, Keyboard, Trackpad, Screenshot | 매번 적용 시 | managed target 배포 뒤 macOS 설정과 배경화면을 다시 적용하고 Dock·Finder·SystemUIServer를 재시작한다. |
 | 03 | brew-packages | regular | Brewfile 기반 패키지 설치·upgrade | Brewfile 변경 시 | zerobrew 대상 formula를 먼저 동기화하고 `ruby`·`xcodes`·cask는 Homebrew로 처리한다. zerobrew가 없거나 실패하면 전체 Brewfile을 `brew bundle`로 폴백하며, 최종 check 실패는 non-zero다. 자동 cleanup은 하지 않는다. |
 | 05 | app-settings | after | Rectangle, Stats 설정 import | 설정 변경 시 | Rectangle import 파일을 앱 지원 경로에 복사하고, Stats plist는 remote credential을 보존한 뒤 import한다. |
 | 05 | runtime | regular | Bun | 최초 1회 | Node.js는 Brewfile에서 관리하고 Bun은 공식 installer로 별도 설치한다. |
 | 07 | tokscale-launchd | after | tokscale LaunchAgent 등록·갱신 | 설정 변경 시 | 3일마다 로컬 14:00에 실행한다. |
-| 08 | dotfiles-update-launchd | after | dotfiles update LaunchAgent 등록·갱신 | 설정 변경 시 | 매월 1일과 16일 로컬 14:00에 실행한다. |
+| 08 | dotfiles-update-launchd | after | dotfiles update LaunchAgent 등록·갱신 | 설정 변경 시 | 시스템 시간대가 Asia/Seoul일 때 매월 1일과 16일 한국 시간 12:00에 실행한다. 예약 업데이트 중에는 주 업데이트가 종료된 뒤 독립 작업이 LaunchAgent를 재등록한다. |
 | 09 | openusage | after | OpenUsage 설치·설정 import | 설정 변경 시 | Homebrew cask 대신 GitHub 최신 릴리스 dmg를 설치하고(동일 버전이면 skip), baseline plist를 `defaults import`로 덮어쓴 뒤 앱을 재실행한다. 설치는 best-effort로, 실패 시 warning만 남기고 설정 import는 계속한다. |
 | 10 | orca-plugins | after | Orca 공식 플러그인 7개 설치 | 최초 적용 및 스크립트 변경 시 | 로컬 Orca가 실행 중이 아니면 앱을 열고 연결을 기다린다. 누락 플러그인만 설치한다. 승인 대기·설치 실패 시 나머지 항목을 처리한 뒤 non-zero로 종료하여 다음 apply에서 재시도한다. |
 
