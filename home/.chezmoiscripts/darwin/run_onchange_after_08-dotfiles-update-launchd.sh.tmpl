@@ -25,6 +25,43 @@ if [ ! -x "$helper" ]; then
     exit 1
 fi
 
+# 예약 작업 안에서 자신을 내리면 재등록 전에 종료되므로 독립 작업으로 넘긴다.
+update_pid="$(launchctl list | awk -v label="$label" '$3 == label { print $1 }')"
+if [ "$update_pid" = "$(ps -o pgid= -p $$ | tr -d '[:space:]')" ]; then
+    log_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/logs"
+    reload_log="$log_dir/launchd-reload-$(date +%Y%m%d-%H%M%S)-$$.log"
+    reload_label="${label}.reload.$$"
+    (
+        umask 077
+        mkdir -p "$log_dir"
+        : > "$reload_log"
+    )
+    reload_script="$(mktemp)"
+    cp "$0" "$reload_script"
+    if ! launchctl submit -l "$reload_label" -o "$reload_log" -e "$reload_log" -- \
+        /usr/bin/env HOME="$HOME" PATH="$PATH" /bin/bash -c '
+            set -euo pipefail
+            update_pid="$1"
+            reload_script="$2"
+            reload_label="$3"
+            cleanup() {
+                rm -f "$reload_script"
+                launchctl remove "$reload_label" 2>/dev/null || true
+            }
+            while kill -0 "$update_pid" 2>/dev/null; do
+                sleep 1
+            done
+            /bin/bash "$reload_script"
+            cleanup
+        ' dotfiles-update-reload "$update_pid" "$reload_script" "$reload_label"; then
+        rm -f "$reload_script"
+        echo "[dotfiles-update-launchd][error] could not schedule reload" >&2
+        exit 1
+    fi
+    echo "[dotfiles-update-launchd] reload deferred until update exits; log=$reload_log"
+    exit 0
+fi
+
 launchctl bootout "gui/${uid}/${label}" 2>/dev/null || true
 if launchctl bootstrap "gui/${uid}" "$plist"; then
     launchctl enable "gui/${uid}/${label}" 2>/dev/null || true

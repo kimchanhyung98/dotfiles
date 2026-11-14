@@ -33,9 +33,9 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 
 - **선언적 관리**: 무엇을 설치할지는 선언 파일(Brewfile, .chezmoiexternal.toml)에 정의하고, 어떻게 설치할지는 실행 스크립트에 분리한다. 패키지 목록과 설치 로직이 섞이지 않아 각각
   독립적으로 변경할 수 있다.
-- **반복 적용**: managed file은 `chezmoi apply`로 source 상태를 다시 적용한다. `run_once_`와 `run_onchange_`는 content trigger가 충족될 때만 실행되므로, source가 바뀌지 않은 package·OS 설정의 외부 drift까지 계속 복구하지는 않는다.
+- **반복 적용**: managed file과 macOS 시스템 설정은 `chezmoi apply`마다 source 상태로 다시 적용한다. 나머지 `run_once_`와 `run_onchange_` 스크립트는 내용에 따른 실행 조건이 충족될 때만 실행하므로, 해당 스크립트가 관리하는 패키지·설정의 로컬 변경을 매번 복원하지는 않는다.
 - **순서 보장**: chezmoi 네이밍 컨벤션(`run_` + `once_`/`onchange_` + `before_`/`after_` + 이름)으로 실행 phase를 제어한다. 번호
-  접두사(01, 02, ...)는 같은 source 디렉터리와 phase 안의 순서를 고정하며, 공통 루트와 OS 하위 디렉터리 사이의 전역 순서는 보장하지 않는다. `macos-settings`는 파일 배포 이후 적용이 필요하므로 `run_onchange_after_`를 사용한다.
+  접두사(01, 02, ...)는 같은 source 디렉터리와 phase 안의 순서를 고정하며, 공통 루트와 OS 하위 디렉터리 사이의 전역 순서는 보장하지 않는다. `macos-settings`는 파일 배포 이후 매번 실행하도록 `run_after_`를 사용한다.
 - **OS 분기**: 실행 스크립트는 OS별 하위 디렉토리(`darwin/`, `linux/`)로 물리적 분리하고, 설정 파일은 `.tmpl` 템플릿 조건문으로 분기한다. 하나의 소스에서 두 OS 환경을 모두
   관리할 수 있다.
 - **설치와 설정 분리**: 도구의 바이너리 설치는 스크립트가 담당하고, 사용자 설정은 chezmoi가 배포하는 설정 파일(`.tmpl`)이 담당한다. 설치 방식이 바뀌어도 설정은 그대로 유지되고, 설정을 변경해도
