@@ -41,7 +41,7 @@ macOS 시스템 설정도 예약·수동 업데이트마다 다시 적용한다.
 
 stdout과 stderr를 합쳐 로그와 콘솔에 출력하며, 로그에는 시작·종료 시각과 종료 코드도 남긴다. launchd 예약 실행과 수동 `dotfiles-update` 실행을 모두 기록한다. 직접 실행한 `chezmoi init`, `chezmoi apply`, `chezmoi update` 등은 이 로그에 포함되지 않는다.
 
-예약 업데이트 뒤 독립 작업으로 수행하는 LaunchAgent 재등록 결과는 같은 디렉터리의 `launchd-reload-YYYYmmdd-HHMMSS-PID.log`에 기록한다. 파일 권한은 `0600`이다. 주 업데이트의 종료 코드에는 뒤이어 실행되는 재등록 결과가 포함되지 않으므로 이 로그도 확인한다. 재등록이 끝나면 임시 스크립트와 작업을 제거한다.
+예약 업데이트 뒤 독립 작업으로 수행하는 LaunchAgent 재등록 결과는 같은 디렉터리의 `launchd-reload-YYYYmmdd-HHMMSS-PID.log`에 기록한다. 파일 권한은 `0600`이다. 주 업데이트의 종료 코드에는 뒤이어 실행되는 재등록 결과가 포함되지 않으므로 이 로그도 확인한다. 재등록이 성공하면 임시 스크립트와 작업을 제거하며, 실패하면 유지하여 launchd가 재시도한다.
 
 ## 프로젝트 준비
 
