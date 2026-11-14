@@ -126,10 +126,8 @@ for scenario in success bootstrap-failure; do
     status=0
     wait "$worker_pid" || status=$?
     worker_pid=""
-    test ! -e "$reload_script"
     test "$(grep -c '^bootout$' "$call_log")" -eq 1
     test "$(grep -c '^bootstrap$' "$call_log")" -eq 1
-    test "$(grep -c '^remove$' "$call_log")" -eq 1
     if [ "$scenario" = success ]; then
         test "$status" -eq 0
         grep -Fq '[dotfiles-update-launchd][done]' "$reload_log"
@@ -137,7 +135,19 @@ for scenario in success bootstrap-failure; do
         test "$status" -eq 1
         grep -Fq '[dotfiles-update-launchd][error] bootstrap failed' "$reload_log"
         if grep -q '^enable$' "$call_log"; then exit 1; fi
+        test -e "$reload_script"
+        if grep -q '^remove$' "$call_log"; then exit 1; fi
+
+        # launchd가 같은 작업을 재시도하면 소스 변경 없이 등록을 복구한다.
+        rm "$test_home/bootstrap-fails"
+        bash "$test_home/submitted.sh" >> "$reload_log" 2>&1
+        test "$(grep -c '^bootout$' "$call_log")" -eq 2
+        test "$(grep -c '^bootstrap$' "$call_log")" -eq 2
+        test "$(grep -c '^enable$' "$call_log")" -eq 1
+        grep -Fq '[dotfiles-update-launchd][done]' "$reload_log"
     fi
+    test ! -e "$reload_script"
+    test "$(grep -c '^remove$' "$call_log")" -eq 1
 done
 
 # 독립 작업 등록에 실패하면 원래 예약을 유지하고 임시 스크립트를 정리한다.
