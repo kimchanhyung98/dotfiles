@@ -14,6 +14,12 @@
 | Screenshot | 저장 위치 Desktop, PNG 형식, 창 그림자 제거                                   | 스크린샷 파일 관리 일관성, 불필요한 그림자 제거     |
 | System     | 새 문서 로컬 디스크 저장                                                    | iCloud 대신 로컬 디스크에 기본 저장         |
 
+## Stats
+
+Stats는 사용자 설정과 앱 실행 기록을 같은 plist에 저장한다. 앱의 설정 내보내기도 인증 정보를 제외한 저장 값을 포함하므로, plist에 실행 기록이 있는 것은 정상이다. [Stats 3.0.23의 저장·내보내기 코드](https://github.com/exelban/stats/blob/v3.0.23/Kit/plugins/Store.swift)를 기준으로 확인했다.
+
+dotfiles의 `Stats.plist`에는 `version`, `updater_check_ts`, `support_ts`를 넣지 않는다. 과거 버전과 시각을 다시 적용하지 않기 위해서다. 적용 스크립트의 `defaults import`는 파일에 선언된 값을 덮어쓰고, 선언하지 않은 기존 값은 보존한다. 따라서 이 세 값은 현재 로컬 값을 유지하며, 신규 설치에는 과거 값을 만들지 않는다. 이 동작은 저장 영역을 교체하는 Stats 앱 내부의 가져오기 기능과 다르다.
+
 ## Ubuntu와 GitHub Codespaces
 
 | 영역  | 설정                           | 상세                                                        |
