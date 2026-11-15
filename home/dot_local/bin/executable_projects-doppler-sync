@@ -77,10 +77,15 @@ for project_dir in "${project_dirs[@]}"; do
         --format env >"$tmp_file" 2>/dev/null \
         && [ -s "$tmp_file" ]; then
         chmod 600 "$tmp_file"
-        mv "$tmp_file" "$env_file"
+        mv -n "$tmp_file" "$env_file"
+        if [ -f "$tmp_file" ]; then
+            rm -f "$tmp_file"
+            preserved=$((preserved + 1))
+        else
+            created=$((created + 1))
+            echo "[projects-doppler-sync] created: $project_name/.env"
+        fi
         tmp_file=""
-        created=$((created + 1))
-        echo "[projects-doppler-sync] created: $project_name/.env"
     else
         rm -f "$tmp_file"
         tmp_file=""

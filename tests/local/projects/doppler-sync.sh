@@ -15,6 +15,7 @@ mkdir -p \
     "$projects/matched/.git" \
     "$projects/unmatched/.git" \
     "$projects/preserved/.git" \
+    "$projects/late-created/.git" \
     "$projects/not-a-repository"
 printf 'ORIGINAL=1\n' > "$projects/preserved/.env"
 
@@ -37,6 +38,11 @@ case " $* " in
             printf 'TOKEN=fixture\n'
             exit 0
         fi
+        if [ "$project" = "late-created" ]; then
+            printf 'LOCAL=keep\n' > "$PROJECTS_ROOT/$project/.env"
+            printf 'TOKEN=fixture\n'
+            exit 0
+        fi
         exit 1
         ;;
 esac
@@ -44,12 +50,15 @@ exit 1
 EOF
 chmod +x "$fake_bin/doppler"
 
-HOME="$test_home" PROJECTS_ROOT="$projects" bash "$command_path" >/dev/null
+HOME="$test_home" PROJECTS_ROOT="$projects" bash "$command_path" > "$test_root/output.log"
 
 grep -Fq 'TOKEN=fixture' "$projects/matched/.env"
 grep -Fq 'ORIGINAL=1' "$projects/preserved/.env"
+test "$(cat "$projects/late-created/.env")" = 'LOCAL=keep'
 test ! -e "$projects/unmatched/.env"
 test ! -e "$projects/not-a-repository/.env"
+test -z "$(find "$projects" -name '.env.tmp.*' -print)"
+grep -Fxq '[projects-doppler-sync] complete (created: 1, preserved: 2, unmatched: 1)' "$test_root/output.log"
 
 case "$(uname -s)" in
     Darwin) mode="$(stat -f '%Lp' "$projects/matched/.env")" ;;
