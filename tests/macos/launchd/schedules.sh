@@ -74,7 +74,7 @@ jq -e '
     .Label == "dev.dotfiles.update"
     and .RunAtLoad == false
     and ([.StartCalendarInterval[].Day] == [1,16])
-    and ([.StartCalendarInterval[].Hour] | all(. == 14))
+    and ([.StartCalendarInterval[].Hour] | all(. == 12))
     and ([.StartCalendarInterval[].Minute] | all(. == 0))
 ' "$dotfiles_json" >/dev/null
 
