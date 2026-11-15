@@ -92,6 +92,7 @@ macOS suite는 임시 HOME에서 다음을 확인한다.
 - managed template 렌더링과 apply dry-run
 - AI 도구 설정 렌더 결과와 Codex 템플릿·배포 파일의 일치
 - cmux, Rectangle, Stats와 Brewfile 관련 설정
+- Stats 설정 적용 시 실행 기록·인증 정보 보존과 신규 설치 시 과거 기록 미생성
 - 원격 변경 없는 반복 업데이트에서 macOS 설정 복원, 배경화면 지정과 관련 프로세스 재시작
 - Orca 플러그인의 누락 설치, 기존 상태 보존, 앱 연결과 승인·오류 처리
 - tokscale 3일마다 14시 및 dotfiles 매월 1·16일 12시 launchd 계약
@@ -100,6 +101,8 @@ macOS suite는 임시 HOME에서 다음을 확인한다.
 - project bootstrap과 Doppler 실패가 dotfiles 실패로 전이되지 않는 계약
 - 공통 skills·instruction symlink topology
 - Zsh 설정과 렌더된 공통·macOS script의 Bash 문법·ShellCheck
+
+Stats 검사는 실제 `defaults` 명령을 임시 plist 경로로 연결하고 앱 종료 명령은 대체한다.
 
 설정 렌더와 command 동작은 fixture에서 검사하므로 실제 사용자 HOME이나 macOS
 설정은 변경하지 않는다. Codex 검사는 버전이 아니라 렌더된 설정의 일치와 CLI의
