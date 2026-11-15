@@ -14,9 +14,6 @@ test_zsh_config() {
     run_chezmoi "$test_home" execute-template \
         < "$source_dir/dot_config/zsh/20-path.zsh.tmpl" \
         > "$test_home/.config/zsh/20-path.zsh"
-    run_chezmoi "$test_home" execute-template \
-        < "$source_dir/dot_config/zsh/30-functions.zsh.tmpl" \
-        > "$test_home/.config/zsh/30-functions.zsh"
     cp "$source_dir"/dot_config/zsh/*.zsh "$test_home/.config/zsh/"
 
     for zsh_file in "$test_home/.zshrc" "$test_home"/.config/zsh/*.zsh; do

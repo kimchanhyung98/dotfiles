@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Prerequisites: Xcode CLI Tools, Homebrew, zerobrew, Rosetta 2 (Apple Silicon), GitHub SSH host keys
+# Prerequisites: Xcode CLI Tools, Homebrew, Rosetta 2 (Apple Silicon), GitHub SSH host keys
 
 {{ if ne .chezmoi.os "darwin" }}
 exit 0
@@ -45,43 +45,8 @@ else
     echo "[prerequisites][homebrew] already installed"
 fi
 
-# 3. zerobrew
-# - Homebrew 대안 패키지 매니저 (빠른 설치 지원)
-ensure_zb_available() {
-    if command -v zb &>/dev/null; then
-        return 0
-    fi
-    # - 여러 설치 경로에서 zb 바이너리 탐색
-    for candidate in "$HOME/.local/bin/zb" "/opt/zerobrew/bin/zb" "/usr/local/zerobrew/bin/zb"; do
-        if [ -x "$candidate" ]; then
-            local dir
-            dir="$(dirname "$candidate")"
-            export PATH="$dir:$PATH"
-            return 0
-        fi
-    done
-    return 1
-}
-
-if ! ensure_zb_available; then
-    echo "[prerequisites][zerobrew] installing"
-    installer=$(mktemp)
-    if curl -fsSL https://zerobrew.rs/install -o "$installer"; then
-        bash "$installer" --no-modify-path || echo "[prerequisites][warning] zerobrew installation failed"
-    else
-        echo "[prerequisites][warning] zerobrew download failed"
-    fi
-    rm -f "$installer"
-fi
-
-if ensure_zb_available; then
-    echo "[prerequisites][zerobrew] ready ($(command -v zb))"
-else
-    echo "[prerequisites][warning] zerobrew not available. Homebrew will be used as fallback."
-fi
-
 {{ if .isAppleSilicon }}
-# 4. Rosetta 2 (Apple Silicon 전용)
+# 3. Rosetta 2 (Apple Silicon 전용)
 # - x86_64 바이너리를 ARM에서 실행하기 위한 호환 레이어
 if ! pkgutil --pkgs 2>/dev/null | grep -q "com.apple.pkg.RosettaUpdateAuto"; then
     echo "[prerequisites][rosetta] installing"
@@ -91,7 +56,7 @@ else
 fi
 {{ end }}
 
-# 5. GitHub SSH known_hosts
+# 4. GitHub SSH known_hosts
 # - 새 환경에서 SSH 호스트 키 검증 프롬프트 방지
 SSH_DIR="$HOME/.ssh"
 KNOWN_HOSTS="$SSH_DIR/known_hosts"
