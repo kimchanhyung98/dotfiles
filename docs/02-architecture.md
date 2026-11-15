@@ -67,7 +67,6 @@ dotfiles/
     │   │   ├── 00-core.zsh
     │   │   ├── 10-env.zsh
     │   │   ├── 20-path.zsh.tmpl
-    │   │   ├── 30-functions.zsh.tmpl
     │   │   ├── 40-completion.zsh
     │   │   ├── 50-plugins.zsh
     │   │   ├── 60-tools.zsh

@@ -6,14 +6,14 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 
 - macOS 중심 환경에 시스템 도구와 AI CLI를 통합한다. Claude와 Codex가 필수 baseline이고 Copilot, Antigravity, Hermes, Kimi Code, omp, CodeGraph 등은 선택 도구다.
 - Linux는 Ubuntu 26.04 LTS를 native 기준선으로 지원한다. GitHub Codespaces에서는 시스템 timezone, 로그인 셸, SSH bootstrap, 데스크톱 앱을 제외하고 공통 CLI·설정·AI 도구를 적용한다. 그 밖의 배포판은 지원하지 않는다.
-- 지정된 저장소 6개를 실제 원격 기준으로 검증하고, 유지 가능한 항목만 선별 적용한다.
+- 지정된 저장소를 실제 원격 기준으로 검증하고, 유지 가능한 항목만 선별 적용한다.
 - 저장소 원본 전체를 복제하지 않고 유지 가능한 구성만 채택한다.
 
 ## 검토 완료 레포
 
 | 카테고리   | 저장소                                                                                         |
 |--------|---------------------------------------------------------------------------------------------|
-| System | lucasgelfond/zerobrew, ghostty-org/ghostty                                                  |
+| System | ghostty-org/ghostty                                                  |
 | Claude | jarrodwatts/claude-hud, VoltAgent/awesome-agent-skills, forrestchang/andrej-karpathy-skills |
 
 ## 검증 스냅샷
@@ -23,7 +23,6 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 
 | 저장소                                 | 검증 커밋     |
 |-------------------------------------|-----------|
-| lucasgelfond/zerobrew               | `a15119f` |
 | ghostty-org/ghostty                 | `e94c905` |
 | jarrodwatts/claude-hud              | `10193cc` |
 | VoltAgent/awesome-agent-skills      | `feb81d6` |

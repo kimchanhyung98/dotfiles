@@ -76,12 +76,9 @@ projects-doppler-sync
 
 ## 패키지 동기화
 
-macOS Brewfile 변경 시 zerobrew가 설치한 formula 중 zerobrew용 Brewfile에 남아 있는 항목만 `zb upgrade`하고, zerobrew용 Brewfile로 누락 formula를 추가한다. `ruby`·`xcodes`와 모든 cask는 Homebrew가 담당한다. zerobrew가 없거나 실패하면 전체 Brewfile을 Homebrew로 폴백한다. `ruby`는 Intel macOS의 zerobrew 경로 치환 버그(zerobrew#286) 때문에 제외하며, 이미 설치된 `xcodes`는 Homebrew bundle에서도 upgrade하지 않는다. 전체 Homebrew 폴백의 최종 check 실패는 apply 실패다.
+macOS Brewfile 변경 시 Homebrew가 formula와 cask를 설치·갱신한다. 이미 설치된 `xcodes`는 upgrade에서 제외한다. `brew bundle check --no-upgrade`로 필요한 패키지의 설치 여부를 확인하며, 실패하면 apply도 실패한다.
 
-`/opt/zerobrew/bin`은 PATH에서 Homebrew보다 앞에 온다. 같은 이름의 명령은 zerobrew 버전이 쓰이고 zerobrew에 없는 명령은 Homebrew로 폴백된다. 경로는 `ZEROBREW_PREFIX`로 바꿀 수 있다.
-
-대화형 셸의 `brew update`는 zerobrew와 Homebrew 메타데이터를 순서대로 갱신한다. 인자 없는 `brew upgrade`도 zerobrew를 먼저 실행한 뒤 기존 Homebrew 소유 패키지를 갱신한다. 대상을 지정한 `brew upgrade <formula>`는 zerobrew가 성공하면 종료하고 실패할 때만 Homebrew로 폴백하며, `brew upgrade --cask`는 Homebrew로 바로 전달한다. 다른 `brew` 하위 명령도 Homebrew로 그대로 전달된다.
-
+대화형 셸의 `brew` 명령은 Homebrew를 직접 실행한다.
 Brewfile에서 삭제된 package는 자동 제거하지 않는다. 제거 후보를 검토할 때만 수동으로 실행한다.
 
 ```sh
@@ -92,11 +89,9 @@ brew bundle cleanup --file="$(chezmoi source-path)/Brewfile"
 
 | 증상 | 의미 | 조치 |
 |---|---|---|
-| Brewfile 최종 check 실패 | zerobrew와 Homebrew 후에도 항목 누락 | 출력된 cask/tap 문제를 해결하고 `chezmoi apply` 재실행 |
+| Brewfile 최종 check 실패 | Homebrew 동기화 후에도 항목 누락 | 출력된 cask/tap 문제를 해결하고 `chezmoi apply` 재실행 |
 | Doppler 로그인에 interactive terminal 필요 | 예약 update 등 비대화형 실행에서 최초 로그인 불가 | 터미널에서 `projects-doppler-sync` 실행 |
 | GitHub 사용자/API 조회 실패 | 잘못된 name, organization, network·rate limit 오류 | name을 확인한 뒤 `projects-bootstrap GITHUB_NAME` 재실행 |
-| zerobrew 명령이 이전 버전을 실행 | 버전 교체 중 symlink 교체 실패로 구버전 링크 잔존 | `zb uninstall <formula>` 후 `zb doctor --repair`, `zb install <formula>` 실행 |
-| `ruby` 실행 시 LoadError | Intel macOS에서 zerobrew의 Mach-O prefix 치환 실패(zerobrew#286) | `zb uninstall ruby` 실행 후 Homebrew ruby 사용 |
 
 ## 운영 경계
 
