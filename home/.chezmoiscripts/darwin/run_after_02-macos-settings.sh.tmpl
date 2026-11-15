@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # macOS system settings: Dock, Finder, Keyboard, Trackpad, Screenshot, System
-# Re-applies when this script changes
+# 매번 적용하여 로컬에서 바뀐 설정을 복원한다.
 
 {{ if ne .chezmoi.os "darwin" }}
 exit 0

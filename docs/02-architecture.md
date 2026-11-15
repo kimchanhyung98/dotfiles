@@ -22,7 +22,7 @@ dotfiles/
     │   │
     │   ├── darwin/
     │   │   ├── run_once_before_01-prerequisites.sh.tmpl
-    │   │   ├── run_onchange_after_02-macos-settings.sh.tmpl
+    │   │   ├── run_after_02-macos-settings.sh.tmpl
     │   │   ├── run_onchange_03-brew-packages.sh.tmpl
     │   │   ├── run_onchange_after_05-app-settings.sh.tmpl
     │   │   ├── run_once_05-runtime.sh.tmpl

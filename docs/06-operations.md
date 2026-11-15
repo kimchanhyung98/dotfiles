@@ -13,7 +13,7 @@ dotfiles-doctor
 macOS에서 두 LaunchAgent가 독립적으로 실행된다.
 
 - tokscale: 3일마다 14:00
-- dotfiles: 매월 1일과 16일 14:00
+- dotfiles: 매월 1일과 16일 12:00 (한국 시간, 시스템 시간대 Asia/Seoul 기준)
 
 두 작업 모두 launchd calendar로 실행한다. 다음 예약 시각을 결정하기 위한 성공 시각, 마지막 실행 시각, cache는 따로 저장하지 않는다. 성공이나 실패가 다음 calendar 실행일을 바꾸지 않는다. dotfiles 실행 로그는 진단용이며 예약 시각 계산에 사용하지 않는다.
 
@@ -31,11 +31,17 @@ dotfiles-update
 `dotfiles-update`는 내부에서 `chezmoi update --no-tty --force`와 `chezmoi verify`를 실행한다. managed file의 로컬 변경분(AI CLI가 런타임에 설정 파일을 다시 쓴 drift 포함)은 항상
 소스 저장소 상태로 덮어씌워진다.
 
+macOS 시스템 설정도 예약·수동 업데이트마다 다시 적용한다. 소스 변경이 없어도 Dock 크기 등 관리하는 값을 복원하고, Dock·Finder·SystemUIServer를 재시작한다. 배경화면 파일이 있으면 모든 데스크탑에 다시 지정한다.
+
+예약 업데이트 중 LaunchAgent 등록 내용이 바뀌면, 독립 작업이 주 업데이트의 종료를 기다린 뒤 재등록한다. 실행 중인 작업이 자신을 제거해 업데이트와 다음 예약이 함께 끊기는 것을 막는다. 일반 `chezmoi apply`나 수동 업데이트에서는 즉시 재등록한다.
+
 ## 실행 로그
 
 `install.sh`와 `dotfiles-update`는 실행마다 `${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/logs/`에 로그를 만든다. 파일명은 각각 `install-YYYYmmdd-HHMMSS-PID.log`, `update-YYYYmmdd-HHMMSS-PID.log`다. 새로 만든 로그 파일 권한은 `0600`이다.
 
 stdout과 stderr를 합쳐 로그와 콘솔에 출력하며, 로그에는 시작·종료 시각과 종료 코드도 남긴다. launchd 예약 실행과 수동 `dotfiles-update` 실행을 모두 기록한다. 직접 실행한 `chezmoi init`, `chezmoi apply`, `chezmoi update` 등은 이 로그에 포함되지 않는다.
+
+예약 업데이트 뒤 독립 작업으로 수행하는 LaunchAgent 재등록 결과는 같은 디렉터리의 `launchd-reload-YYYYmmdd-HHMMSS-PID.log`에 기록한다. 파일 권한은 `0600`이다. 주 업데이트의 종료 코드에는 뒤이어 실행되는 재등록 결과가 포함되지 않으므로 이 로그도 확인한다. 재등록이 성공하면 임시 스크립트와 작업을 제거하며, 실패하면 유지하여 launchd가 재시도한다.
 
 ## 프로젝트 준비
 
