@@ -14,6 +14,7 @@ run_chezmoi "$test_home" execute-template \
     < "$repo_dir/home/dot_claude/settings.json.tmpl" > "$rendered"
 
 jq empty "$rendered"
+jq -e '.enabledPlugins["swift-lsp@claude-plugins-official"] == false' "$rendered" >/dev/null
 jq -e 'has("hooks") | not' "$rendered" >/dev/null
 jq -e '
     .permissions.deny
