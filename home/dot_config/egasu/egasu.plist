@@ -2,16 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>SUAutomaticallyUpdate</key>
-	<true/>
-	<key>SUHasLaunchedBefore</key>
-	<true/>
 	<key>alwaysShowPacing</key>
 	<true/>
 	<key>appearance</key>
 	<string>system</string>
-	<key>betaUpdatesEnabled</key>
-	<false/>
 	<key>density</key>
 	<string>compact</string>
 	<key>meterStyle</key>
@@ -245,8 +239,6 @@
 	<real>896</real>
 	<key>openusage.panel.height.settings</key>
 	<real>896</real>
-	<key>openusage.settings.schemaVersion</key>
-	<integer>2</integer>
 	<key>openusage.totalSpend.metric</key>
 	<string>tokens</string>
 	<key>openusage.totalSpend.period</key>

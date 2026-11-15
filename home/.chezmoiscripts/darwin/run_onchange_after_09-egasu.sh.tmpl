@@ -1,0 +1,73 @@
+#!/bin/bash
+# egasu 최초 설치와 기본 설정 적용. 이후 업데이트는 인앱에서 처리한다.
+#
+# egasu config hash: {{ include "dot_config/egasu/egasu.plist" | sha256sum }}
+
+{{ if ne .chezmoi.os "darwin" }}
+exit 0
+{{ end }}
+
+set -eufo pipefail
+
+echo "[egasu][start]"
+
+app="/Applications/egasu.app"
+config="$HOME/.config/egasu/egasu.plist"
+repo="kimchanhyung98/egasu"
+work_dir=""
+
+trap 'if [ -n "$work_dir" ]; then hdiutil detach "$work_dir/mnt" >/dev/null 2>&1 || true; rm -rf "$work_dir"; fi' EXIT
+
+# 설치는 best-effort: 실패해도 warning만 남기고 설정 import는 계속한다.
+install_egasu() {
+    work_dir="$(mktemp -d "${app%/*}/.egasu-install.XXXXXX")" || return 1
+    curl -fsSL -o "$work_dir/egasu.dmg" \
+        "https://github.com/$repo/releases/download/v$latest/egasu-$latest.dmg" || return 1
+    mkdir -p "$work_dir/mnt" || return 1
+    hdiutil attach -nobrowse -readonly -mountpoint "$work_dir/mnt" "$work_dir/egasu.dmg" >/dev/null || return 1
+    ditto "$work_dir/mnt/egasu.app" "$work_dir/egasu.app" || return 1
+    [ "$(/usr/bin/plutil -extract CFBundleIdentifier raw -o - "$work_dir/egasu.app/Contents/Info.plist")" = "com.kimchanhyung98.openusage" ] || return 1
+    [ -x "$work_dir/egasu.app/Contents/MacOS/egasu" ] || return 1
+    mv -n "$work_dir/egasu.app" "${app%/*}/" || return 1
+}
+
+if [ -e "$app" ] || [ -L "$app" ]; then
+    echo "[egasu] already installed; updates are managed in-app"
+else
+    latest=""
+    if release_url="$(curl -fsSL -o /dev/null -w '%{url_effective}' "https://github.com/$repo/releases/latest")"; then
+        case "$release_url" in
+            */tag/v*) latest="${release_url##*/tag/v}" ;;
+        esac
+    fi
+    if [ -z "$latest" ]; then
+        echo "[egasu][warning] release check failed; skip install"
+    else
+        echo "[egasu] install $latest"
+        if ! install_egasu; then
+            echo "[egasu][warning] install failed; skip" >&2
+        fi
+    fi
+    if [ -n "$work_dir" ]; then
+        hdiutil detach "$work_dir/mnt" >/dev/null 2>&1 || true
+        rm -rf "$work_dir"
+        work_dir=""
+    fi
+fi
+
+# 설정 baseline 덮어쓰기
+if [ -f "$config" ]; then
+    echo "[egasu] import defaults"
+    pkill -f "^${app//./[.]}/Contents/MacOS/egasu([[:space:]]|$)" 2>/dev/null || true
+    defaults import com.kimchanhyung98.openusage "$config"
+else
+    echo "[egasu][warning] config not found: $config"
+fi
+
+if [ -d "$app" ]; then
+    if ! open -g "$app"; then
+        echo "[egasu][warning] installed but could not launch automatically: $app" >&2
+    fi
+fi
+
+echo "[egasu][done]"
