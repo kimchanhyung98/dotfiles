@@ -12,8 +12,8 @@ homebrew_prefix="$test_home/homebrew"
 fake_bin="$test_home/.local/bin"
 call_log="$test_home/calls.log"
 bundle_state="$test_home/bundle-satisfied"
-tap_state="$test_home/doppler-tapped"
-trust_state="$test_home/doppler-trusted"
+tap_state="$test_home/orca-tapped"
+trust_state="$test_home/orca-trusted"
 outdated_state="$test_home/outdated-package"
 mkdir -p "$homebrew_prefix/bin" "$fake_bin"
 configure_chezmoi_test_home "$test_home" "$homebrew_prefix"
@@ -54,11 +54,10 @@ case "${1:-}" in
             grep -q '^brew "xcodes"' "$bundle_file"
             grep -q '^cask "ghostty"' "$bundle_file"
             grep -q '^cask "stablyai/orca/orca"' "$bundle_file"
-            test -f "${TAP_STATE}.orca"
-            test -f "${TRUST_STATE}.orca"
-            grep -q '^brew "git"' "$bundle_file"
-            grep -q '^brew "dopplerhq/cli/doppler"' "$bundle_file"
+            test -f "$TAP_STATE"
             test -f "$TRUST_STATE"
+            grep -q '^brew "git"' "$bundle_file"
+            grep -q '^brew "doppler"' "$bundle_file"
             printf 'brew bundle full\n' >> "$CALL_LOG"
             test "${BREW_FAIL:-}" != "bundle"
             rm -f "$OUTDATED_STATE"
@@ -73,36 +72,22 @@ case "${1:-}" in
         ;;
     tap)
         case "${2:-}" in
-            dopplerhq/cli)
-                printf 'brew tap\n' >> "$CALL_LOG"
-                test "${BREW_FAIL:-}" != "doppler-tap"
-                if [ ! -f "$TAP_STATE" ]; then
-                    rm -f "$TRUST_STATE"
-                    touch "$TAP_STATE"
-                fi
-                ;;
             stablyai/orca)
                 printf 'brew tap orca\n' >> "$CALL_LOG"
                 test "${ORCA_FAIL:-}" != "tap"
-                touch "${TAP_STATE}.orca"
+                touch "$TAP_STATE"
                 ;;
             *) exit 1 ;;
         esac
         ;;
     trust)
         case "${3:-}" in
-            dopplerhq/cli/doppler)
-                test "${2:-}" = "--formula"
-                printf 'brew trust\n' >> "$CALL_LOG"
-                test "${BREW_FAIL:-}" != "doppler-trust"
-                touch "$TRUST_STATE"
-                ;;
             stablyai/orca/orca)
                 test "${2:-}" = "--cask"
-                test -f "${TAP_STATE}.orca"
+                test -f "$TAP_STATE"
                 printf 'brew trust orca\n' >> "$CALL_LOG"
                 test "${ORCA_FAIL:-}" != "trust"
-                touch "${TRUST_STATE}.orca"
+                touch "$TRUST_STATE"
                 ;;
             *) exit 1 ;;
         esac
@@ -133,25 +118,23 @@ run_sync() {
 # 기존 xcodes는 유지하고, 새 설치에서는 전체 Brewfile에 포함한다.
 for xcodes_installed in 0 1; do
     : > "$call_log"
-    rm -f "$bundle_state" "$tap_state" "$trust_state" \
-        "${tap_state}.orca" "${trust_state}.orca"
+    rm -f "$bundle_state" "$tap_state" "$trust_state"
     touch "$outdated_state"
     XCODES_INSTALLED="$xcodes_installed" run_sync >/dev/null
-    test "$(sed -n '1p' "$call_log")" = 'brew tap'
-    test "$(sed -n '2p' "$call_log")" = 'brew trust'
-    test "$(sed -n '3p' "$call_log")" = 'brew tap orca'
-    test "$(sed -n '4p' "$call_log")" = 'brew trust orca'
-    test "$(sed -n '5p' "$call_log")" = 'brew bundle full'
-    test "$(wc -l < "$call_log" | tr -d ' ')" = "5"
+    test "$(sed -n '1p' "$call_log")" = 'brew tap orca'
+    test "$(sed -n '2p' "$call_log")" = 'brew trust orca'
+    test "$(sed -n '3p' "$call_log")" = 'brew bundle full'
+    test "$(wc -l < "$call_log" | tr -d ' ')" = "3"
     test -f "$bundle_state"
     test ! -f "$outdated_state"
 done
 
-# Doppler 준비, bundle 실행 또는 최종 설치 검사가 실패하면 적용도 실패한다.
-for brew_fail in doppler-tap doppler-trust bundle check; do
+# bundle 실행 또는 최종 설치 검사가 실패하면 적용도 실패한다.
+# 패키지가 이미 설치되어 최종 검사가 통과하는 상태에서도 bundle 실패를 숨기지 않는다.
+for brew_fail in bundle check; do
     : > "$call_log"
-    rm -f "$bundle_state" "$tap_state" "$trust_state" \
-        "${tap_state}.orca" "${trust_state}.orca"
+    rm -f "$tap_state" "$trust_state"
+    touch "$bundle_state"
     if BREW_FAIL="$brew_fail" run_sync >/dev/null 2>&1; then
         echo "Homebrew $brew_fail failure did not stop package synchronization" >&2
         exit 1
@@ -161,8 +144,7 @@ done
 # Orca tap 또는 trust가 실패하면 bundle 전에 중단한다.
 for orca_fail in tap trust; do
     : > "$call_log"
-    rm -f "$bundle_state" "$tap_state" "$trust_state" \
-        "${tap_state}.orca" "${trust_state}.orca"
+    rm -f "$bundle_state" "$tap_state" "$trust_state"
     if ORCA_FAIL="$orca_fail" run_sync >/dev/null 2>&1; then
         echo "Orca $orca_fail failure did not stop package synchronization" >&2
         exit 1

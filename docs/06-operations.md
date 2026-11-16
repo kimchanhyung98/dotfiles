@@ -79,6 +79,7 @@ projects-doppler-sync
 macOS Brewfile 변경 시 Homebrew가 formula와 cask를 설치·갱신한다. 이미 설치된 `xcodes`는 upgrade에서 제외한다. `brew bundle check --no-upgrade`로 필요한 패키지의 설치 여부를 확인하며, 실패하면 apply도 실패한다.
 
 대화형 셸의 `brew` 명령은 Homebrew를 직접 실행한다.
+
 Brewfile에서 삭제된 package는 자동 제거하지 않는다. 제거 후보를 검토할 때만 수동으로 실행한다.
 
 ```sh

@@ -13,7 +13,7 @@ macOS / Linux 개발 환경 자동화를 위한 chezmoi 기반 dotfiles.
 
 | 카테고리   | 저장소                                                                                         |
 |--------|---------------------------------------------------------------------------------------------|
-| System | ghostty-org/ghostty                                                  |
+| System | ghostty-org/ghostty                                                                         |
 | Claude | jarrodwatts/claude-hud, VoltAgent/awesome-agent-skills, forrestchang/andrej-karpathy-skills |
 
 ## 검증 스냅샷

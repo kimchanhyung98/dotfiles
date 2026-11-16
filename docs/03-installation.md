@@ -116,7 +116,7 @@ native Linux의 지원 범위는 Ubuntu 26.04 LTS다. GitHub Codespaces는 under
 
 Brewfile의 formula와 cask는 모두 Homebrew로 설치·동기화한다. `brew bundle`은 누락 패키지를 설치하고 기존 패키지를 갱신한다. 이미 설치된 `xcodes`는 bottle 없는 release로의 upgrade 실패를 피하기 위해 제외한다. 이후 `brew bundle check --no-upgrade`로 설치 여부를 확인하며, 실패하면 apply도 실패한다. Brewfile에서 빠진 package는 별도 cleanup 명령 없이는 제거하지 않는다.
 
-bundle 실행 전에 Doppler tap을 등록하고 `brew trust --formula dopplerhq/cli/doppler`로 formula를 신뢰한다. Doppler는 최초 프로젝트 `.env` 동기화에 필요하므로 설치 검사에서 제외하지 않는다.
+Doppler는 homebrew/core의 `doppler` formula로 설치한다. `dopplerhq/cli` tap은 formula를 cask로 옮겼으므로 사용하지 않는다. Doppler는 최초 프로젝트 `.env` 동기화에 필요하므로 설치 검사에서 제외하지 않는다.
 Orca는 공식 `stablyai/orca` tap의 `stablyai/orca/orca` cask로 설치한다. bundle 실행 전에 해당 tap을 등록하고 `brew trust --cask stablyai/orca/orca`로 이 cask만 신뢰한다. 기본 `orca` cask는 Plotly 앱이므로 사용하지 않는다. Orca cask가 앱과 `orca` CLI를 함께 설치하므로 별도 PATH 설정은 필요 없다.
 AI 도구는 설치 채널 정책에 따라 AI 스크립트에서 관리한다. 단, macOS Copilot CLI는 공식 Homebrew cask를 사용한다. Claude/Codex만 필수 baseline이며 나머지는 선택 도구다.
 
