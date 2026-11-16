@@ -5,6 +5,14 @@ if [ -z "${HOMEBREW_SHELLENV_LOADED:-}" ] && [ -x "{{ .homebrewPrefix }}/bin/bre
     eval "$({{ .homebrewPrefix }}/bin/brew shellenv)"
     export HOMEBREW_SHELLENV_LOADED=1
 fi
+
+# 중첩 로그인 셸은 shellenv를 건너뛰고, path_helper는 시스템 경로를 앞으로 옮긴다.
+# 이때도 Homebrew 명령이 시스템 명령보다 먼저 오도록 한다.
+if [ -d "{{ .homebrewPrefix }}/bin" ]; then
+    path=("{{ .homebrewPrefix }}/bin" "{{ .homebrewPrefix }}/sbin" "${path[@]}")
+    typeset -U path
+    export PATH
+fi
 {{ end }}
 
 case ":$PATH:" in

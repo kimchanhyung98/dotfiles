@@ -43,6 +43,21 @@ path_entries="$(printf '%s\n' "$path_value" | tr ':' '\n')"
 test "$(printf '%s\n' "$path_entries" | grep -cxF "$homebrew_prefix/bin")" = "1"
 test "$(printf '%s\n' "$path_entries" | grep -cxF "$test_home/.local/bin")" = "1"
 
+# shellenv를 건너뛰는 중첩 로그인 셸에서도 Homebrew가 시스템 경로보다 앞에 온다.
+nested_path="$(
+    env -i HOME="$test_home" HOMEBREW_SHELLENV_LOADED=1 \
+        PATH="/usr/bin:/bin:$homebrew_prefix/bin" zsh -fc '
+            source "$HOME/.config/zsh/20-path.zsh"
+            print -r -- "$PATH"
+        '
+)"
+test "$(cat "$brew_count")" = "1"
+nested_entries="$(printf '%s\n' "$nested_path" | tr ':' '\n')"
+test "$(printf '%s\n' "$nested_entries" | grep -cxF "$homebrew_prefix/bin")" = "1"
+homebrew_line="$(printf '%s\n' "$nested_entries" | grep -nxF "$homebrew_prefix/bin" | cut -d: -f1)"
+system_line="$(printf '%s\n' "$nested_entries" | grep -nxF "/usr/bin" | cut -d: -f1)"
+test "$homebrew_line" -lt "$system_line"
+
 rm -f "$homebrew_prefix/bin/brew"
 missing_brew_stderr="$test_home/missing-brew.stderr"
 env -i HOME="$test_home" PATH="/usr/bin:/bin" \
