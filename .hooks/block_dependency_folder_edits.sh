@@ -18,8 +18,15 @@ extract_paths() {
 }
 
 payload="$(cat)"
+cwd="$(printf '%s\n' "$payload" | jq -r '.cwd // empty')"
+[ -n "$cwd" ] || cwd="$PWD"
 while IFS= read -r file_path; do
-  if printf '%s\n' "$file_path" | grep -Eq "$blocked_dir"; then
+  [ -n "$file_path" ] || continue
+  if ! resolved="$(python3 -c 'import os, sys; print(os.path.realpath(os.path.join(sys.argv[2], sys.argv[1])))' "$file_path" "$cwd")"; then
+    deny
+    exit 0
+  fi
+  if printf '%s\n' "$file_path" "$resolved" | grep -Eq "$blocked_dir"; then
     deny
     exit 0
   fi
