@@ -19,3 +19,6 @@ Library/Logs/tokscale-submit.log
 
 # Codex legacy skills path removal (official path is ~/.agents/skills)
 .codex/skills
+
+# 패키지 관리자 래퍼 제거
+.config/zsh/30-functions.zsh

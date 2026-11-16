@@ -1,5 +1,5 @@
 # Brewfile
-# chezmoi로 관리 — 일반 formula는 zerobrew 우선, ruby·xcodes·cask는 Homebrew, zerobrew 실패 시 전체 Homebrew 폴백
+# chezmoi로 관리 — formula와 cask 모두 Homebrew로 설치·동기화
 
 # 시스템 CLI 도구
 brew "bash"               # Bash 셸
@@ -23,7 +23,7 @@ brew "zsh"                # Zsh 셸
 brew "act"          # GitHub Actions 로컬 실행
 brew "awscli"       # AWS CLI
 brew "direnv"       # 디렉토리별 환경 변수
-brew "dopplerhq/cli/doppler"  # 시크릿 관리 CLI
+brew "doppler"      # 시크릿 관리 CLI
 brew "fswatch"      # 파일시스템 이벤트 모니터
 brew "fzf"          # 퍼지 파인더
 brew "ripgrep"      # 빠른 텍스트 검색 (rg)

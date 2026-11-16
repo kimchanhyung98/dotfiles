@@ -33,9 +33,9 @@ script phase는 파일명의 `before_`/`after_`가 우선한다. 번호는 같�
 
 | 순서 | 스크립트 | phase | 역할 | 실행 조건 | 상세 |
 |:--:|---|---|---|---|---|
-| 01 | prerequisites | before | Xcode CLI, Homebrew, zerobrew, Rosetta, GitHub SSH host keys | 최초 1회 | Xcode Command Line Tools와 Homebrew를 준비하고, 셸 설정을 변경하지 않도록 zerobrew installer를 실행한다. Apple Silicon이면 Rosetta 2를 설치하고 GitHub SSH host key를 검증해 등록한다. |
+| 01 | prerequisites | before | Xcode CLI, Homebrew, Rosetta, GitHub SSH host keys | 최초 1회 | Xcode Command Line Tools와 Homebrew를 준비한다. Apple Silicon이면 Rosetta 2를 설치하고 GitHub SSH host key를 검증해 등록한다. |
 | 02 | macos-settings | after | Dock, Finder, Keyboard, Trackpad, Screenshot | 매번 적용 시 | managed target 배포 뒤 macOS 설정과 배경화면을 다시 적용하고 Dock·Finder·SystemUIServer를 재시작한다. |
-| 03 | brew-packages | regular | Brewfile 기반 패키지 설치·upgrade | Brewfile 변경 시 | zerobrew 대상 formula를 먼저 동기화하고 `ruby`·`xcodes`·cask는 Homebrew로 처리한다. zerobrew가 없거나 실패하면 전체 Brewfile을 `brew bundle`로 폴백하며, 최종 check 실패는 non-zero다. 자동 cleanup은 하지 않는다. |
+| 03 | brew-packages | regular | Brewfile 기반 패키지 설치·upgrade | Brewfile 변경 시 | 전체 Brewfile을 `brew bundle`로 동기화하며, 최종 check 실패는 non-zero다. 자동 cleanup은 하지 않는다. |
 | 05 | app-settings | after | Rectangle, Stats 설정 import | 설정 변경 시 | Rectangle import 파일을 앱 지원 경로에 복사하고, Stats plist는 remote credential을 보존한 뒤 import한다. Stats의 버전·확인·지원 시각은 배포 파일에서 제외하며, 선언하지 않은 로컬 값은 `defaults import`가 보존한다. |
 | 05 | runtime | regular | Bun | 최초 1회 | Node.js는 Brewfile에서 관리하고 Bun은 공식 installer로 별도 설치한다. |
 | 07 | tokscale-launchd | after | tokscale LaunchAgent 등록·갱신 | 설정 변경 시 | 3일마다 로컬 14:00에 실행한다. |
@@ -114,8 +114,9 @@ native Linux의 지원 범위는 Ubuntu 26.04 LTS다. GitHub Codespaces는 under
 
 ## Brewfile 패키지
 
-Brewfile은 `zb init --no-modify-path`로 chezmoi 관리 셸 파일을 건드리지 않고 초기화한 뒤, `zb list`로 확인한 설치 formula 중 zerobrew용 Brewfile에 남아 있는 항목만 `zb upgrade`하고 `zb bundle install`로 누락 formula를 추가한다. `zb bundle install`은 기존 버전의 symlink를 교체하지 못하므로 버전 교체는 `zb upgrade`가 담당한다. Intel macOS에서 Mach-O의 `/usr/local` 경로를 더 긴 zerobrew prefix로 치환하지 못하는 zerobrew#286의 영향을 받는 `ruby`, zerobrew 소스 빌드가 실패하는 `xcodes`, zerobrew가 binary artifact만 제한적으로 지원하는 cask는 zerobrew 대상에서 제외하고 Homebrew가 담당한다. zerobrew 동기화가 성공하면 이 Homebrew 전용 항목만 별도 Brewfile로 처리하고, zerobrew가 없거나 실패하면 전체 Brewfile을 Homebrew로 폴백한다. 이미 설치된 `xcodes`는 Homebrew 실행에서 제외해 bottle 없는 release로의 upgrade 실패를 피한다. 전체 Homebrew 폴백의 사후 검증은 보류 중인 upgrade가 아니라 설치 여부만 확인한다. Brewfile에서 빠진 package 제거는 별도 cleanup 명령 없이는 수행하지 않는다.
-Homebrew 폴백은 `brew trust --formula dopplerhq/cli/doppler`로 Doppler formula를 신뢰한 뒤 bundle을 실행한다. Doppler는 최초 프로젝트 `.env` 동기화에 필요하므로 설치 검사에서 제외하지 않는다.
+Brewfile의 formula와 cask는 모두 Homebrew로 설치·동기화한다. `brew bundle`은 누락 패키지를 설치하고 기존 패키지를 갱신한다. 이미 설치된 `xcodes`는 bottle 없는 release로의 upgrade 실패를 피하기 위해 제외한다. 이후 `brew bundle check --no-upgrade`로 설치 여부를 확인하며, 실패하면 apply도 실패한다. Brewfile에서 빠진 package는 별도 cleanup 명령 없이는 제거하지 않는다.
+
+Doppler는 homebrew/core의 `doppler` formula로 설치한다. `dopplerhq/cli` tap은 formula를 cask로 옮겼으므로 사용하지 않는다. Doppler는 최초 프로젝트 `.env` 동기화에 필요하므로 설치 검사에서 제외하지 않는다.
 Orca는 공식 `stablyai/orca` tap의 `stablyai/orca/orca` cask로 설치한다. bundle 실행 전에 해당 tap을 등록하고 `brew trust --cask stablyai/orca/orca`로 이 cask만 신뢰한다. 기본 `orca` cask는 Plotly 앱이므로 사용하지 않는다. Orca cask가 앱과 `orca` CLI를 함께 설치하므로 별도 PATH 설정은 필요 없다.
 AI 도구는 설치 채널 정책에 따라 AI 스크립트에서 관리한다. 단, macOS Copilot CLI는 공식 Homebrew cask를 사용한다. Claude/Codex만 필수 baseline이며 나머지는 선택 도구다.
 

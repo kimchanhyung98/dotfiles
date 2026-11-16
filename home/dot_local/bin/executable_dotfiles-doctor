@@ -147,7 +147,6 @@ check_version_optional "ruby" "ruby --version"
 # Package Managers
 section "Package Managers"
 check_optional "brew" "command -v brew"
-check_optional "zb" "command -v zb"
 check_optional "pipx" "command -v pipx"
 check_optional "bun" "command -v bun"
 check "doppler" "command -v doppler"

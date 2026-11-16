@@ -92,6 +92,7 @@ macOS suite는 임시 HOME에서 다음을 확인한다.
 - managed template 렌더링과 apply dry-run
 - AI 도구 설정 렌더 결과와 Codex 템플릿·배포 파일의 일치
 - cmux, Rectangle, Stats와 Brewfile 관련 설정
+- Homebrew의 전체 Brewfile 동기화, 기존 xcodes 보존과 설치·검사 실패 처리
 - Stats 설정 적용 시 실행 기록·인증 정보 보존과 신규 설치 시 과거 기록 미생성
 - 원격 변경 없는 반복 업데이트에서 macOS 설정 복원, 배경화면 지정과 관련 프로세스 재시작
 - Orca 플러그인의 누락 설치, 기존 상태 보존, 앱 연결과 승인·오류 처리

@@ -6,14 +6,14 @@ if [ -z "${HOMEBREW_SHELLENV_LOADED:-}" ] && [ -x "{{ .homebrewPrefix }}/bin/bre
     export HOMEBREW_SHELLENV_LOADED=1
 fi
 
-# zerobrew를 Homebrew보다 앞에 둔다. zerobrew에 없는 명령은 뒤쪽 Homebrew 경로로 폴백된다.
-zerobrew_bin="${ZEROBREW_PREFIX:-/opt/zerobrew}/bin"
-if [ -d "$zerobrew_bin" ]; then
-    path=("$zerobrew_bin" "${path[@]}")
+# 중첩 로그인 셸은 shellenv를 건너뛰고, path_helper는 시스템 경로를 앞으로 옮긴다.
+# 로그인 셸은 첫 셸과 같은 ~/.local/bin, Homebrew, 시스템 경로 순서로 되돌린다.
+# 비로그인 하위 셸은 부모의 PATH 순서를 그대로 쓴다.
+if [[ -o login ]] && [ -d "{{ .homebrewPrefix }}/bin" ]; then
+    path=("$HOME/.local/bin" "{{ .homebrewPrefix }}/bin" "{{ .homebrewPrefix }}/sbin" "${path[@]}")
     typeset -U path
     export PATH
 fi
-unset zerobrew_bin
 {{ end }}
 
 case ":$PATH:" in

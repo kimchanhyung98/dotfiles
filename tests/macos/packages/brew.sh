@@ -12,9 +12,8 @@ homebrew_prefix="$test_home/homebrew"
 fake_bin="$test_home/.local/bin"
 call_log="$test_home/calls.log"
 bundle_state="$test_home/bundle-satisfied"
-homebrew_only_state="$test_home/homebrew-only-satisfied"
-tap_state="$test_home/doppler-tapped"
-trust_state="$test_home/doppler-trusted"
+tap_state="$test_home/orca-tapped"
+trust_state="$test_home/orca-trusted"
 outdated_state="$test_home/outdated-package"
 mkdir -p "$homebrew_prefix/bin" "$fake_bin"
 configure_chezmoi_test_home "$test_home" "$homebrew_prefix"
@@ -29,6 +28,7 @@ case "${1:-}" in
         ;;
     bundle)
         if [ "${2:-}" = "check" ]; then
+            test "${BREW_FAIL:-}" != "check"
             test -f "$BUNDLE_STATE"
             if [[ " $* " != *" --no-upgrade "* ]]; then
                 test ! -f "$OUTDATED_STATE"
@@ -42,7 +42,7 @@ case "${1:-}" in
             done
             test -f "$bundle_file"
             if [[ " $* " == *" --no-upgrade "* ]]; then
-                echo 'brew bundle fallback must preserve normal upgrades' >&2
+                echo 'brew bundle must preserve normal upgrades' >&2
                 exit 1
             fi
             if [ "${XCODES_INSTALLED:-1}" = "1" ]; then
@@ -54,25 +54,14 @@ case "${1:-}" in
             grep -q '^brew "xcodes"' "$bundle_file"
             grep -q '^cask "ghostty"' "$bundle_file"
             grep -q '^cask "stablyai/orca/orca"' "$bundle_file"
-            test -f "${TAP_STATE}.orca"
-            test -f "${TRUST_STATE}.orca"
-            if grep -q '^brew "git"' "$bundle_file"; then
-                grep -q '^brew "dopplerhq/cli/doppler"' "$bundle_file"
-                test -f "$TRUST_STATE"
-                printf 'brew bundle full\n' >> "$CALL_LOG"
-                rm -f "$OUTDATED_STATE"
-                touch "$BUNDLE_STATE"
-            else
-                test "$(grep -c '^brew ' "$bundle_file")" = "2"
-                if grep -q '^brew "dopplerhq/cli/doppler"' "$bundle_file"; then
-                    echo 'Homebrew-only Brewfile contains a zerobrew formula' >&2
-                    exit 1
-                fi
-                test ! -f "$TAP_STATE"
-                test ! -f "$TRUST_STATE"
-                printf 'brew bundle homebrew-only\n' >> "$CALL_LOG"
-                touch "$HOMEBREW_ONLY_STATE"
-            fi
+            test -f "$TAP_STATE"
+            test -f "$TRUST_STATE"
+            grep -q '^brew "git"' "$bundle_file"
+            grep -q '^brew "doppler"' "$bundle_file"
+            printf 'brew bundle full\n' >> "$CALL_LOG"
+            test "${BREW_FAIL:-}" != "bundle"
+            rm -f "$OUTDATED_STATE"
+            touch "$BUNDLE_STATE"
         fi
         ;;
     list)
@@ -83,34 +72,22 @@ case "${1:-}" in
         ;;
     tap)
         case "${2:-}" in
-            dopplerhq/cli)
-                printf 'brew tap\n' >> "$CALL_LOG"
-                if [ ! -f "$TAP_STATE" ]; then
-                    rm -f "$TRUST_STATE"
-                    touch "$TAP_STATE"
-                fi
-                ;;
             stablyai/orca)
                 printf 'brew tap orca\n' >> "$CALL_LOG"
                 test "${ORCA_FAIL:-}" != "tap"
-                touch "${TAP_STATE}.orca"
+                touch "$TAP_STATE"
                 ;;
             *) exit 1 ;;
         esac
         ;;
     trust)
         case "${3:-}" in
-            dopplerhq/cli/doppler)
-                test "${2:-}" = "--formula"
-                printf 'brew trust\n' >> "$CALL_LOG"
-                touch "$TRUST_STATE"
-                ;;
             stablyai/orca/orca)
                 test "${2:-}" = "--cask"
-                test -f "${TAP_STATE}.orca"
+                test -f "$TAP_STATE"
                 printf 'brew trust orca\n' >> "$CALL_LOG"
                 test "${ORCA_FAIL:-}" != "trust"
-                touch "${TRUST_STATE}.orca"
+                touch "$TRUST_STATE"
                 ;;
             *) exit 1 ;;
         esac
@@ -120,228 +97,70 @@ esac
 EOF
 cat > "$fake_bin/zb" <<'EOF'
 #!/usr/bin/env sh
-
-case "${1:-}" in
-    init)
-        test "${2:-}" = "--no-modify-path"
-        printf 'zb init\n' >> "$CALL_LOG"
-        ;;
-    list)
-        printf 'zb list\n' >> "$CALL_LOG"
-        if [ "${ZB_LIST_EMPTY:-0}" = "1" ]; then
-            printf 'No formulas installed.\n'
-        elif [ "${ZB_LIST_DISJOINT:-0}" = "1" ]; then
-            printf 'manual-only 1.0.0\ncask:ghostty 1.0.0\n'
-        else
-            printf 'git 2.50.1\nruby 4.0.6\npkgconf 3.0.4\nmanual-only 1.0.0\ncask:ghostty 1.0.0\nxcodes 1.6.0\n'
-        fi
-        ;;
-    upgrade)
-        shift
-        printf 'zb upgrade %s\n' "$*" >> "$CALL_LOG"
-        if [ "$*" != "git pkgconf" ]; then
-            echo "unexpected zerobrew upgrade targets: $*" >&2
-            exit 1
-        fi
-        ;;
-    bundle)
-        test "${2:-}" = "install"
-        test "${3:-}" = "-f"
-        test -f "${4:-}"
-        if grep -Eq '^brew "(ruby|xcodes)"' "${4:-}"; then
-            echo 'zerobrew Brewfile contains a Homebrew-only formula' >&2
-            exit 1
-        fi
-        grep -q '^brew "git"' "${4:-}"
-        grep -q '^brew "dopplerhq/cli/doppler"' "${4:-}"
-        if grep -q '^cask ' "${4:-}"; then
-            echo 'zerobrew Brewfile contains a Homebrew-only cask' >&2
-            exit 1
-        fi
-        printf 'zb bundle\n' >> "$CALL_LOG"
-        if [ "${ZB_FAIL:-0}" = "1" ]; then
-            exit 1
-        fi
-        ;;
-esac
-exit 0
+printf 'unexpected zb %s\n' "$*" >> "$CALL_LOG"
+exit 1
 EOF
 chmod +x "$homebrew_prefix/bin/brew" "$fake_bin/zb"
-touch "$outdated_state"
 
 rendered="$test_home/brew-packages.sh"
 run_chezmoi "$test_home" execute-template \
     < "$repo_dir/home/.chezmoiscripts/darwin/run_onchange_03-brew-packages.sh.tmpl" \
     > "$rendered"
 
-PATH="/usr/bin:/bin" \
-HOME="$test_home" \
-ZEROBREW_PREFIX="$test_home/absent-zerobrew" \
-HOMEBREW_PREFIX="$homebrew_prefix" \
-BUNDLE_STATE="$bundle_state" \
-HOMEBREW_ONLY_STATE="$homebrew_only_state" \
-TAP_STATE="$tap_state" \
-TRUST_STATE="$trust_state" \
-OUTDATED_STATE="$outdated_state" \
-CALL_LOG="$call_log" \
-    bash "$rendered" >/dev/null
+run_sync() {
+    HOME="$test_home" PATH="$fake_bin:/usr/bin:/bin" \
+        HOMEBREW_PREFIX="$homebrew_prefix" \
+        BUNDLE_STATE="$bundle_state" TAP_STATE="$tap_state" \
+        TRUST_STATE="$trust_state" OUTDATED_STATE="$outdated_state" \
+        CALL_LOG="$call_log" bash "$rendered"
+}
 
-test "$(sed -n '1p' "$call_log")" = 'zb init'
-test "$(sed -n '2p' "$call_log")" = 'zb list'
-test "$(sed -n '3p' "$call_log")" = 'zb upgrade git pkgconf'
-test "$(sed -n '4p' "$call_log")" = 'zb bundle'
-test "$(sed -n '5p' "$call_log")" = 'brew tap orca'
-test "$(sed -n '6p' "$call_log")" = 'brew trust orca'
-test "$(sed -n '7p' "$call_log")" = 'brew bundle homebrew-only'
-test "$(wc -l < "$call_log" | tr -d ' ')" = "7"
-test ! -f "$bundle_state"
-test -f "$homebrew_only_state"
-test -f "$outdated_state"
+# 기존 xcodes는 유지하고, 새 설치에서는 전체 Brewfile에 포함한다.
+for xcodes_installed in 0 1; do
+    : > "$call_log"
+    rm -f "$bundle_state" "$tap_state" "$trust_state"
+    touch "$outdated_state"
+    XCODES_INSTALLED="$xcodes_installed" run_sync >/dev/null
+    test "$(sed -n '1p' "$call_log")" = 'brew tap orca'
+    test "$(sed -n '2p' "$call_log")" = 'brew trust orca'
+    test "$(sed -n '3p' "$call_log")" = 'brew bundle full'
+    test "$(wc -l < "$call_log" | tr -d ' ')" = "3"
+    test -f "$bundle_state"
+    test ! -f "$outdated_state"
+done
 
-: > "$call_log"
-rm -f "$homebrew_only_state"
-custom_zerobrew_prefix="$test_home/custom-zerobrew"
-mkdir -p "$custom_zerobrew_prefix/bin"
-cp "$fake_bin/zb" "$custom_zerobrew_prefix/bin/zb"
-PATH="/usr/bin:/bin" \
-HOME="$test_home" \
-ZEROBREW_PREFIX="$custom_zerobrew_prefix" \
-HOMEBREW_PREFIX="$homebrew_prefix" \
-BUNDLE_STATE="$bundle_state" \
-HOMEBREW_ONLY_STATE="$homebrew_only_state" \
-TAP_STATE="$tap_state" \
-TRUST_STATE="$trust_state" \
-OUTDATED_STATE="$outdated_state" \
-CALL_LOG="$call_log" \
-ZB_LIST_EMPTY=1 \
-XCODES_INSTALLED=0 \
-    bash "$rendered" >/dev/null
+# bundle 실행 또는 최종 설치 검사가 실패하면 적용도 실패한다.
+# 패키지가 이미 설치되어 최종 검사가 통과하는 상태에서도 bundle 실패를 숨기지 않는다.
+for brew_fail in bundle check; do
+    : > "$call_log"
+    rm -f "$tap_state" "$trust_state"
+    touch "$bundle_state"
+    if BREW_FAIL="$brew_fail" run_sync >/dev/null 2>&1; then
+        echo "Homebrew $brew_fail failure did not stop package synchronization" >&2
+        exit 1
+    fi
+done
 
-test "$(sed -n '1p' "$call_log")" = 'zb init'
-test "$(sed -n '2p' "$call_log")" = 'zb list'
-test "$(sed -n '3p' "$call_log")" = 'zb bundle'
-test "$(sed -n '4p' "$call_log")" = 'brew tap orca'
-test "$(sed -n '5p' "$call_log")" = 'brew trust orca'
-test "$(sed -n '6p' "$call_log")" = 'brew bundle homebrew-only'
-test "$(wc -l < "$call_log" | tr -d ' ')" = "6"
-test -f "$homebrew_only_state"
-
-# 설치 목록이 비어 있지 않아도 Brewfile과 교집합이 없으면 upgrade를 건너뛴다.
-: > "$call_log"
-rm -f "$homebrew_only_state"
-PATH="/usr/bin:/bin" \
-HOME="$test_home" \
-ZEROBREW_PREFIX="$test_home/absent-zerobrew" \
-HOMEBREW_PREFIX="$homebrew_prefix" \
-BUNDLE_STATE="$bundle_state" \
-HOMEBREW_ONLY_STATE="$homebrew_only_state" \
-TAP_STATE="$tap_state" \
-TRUST_STATE="$trust_state" \
-OUTDATED_STATE="$outdated_state" \
-CALL_LOG="$call_log" \
-ZB_LIST_DISJOINT=1 \
-    bash "$rendered" >/dev/null
-
-test "$(sed -n '1p' "$call_log")" = 'zb init'
-test "$(sed -n '2p' "$call_log")" = 'zb list'
-test "$(sed -n '3p' "$call_log")" = 'zb bundle'
-test "$(sed -n '4p' "$call_log")" = 'brew tap orca'
-test "$(sed -n '5p' "$call_log")" = 'brew trust orca'
-test "$(sed -n '6p' "$call_log")" = 'brew bundle homebrew-only'
-test "$(wc -l < "$call_log" | tr -d ' ')" = "6"
-test -f "$homebrew_only_state"
-
-: > "$call_log"
-rm -f "$homebrew_only_state"
-PATH="/usr/bin:/bin" \
-HOME="$test_home" \
-ZEROBREW_PREFIX="$test_home/absent-zerobrew" \
-HOMEBREW_PREFIX="$homebrew_prefix" \
-BUNDLE_STATE="$bundle_state" \
-HOMEBREW_ONLY_STATE="$homebrew_only_state" \
-TAP_STATE="$tap_state" \
-TRUST_STATE="$trust_state" \
-OUTDATED_STATE="$outdated_state" \
-CALL_LOG="$call_log" \
-ZB_FAIL=1 \
-    bash "$rendered" >/dev/null 2>&1
-
-test "$(sed -n '1p' "$call_log")" = 'zb init'
-test "$(sed -n '2p' "$call_log")" = 'zb list'
-test "$(sed -n '3p' "$call_log")" = 'zb upgrade git pkgconf'
-test "$(sed -n '4p' "$call_log")" = 'zb bundle'
-test "$(sed -n '5p' "$call_log")" = 'brew tap'
-test "$(sed -n '6p' "$call_log")" = 'brew trust'
-test "$(sed -n '7p' "$call_log")" = 'brew tap orca'
-test "$(sed -n '8p' "$call_log")" = 'brew trust orca'
-test "$(sed -n '9p' "$call_log")" = 'brew bundle full'
-test -f "$tap_state"
-test -f "$trust_state"
-test -f "$bundle_state"
-test ! -f "$outdated_state"
-
-: > "$call_log"
-rm -f "$bundle_state" "$tap_state" "$trust_state"
-touch "$outdated_state"
-chmod -x "$fake_bin/zb"
-
-PATH="/usr/bin:/bin" \
-HOME="$test_home" \
-ZEROBREW_PREFIX="$test_home/absent-zerobrew" \
-HOMEBREW_PREFIX="$homebrew_prefix" \
-BUNDLE_STATE="$bundle_state" \
-HOMEBREW_ONLY_STATE="$homebrew_only_state" \
-TAP_STATE="$tap_state" \
-TRUST_STATE="$trust_state" \
-OUTDATED_STATE="$outdated_state" \
-CALL_LOG="$call_log" \
-    bash "$rendered" >/dev/null
-
-test "$(sed -n '1p' "$call_log")" = 'brew tap'
-test "$(sed -n '2p' "$call_log")" = 'brew trust'
-test "$(sed -n '3p' "$call_log")" = 'brew tap orca'
-test "$(sed -n '4p' "$call_log")" = 'brew trust orca'
-test "$(sed -n '5p' "$call_log")" = 'brew bundle full'
-test -f "$bundle_state"
-test ! -f "$outdated_state"
-
-# Orca tap 또는 trust가 실패하면 두 설치 경로 모두 bundle 전에 중단한다.
-chmod +x "$fake_bin/zb"
-for zb_fail in 0 1; do
-    for orca_fail in tap trust; do
-        : > "$call_log"
-        rm -f "$bundle_state" "$homebrew_only_state" "$tap_state" "$trust_state" \
-            "${tap_state}.orca" "${trust_state}.orca"
-        if PATH="/usr/bin:/bin" \
-            HOME="$test_home" \
-            ZEROBREW_PREFIX="$test_home/absent-zerobrew" \
-            HOMEBREW_PREFIX="$homebrew_prefix" \
-            BUNDLE_STATE="$bundle_state" \
-            HOMEBREW_ONLY_STATE="$homebrew_only_state" \
-            TAP_STATE="$tap_state" \
-            TRUST_STATE="$trust_state" \
-            OUTDATED_STATE="$outdated_state" \
-            CALL_LOG="$call_log" \
-            ZB_FAIL="$zb_fail" \
-            ORCA_FAIL="$orca_fail" \
-                bash "$rendered" >/dev/null 2>&1; then
-            echo "Orca $orca_fail failure did not stop package synchronization" >&2
-            exit 1
-        fi
-        grep -Fxq 'brew tap orca' "$call_log"
-        if [ "$orca_fail" = "trust" ]; then
-            grep -Fxq 'brew trust orca' "$call_log"
-        elif grep -Fxq 'brew trust orca' "$call_log"; then
-            echo 'Orca trust ran after tap failed' >&2
-            exit 1
-        fi
-        if grep -q '^brew bundle ' "$call_log"; then
-            echo 'Homebrew bundle ran after Orca setup failed' >&2
-            exit 1
-        fi
-        test ! -f "$bundle_state"
-        test ! -f "$homebrew_only_state"
-    done
+# Orca tap 또는 trust가 실패하면 bundle 전에 중단한다.
+for orca_fail in tap trust; do
+    : > "$call_log"
+    rm -f "$bundle_state" "$tap_state" "$trust_state"
+    if ORCA_FAIL="$orca_fail" run_sync >/dev/null 2>&1; then
+        echo "Orca $orca_fail failure did not stop package synchronization" >&2
+        exit 1
+    fi
+    grep -Fxq 'brew tap orca' "$call_log"
+    if [ "$orca_fail" = "trust" ]; then
+        grep -Fxq 'brew trust orca' "$call_log"
+    elif grep -Fxq 'brew trust orca' "$call_log"; then
+        echo 'Orca trust ran after tap failed' >&2
+        exit 1
+    fi
+    if grep -q '^brew bundle ' "$call_log"; then
+        echo 'Homebrew bundle ran after Orca setup failed' >&2
+        exit 1
+    fi
+    test ! -f "$bundle_state"
 done
 
 grep -Fq 'brew "pkgconf"' "$repo_dir/home/Brewfile"
