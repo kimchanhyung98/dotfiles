@@ -40,7 +40,7 @@ script phase는 파일명의 `before_`/`after_`가 우선한다. 번호는 같�
 | 05 | runtime | regular | Bun | 최초 1회 | Node.js는 Brewfile에서 관리하고 Bun은 공식 installer로 별도 설치한다. |
 | 07 | tokscale-launchd | after | tokscale LaunchAgent 등록·갱신 | 설정 변경 시 | 3일마다 로컬 14:00에 실행한다. |
 | 08 | dotfiles-update-launchd | after | dotfiles update LaunchAgent 등록·갱신 | 설정 변경 시 | 시스템 시간대가 Asia/Seoul일 때 매월 1일과 16일 한국 시간 12:00에 실행한다. 예약 업데이트 중에는 주 업데이트가 종료된 뒤 독립 작업이 LaunchAgent를 재등록한다. |
-| 09 | openusage | after | OpenUsage 설치·설정 import | 설정 변경 시 | Homebrew cask 대신 GitHub 최신 릴리스 dmg를 설치하고(동일 버전이면 skip), baseline plist를 `defaults import`로 덮어쓴 뒤 앱을 재실행한다. 설치는 best-effort로, 실패 시 warning만 남기고 설정 import는 계속한다. |
+| 09 | egasu | after | egasu 최초 설치·설정 import | 스크립트·설정 변경 시 | 앱이 없을 때만 `kimchanhyung98/egasu`의 최신 정식 릴리스를 설치한다. bundle ID가 같은 이전 이름의 `OpenUsage.app`이 있으면 설치하지 않는다. 그 앱은 인앱 업데이트가 `egasu.app`으로 바꾼다. `~/.config/egasu/egasu.plist`를 import한 뒤 `egasu.app`이 있으면 재실행한다. 업데이트·베타 선택은 인앱에서 관리한다. 설치 실패 시 warning을 남기고 설정 적용은 계속하며, 다음 스크립트·설정 변경 시 설치를 재시도한다. |
 | 10 | orca-plugins | after | Orca 공식 플러그인 7개 설치 | 최초 적용 및 스크립트 변경 시 | 로컬 Orca가 실행 중이 아니면 앱을 열고 연결을 기다린다. 누락 플러그인만 설치한다. 승인 대기·설치 실패 시 나머지 항목을 처리한 뒤 non-zero로 종료하여 다음 apply에서 재시도한다. |
 
 > cmux 외부 자동화 제어는 별도 스크립트 없이 `~/.config/cmux/cmux.json`(`automation.socketControlMode=allowAll`)을 선언적으로 배포하여 기본 활성화한다. cmux 0.64+는 이 파일을 정식 설정 경로로 읽으며, 과거 `defaults write com.cmuxterm.app socketControlMode` 방식은 폐기되었다.
@@ -89,7 +89,7 @@ script phase는 파일명의 `before_`/`after_`가 우선한다. 번호는 같�
    - mattpocock-skills
    - projects-bootstrap
    - macos-settings, app-settings
-   - tokscale-launchd, dotfiles-update-launchd, openusage, orca-plugins, manual-install
+   - tokscale-launchd, dotfiles-update-launchd, egasu, orca-plugins, manual-install
 ```
 
 `app-settings`와 두 LaunchAgent 등록 스크립트는 앞 phase에서 배포된 target을 사용한다. 예약 작업은 다음 실행 시각을 결정하기 위한 성공 시각이나 cache를 따로 저장하지 않으며 calendar가 실행 시각을 결정한다. dotfiles 실행 로그는 진단용이며 예약 시각 계산에 사용하지 않는다. external의 `168h`는 예약 주기가 아니라 chezmoi command가 상태를 읽을 때 refresh 여부를 판단하는 cache 최소 age다.
