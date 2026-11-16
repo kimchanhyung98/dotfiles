@@ -160,7 +160,28 @@ for failure in download copy bundle; do
     grep -Fq '[egasu][warning] install failed; skip' "$test_home/failure.log"
     test ! -e "$test_app"
     test -z "$(find "$test_home/Applications" -name '.egasu-install.*' -print)"
+    grep -q '^defaults:import ' "$call_log"
+    if grep -q '^open:' "$call_log"; then
+        echo 'egasu setup launched an app that was not installed' >&2
+        exit 1
+    fi
 done
+
+# bundle ID가 같은 이전 이름의 앱은 인앱 업데이트가 egasu로 바꾸므로 따로 설치하지 않는다.
+legacy_app="$test_home/Applications/OpenUsage.app"
+mkdir -p "$legacy_app/Contents"
+cp "$info_plist" "$legacy_app/Contents/Info.plist"
+: > "$call_log"
+run_installer > "$test_home/legacy-run.log" 2>&1
+grep -Fq '[egasu] legacy OpenUsage.app found' "$test_home/legacy-run.log"
+test ! -e "$test_app"
+if grep -Eq '^(curl|hdiutil|ditto|open):' "$call_log"; then
+    echo 'egasu was installed or launched next to a legacy OpenUsage app' >&2
+    exit 1
+fi
+grep -q '^defaults:import ' "$call_log"
+# bundle ID가 다른 OpenUsage 앱은 별개의 앱이므로 설치를 막지 않는다.
+plutil -replace CFBundleIdentifier -string com.robinebers.openusage "$legacy_app/Contents/Info.plist"
 
 : > "$call_log"
 EGASU_OPEN_STATUS=1 run_installer > "$test_home/first-run.log" 2>&1
@@ -183,6 +204,7 @@ for installed_version in 0.1.0 1.0.0 2.0.0-beta.1; do
         echo 'egasu checked or replaced an existing installation' >&2
         exit 1
     fi
+    grep -Fq "open:-g $test_app" "$call_log"
     test "$(plutil -extract CFBundleShortVersionString raw -o - "$test_app/Contents/Info.plist")" = "$installed_version"
     test "$(cat "$test_app/preserved")" = 'installed app'
     test "$(plutil -extract betaUpdatesEnabled raw -o - "$defaults_plist")" = true

@@ -12,6 +12,7 @@ set -eufo pipefail
 echo "[egasu][start]"
 
 app="/Applications/egasu.app"
+legacy_app="${app%/*}/OpenUsage.app"
 config="$HOME/.config/egasu/egasu.plist"
 repo="kimchanhyung98/egasu"
 work_dir=""
@@ -33,6 +34,9 @@ install_egasu() {
 
 if [ -e "$app" ] || [ -L "$app" ]; then
     echo "[egasu] already installed; updates are managed in-app"
+elif [ "$(/usr/bin/plutil -extract CFBundleIdentifier raw -o - "$legacy_app/Contents/Info.plist" 2>/dev/null)" = "com.kimchanhyung98.openusage" ]; then
+    # 인앱 업데이트가 이 앱을 egasu.app으로 바꾼다. 옆에 따로 설치하면 그 전환이 실패한다.
+    echo "[egasu] legacy OpenUsage.app found; the in-app update renames it"
 else
     latest=""
     if release_url="$(curl -fsSL -o /dev/null -w '%{url_effective}' "https://github.com/$repo/releases/latest")"; then
