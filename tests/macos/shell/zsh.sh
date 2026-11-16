@@ -43,10 +43,10 @@ path_entries="$(printf '%s\n' "$path_value" | tr ':' '\n')"
 test "$(printf '%s\n' "$path_entries" | grep -cxF "$homebrew_prefix/bin")" = "1"
 test "$(printf '%s\n' "$path_entries" | grep -cxF "$test_home/.local/bin")" = "1"
 
-# shellenv를 건너뛰는 중첩 로그인 셸에서도 Homebrew가 시스템 경로보다 앞에 온다.
+# shellenv를 건너뛰는 중첩 로그인 셸은 path_helper가 바꾼 순서를 첫 셸과 같게 되돌린다.
 nested_path="$(
     env -i HOME="$test_home" HOMEBREW_SHELLENV_LOADED=1 \
-        PATH="/usr/bin:/bin:$homebrew_prefix/bin" zsh -fc '
+        PATH="/usr/bin:/bin:$homebrew_prefix/bin:$test_home/.local/bin" zsh -flc '
             source "$HOME/.config/zsh/20-path.zsh"
             print -r -- "$PATH"
         '
@@ -54,9 +54,22 @@ nested_path="$(
 test "$(cat "$brew_count")" = "1"
 nested_entries="$(printf '%s\n' "$nested_path" | tr ':' '\n')"
 test "$(printf '%s\n' "$nested_entries" | grep -cxF "$homebrew_prefix/bin")" = "1"
+test "$(printf '%s\n' "$nested_entries" | grep -cxF "$test_home/.local/bin")" = "1"
+local_line="$(printf '%s\n' "$nested_entries" | grep -nxF "$test_home/.local/bin" | cut -d: -f1)"
 homebrew_line="$(printf '%s\n' "$nested_entries" | grep -nxF "$homebrew_prefix/bin" | cut -d: -f1)"
 system_line="$(printf '%s\n' "$nested_entries" | grep -nxF "/usr/bin" | cut -d: -f1)"
+test "$local_line" -lt "$homebrew_line"
 test "$homebrew_line" -lt "$system_line"
+
+# 비로그인 하위 셸은 venv 등 부모가 정한 PATH 순서를 바꾸지 않는다.
+subshell_input="$test_home/venv/bin:$homebrew_prefix/bin:$test_home/.local/bin:/usr/bin:/bin"
+subshell_path="$(
+    env -i HOME="$test_home" HOMEBREW_SHELLENV_LOADED=1 PATH="$subshell_input" zsh -fc '
+        source "$HOME/.config/zsh/20-path.zsh"
+        print -r -- "$PATH"
+    '
+)"
+test "$subshell_path" = "$subshell_input"
 
 rm -f "$homebrew_prefix/bin/brew"
 missing_brew_stderr="$test_home/missing-brew.stderr"
