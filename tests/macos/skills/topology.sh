@@ -17,6 +17,7 @@ grep -Fqx 'disable-model-invocation: true' "$skill_dir/SKILL.md"
 grep -Fq '$i-have-adhd in Codex for the current turn' "$skill_dir/SKILL.md"
 grep -Fqx '  allow_implicit_invocation: false' "$skill_dir/agents/openai.yaml"
 test ! -e "$skill_dir/agents/gemini.toml"
+grep -Fqx 'name: modern-web-guidance' "$test_home/.skills/modern-web-guidance/SKILL.md"
 
 for target in \
     .claude/CLAUDE.md \
@@ -35,6 +36,8 @@ for target in \
     .skills/i-have-adhd/LICENSE \
     .skills/i-have-adhd/SKILL.md \
     .skills/i-have-adhd/agents/openai.yaml \
+    .skills/modern-web-guidance/LICENSE \
+    .skills/modern-web-guidance/SKILL.md \
     .local/bin/mattpocock-skills-sync; do
     grep -Fxq "$target" <<<"$managed"
 done
