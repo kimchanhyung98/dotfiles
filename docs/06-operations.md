@@ -99,5 +99,6 @@ brew bundle cleanup --file="$(chezmoi source-path)/Brewfile"
 - 비밀은 Git/chezmoi source에 저장하지 않는다.
 - `refreshPeriod`는 scheduler가 아니라 external cache age다.
 - `@latest` tokscale 사용은 의도된 정책이다.
+- Modern Web Guidance 스킬의 `@latest` CLI 실행은 upstream 동작을 그대로 수용한다. 스킬 갱신은 `home/dot_skills/modern-web-guidance`의 upstream 사본을 교체하는 commit으로만 한다.
 - 시스템 timezone이 Asia/Seoul이 아닌 머신은 예약 시각 보장 범위 밖이다.
 - 자동 dotfiles update는 dirty source에서 중단한다. 실행 로그는 남기지만 다음 예약 시각을 결정하는 상태는 저장하지 않는다.

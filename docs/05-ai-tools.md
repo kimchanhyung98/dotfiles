@@ -38,6 +38,13 @@ chezmoi는 `home/dot_skills`에 선언된 하위 디렉토리를, `mattpocock-sk
 **스킬 소스**:
 
 - **chezmoi 관리 스킬**: `home/dot_skills/<skill-name>/`에 추가해 `~/.skills/<skill-name>/`로 배포한다. `i-have-adhd`는 upstream commit `cbe69fb83c08a37cf54d5ec9ec6bb88c8bc9973c`의 `SKILL.md`를 Claude/Codex 호출 방식과 적용 범위에 맞게 조정하고, `agents/openai.yaml`과 MIT 라이선스를 가져온다. Claude Code에서는 `/i-have-adhd`로 세션 모드를 시작하고, Codex에서는 매 턴 `$i-have-adhd`를 명시 호출한다.
+- **Modern Web Guidance**: `home/dot_skills/modern-web-guidance/`는 `~/.skills/modern-web-guidance/`로 배포된다. 이 디렉토리는 upstream `GoogleChrome/modern-web-guidance` commit `64a6d708f5a43f2cd3fde5d4d7db3905ba1bdf65`(v1.0.1)의 `skills/modern-web-guidance/SKILL.md`와 Apache-2.0 `LICENSE`를 수정 없이 가져온다.
+  upstream 스킬 디렉토리의 `guides/`는 가져오지 않는다. `SKILL.md`는 로컬 `guides/`를 참조하지 않고, CLI는 자체 npm 패키지에 포함된 guide를 읽는다.
+  스킬은 `npx -y modern-web-guidance@latest`로 CLI를 실행하므로 Node.js 22 이상과 네트워크가 필요하다. macOS는 Brewfile의 `node`가 Node.js를 제공한다. Linux 설치 스크립트는 Node.js를 설치하지 않으므로 호스트 환경에 따른다.
+  CLI는 최신 npm 패키지의 `SKILL.md`가 배포된 `SKILL.md`보다 새로우면 갱신을 안내한다. 경과 일수는 배포된 `SKILL.md`의 `--skill-version` 날짜(현재 2026-11-10)부터 센다. 5일을 넘으면 경고하고, 60일 이상이면 갱신을 강하게 요구한다.
+  갱신하려면 새 upstream commit의 `SKILL.md`와 `LICENSE`를 `home/dot_skills/modern-web-guidance/`에 다시 복사하고 commit한다. 예약 `dotfiles-update`는 upstream 변경을 확인하지 않는다.
+  경고가 안내하는 `npx modern-web-guidance update`, `npx skills add`·`update`, `/plugin install`은 사용하지 않는다. 이 명령은 symlink로 공유하는 `~/.skills`에 관리되지 않는 사본이나 중복 플러그인을 만들 수 있다.
+  CLI는 기본으로 telemetry를 보낸다. 대상은 호출한 agent 이름, guide ID, 검색어다. 끄려면 `DISABLE_TELEMETRY=1`을 설정한다. 이 저장소는 이 변수를 설정하지 않는다.
 - **mattpocock/skills**: 공통 engineering/productivity 후보 스킬은 repo에 직접 포함하지 않는다.
   `~/.local/bin/mattpocock-skills-sync`가 호환되는 upstream tag `v1.0.1`에서 선택한 15개 스킬만 `~/.skills`로 동기화한다.
   `run_onchange_after_06-mattpocock-skills`가 최초 적용 및 스크립트 변경 시 실행한다.
